@@ -23,8 +23,8 @@ return new class extends Migration
         Schema::create('tb_area_parkir', function (Blueprint $table) {
             $table->id('id_area');
             $table->string('nama_area');
-            $table->int('kapasitas');
-            $table->int('terisi');
+            $table->integer('kapasitas');
+            $table->integer('terisi');
         });
 
         Schema::create('tb_transaksi', function (Blueprint $table) {
@@ -35,7 +35,7 @@ return new class extends Migration
             $table->id('id_area');
             $table->datetime('waktu_masuk');
             $table->datetime('waktu_keluar');
-            $table->int('durasi_jam');
+            $table->integer('durasi_jam');
             $table->decimal('biaya_total');
             $table->enum('status', ['masuk', 'keluar']);
         });
