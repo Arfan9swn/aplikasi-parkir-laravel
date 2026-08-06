@@ -7,11 +7,11 @@ Route::get('/', function () {
 });
 
 Route::get('/registrasi', function () {
-    return view('user.registrasi');
+    return view('auth.registrasi');
 });
 
 Route::get('/masuk', function () {
-    return view('user.masuk');
+    return view('auth.masuk');
 });
 
 Route::get('/dashboard', function () {
