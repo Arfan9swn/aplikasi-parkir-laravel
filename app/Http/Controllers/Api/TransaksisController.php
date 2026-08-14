@@ -47,7 +47,6 @@ class TransaksisController extends Controller
 
         $area = parkir_areas::find($request->id_area);
 
-        // Check capacity when vehicle enters
         if ($request->status === 'masuk') {
             if ($area->terisi >= $area->kapasitas) {
                 return response()->json([
@@ -59,13 +58,11 @@ class TransaksisController extends Controller
 
         $data = $request->all();
 
-        // Calculate duration and total fee if waktu_keluar is provided
         if ($request->waktu_keluar) {
             $waktuMasuk = new \DateTime($request->waktu_masuk);
             $waktuKeluar = new \DateTime($request->waktu_keluar);
             $durasi = $waktuMasuk->diff($waktuKeluar);
 
-            // Convert to hours, round up to at least 1 hour
             $durasiJam = max(1, ceil(($durasi->h + ($durasi->i / 60) + ($durasi->s / 3600))));
 
             $tarif = parkir_tarifs::find($request->id_tarif);
@@ -77,7 +74,6 @@ class TransaksisController extends Controller
 
         $transaksi = parkir_transaksis::create($data);
 
-        // Update area capacity
         if ($request->status === 'masuk') {
             $area->increment('terisi');
         } else {
@@ -146,7 +142,6 @@ class TransaksisController extends Controller
 
         $data = $request->all();
 
-        // Recalculate duration and fee if waktu_keluar is being set/updated
         if ($request->has('waktu_keluar') && $request->waktu_keluar) {
             $waktuMasuk = new \DateTime($request->waktu_masuk ?? $transaksi->waktu_masuk);
             $waktuKeluar = new \DateTime($request->waktu_keluar);
@@ -162,7 +157,6 @@ class TransaksisController extends Controller
             $data['biaya_total'] = $biayaTotal;
         }
 
-        // Handle area capacity changes if status or area changes
         if ($request->has('status') && $request->status !== $transaksi->status) {
             $area = parkir_areas::find($request->id_area ?? $transaksi->id_area);
             if ($request->status === 'masuk') {
@@ -195,7 +189,6 @@ class TransaksisController extends Controller
             ], 404);
         }
 
-        // Decrement area capacity if the vehicle was still parked
         if ($transaksi->status === 'masuk') {
             $area = parkir_areas::find($transaksi->id_area);
             if ($area && $area->terisi > 0) {
