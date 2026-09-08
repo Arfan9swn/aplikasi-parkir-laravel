@@ -75,6 +75,54 @@ class AuthController extends Controller
     }
 
     /**
+     * Register a new staff (petugas) account and sign them in.
+     * POST /api/register
+     */
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nama_lengkap' => 'required|string|max:255',
+            'username'     => 'required|string|min:3|max:255|unique:tb_user,username',
+            'password'     => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Self-registration always creates an active staff account —
+        // admin/owner roles can only be granted by an admin via /api/users.
+        $user = parkir_users::create([
+            'nama_lengkap' => $request->nama_lengkap,
+            'username'     => $request->username,
+            'password'     => Hash::make($request->password),
+            'role'         => 'petugas',
+            'status_aktif' => 1,
+        ]);
+
+        $this->logActivity($user, 'Registrasi akun baru');
+
+        // auto-login right after registering
+        $request->session()->put(self::SESSION_KEY, [
+            'id_user'  => $user->id_user,
+            'nama'     => $user->nama_lengkap,
+            'username' => $user->username,
+            'role'     => $user->role,
+        ]);
+
+        $this->logActivity($user, 'Login ke sistem ParkEase');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Registrasi berhasil. Selamat datang, ' . $user->nama_lengkap . '!',
+            'data'    => $request->session()->get(self::SESSION_KEY)
+        ], 201);
+    }
+
+    /**
      * End the session (API).
      * POST /api/logout
      */

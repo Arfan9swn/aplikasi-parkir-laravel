@@ -840,11 +840,57 @@ function login() {
   });
 }
 
+// ============================================================
+// REGISTER — create a petugas account, then auto-login
+// ============================================================
+function register() {
+  const form = $('#register-form');
+  if (!form) return;
+
+  const nama = $('#register-nama');
+  const username = $('#register-username');
+  const password = $('#register-password');
+  const password2 = $('#register-password2');
+  const submit = $('#register-submit');
+
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+
+    const n = nama.value.trim();
+    const u = username.value.trim();
+    const p = password.value;
+    const p2 = password2.value;
+
+    if (!n || !u || !p || !p2) return toast('Semua kolom wajib diisi.', 'err');
+    if (u.length < 3) return toast('Username minimal 3 karakter.', 'err');
+    if (p.length < 8) return toast('Password minimal 8 karakter.', 'err');
+    if (p !== p2) return toast('Konfirmasi password tidak cocok.', 'err');
+
+    setBusy(submit, true, 'Mendaftarkan…');
+    try {
+      const res = await api('/api/register', {
+        method: 'POST',
+        body: {
+          nama_lengkap: n,
+          username: u,
+          password: p,
+          password_confirmation: p2,
+        },
+      });
+      toast(res.message || 'Registrasi berhasil.');
+      setTimeout(() => { window.location.href = '/'; }, 500);
+    } catch (e) {
+      toast(e.message, 'err');
+      setBusy(submit, false);
+    }
+  });
+}
+
 // ------------------------------------------------------------
 // boot
 // ------------------------------------------------------------
 const PAGE = document.body ? document.body.dataset.page : '';
-const PAGES = { beranda, masuk, keluar, transaksi, area, kendaraan, login };
+const PAGES = { beranda, masuk, keluar, transaksi, area, kendaraan, login, register };
 
 startClock();
 

@@ -37,8 +37,11 @@ Route::get('/login', function () {
 Route::post('/logout', [AuthController::class, 'logoutWeb'])->name('logout');
 
 Route::get('/registrasi', function () {
-    return view('auth.registrasi');
-});
+    if (session('auth_user')) {
+        return redirect()->route('beranda');
+    }
+    return view('auth.register');
+})->name('register');
 
 Route::get('/dashboard', function () {
     return view('dashboard.dashboard');

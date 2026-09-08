@@ -61,6 +61,10 @@
                         </form>
                     </div>
                 @else
+                    <a href="{{ route('register') }}"
+                        class="inline-flex items-center rounded-lg border border-primary-200 bg-white px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-50">
+                        Daftar
+                    </a>
                     <a href="{{ route('login') }}"
                         class="inline-flex items-center gap-1.5 rounded-lg bg-primary-500 px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-600">
                         Masuk
