@@ -12,15 +12,9 @@
     <header class="sticky top-0 z-40 border-b border-primary-200/60 bg-white shadow-sm">
         <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 px-4 py-3 sm:px-6">
             <a href="/" class="flex items-center gap-2.5">
-                <span class="grid h-9 w-9 place-items-center rounded-lg bg-primary-500 text-white">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect width="18" height="18" x="3" y="3" rx="2"/>
-                        <path d="M9 17V7h4a3 3 0 0 1 0 6H9"/>
-                    </svg>
-                </span>
-                <span class="leading-tight">
-                    <span class="block text-base font-bold text-primary-700">park.</span>
-                    <span class="block text-[11px] uppercase tracking-widest text-slate-400">Tiket Parkir</span>
+                <span class="leading-1 flex-column">
+                    <span class="block font-bold text-primary-700 text-3xl">park.</span>
+                    <span class="block text-[11px] tracking-widest text-slate-400">tiket parkir.</span>
                 </span>
             </a>
 
