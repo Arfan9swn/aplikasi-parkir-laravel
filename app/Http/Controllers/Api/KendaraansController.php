@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\parkir_kendaraans;
+use App\Models\parkir_transaksis;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -120,6 +121,13 @@ class KendaraansController extends Controller
                 'success' => false,
                 'message' => 'Kendaraan tidak ditemukan'
             ], 404);
+        }
+
+        if (parkir_transaksis::where('id_kendaraan', $kendaraan->id_kendaraan)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kendaraan tidak dapat dihapus karena masih memiliki riwayat transaksi.'
+            ], 422);
         }
 
         $kendaraan->delete();

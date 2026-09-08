@@ -746,23 +746,31 @@ function wireAreaManagement({ modal, form, title, submit, managed, getAreas, ref
 }
 
 // ============================================================
-// VEHICLES — registry with search
+// VEHICLES — registry with search + add / edit / delete
 // ============================================================
 async function kendaraan() {
   const grid = $('#vehicle-grid');
   const input = $('#vehicle-search');
+  const modal = $('#vehicle-modal');
+  const form = $('#vehicle-form');
   let all = [];
   let parkedNow = {};
+  let users = [];
 
-  try {
-    all = (await api('/api/kendaraans')).data || [];
-    const tx = (await api('/api/transaksis')).data || [];
-    tx.filter((t) => t.status === 'masuk').forEach((t) => {
-      parkedNow[t.id_kendaraan] = t;
-    });
-  } catch (e) {
-    toast(e.message, 'err');
-  }
+  const load = async () => {
+    try {
+      all = (await api('/api/kendaraans')).data || [];
+      const tx = (await api('/api/transaksis')).data || [];
+      parkedNow = {};
+      tx.filter((t) => t.status === 'masuk').forEach((t) => {
+        parkedNow[t.id_kendaraan] = t;
+      });
+    } catch (e) {
+      toast(e.message, 'err');
+      return;
+    }
+    render();
+  };
 
   const render = () => {
     const q = normPlate(input ? input.value : '');
@@ -778,6 +786,11 @@ async function kendaraan() {
 
     grid.innerHTML = rows.map((v, i) => {
       const active = parkedNow[v.id_kendaraan];
+      const actions = `
+        <div class="mt-auto flex gap-2 border-t border-primary-50 pt-3">
+          <button type="button" data-edit="${v.id_kendaraan}" class="flex-1 rounded-lg border border-primary-200 bg-white px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-50">Ubah</button>
+          <button type="button" data-del="${v.id_kendaraan}" class="flex-1 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50">Hapus</button>
+        </div>`;
       return `
         <div class="rise flex flex-col gap-3 rounded-2xl border border-primary-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style="animation-delay:${i * 50}ms">
           <div class="flex items-center justify-between">
@@ -793,12 +806,126 @@ async function kendaraan() {
           ${active
             ? `<div class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-0.5 text-[11px] font-semibold"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 live-dot"></span>SEDANG PARKIR · ${esc(ticketNo(active.id_parkir))}</div>`
             : '<span class="text-[11px] text-slate-300">Belum ada tiket aktif</span>'}
+          ${actions}
         </div>`;
     }).join('');
   };
 
-  render();
+  try {
+    users = (await api('/api/users')).data || [];
+  } catch (e) { /* dropdown stays empty */ }
+
+  wireVehicleManagement({ modal, form, getUsers: () => users, getVehicles: () => all, refresh: load });
+
+  await load();
+
   if (input) input.addEventListener('input', render);
+}
+
+// ------------------------------------------------------------
+// vehicle management modal — add / edit / delete
+// ------------------------------------------------------------
+function wireVehicleManagement({ modal, form, getUsers, getVehicles, refresh }) {
+  if (!modal || !form) return;
+
+  const title = $('#vehicle-modal-title');
+  const submit = $('#vehicle-submit');
+
+  const fillUserOptions = (selectedId) => {
+    const sel = $('#vehicle-form-user');
+    if (!sel) return;
+    sel.innerHTML = getUsers()
+      .map((u) => `<option value="${u.id_user}">${esc(u.nama_lengkap || u.username)} · ${esc(u.role)}</option>`)
+      .join('');
+    if (selectedId) {
+      sel.value = selectedId;
+    } else {
+      const def = getUsers().find((u) => u.role === 'petugas' && num(u.status_aktif) === 1) || getUsers()[0];
+      if (def) sel.value = def.id_user;
+    }
+  };
+
+  const openModal = (v = null) => {
+    form.dataset.editing = v ? v.id_kendaraan : '';
+    $('#vehicle-form-plate').value = v ? v.plat_nomor : '';
+    $('#vehicle-form-type').value = v ? v.jenis_kendaraan : 'mobil';
+    $('#vehicle-form-color').value = v && v.warna && v.warna !== '—' ? v.warna : '';
+    $('#vehicle-form-owner').value = v && v.pemilik && v.pemilik !== 'Tanpa nama' ? v.pemilik : '';
+    fillUserOptions(v ? v.id_user : null);
+    if (title) title.textContent = v ? `Ubah Kendaraan — ${v.plat_nomor}` : 'Tambah Kendaraan';
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    $('#vehicle-form-plate').focus();
+  };
+
+  const closeModal = () => {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  };
+
+  $('#vehicle-add')?.addEventListener('click', () => openModal());
+  $('#vehicle-cancel')?.addEventListener('click', closeModal);
+  $('#vehicle-close')?.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+
+    const editingId = form.dataset.editing || '';
+    const plate = normPlate($('#vehicle-form-plate').value);
+    const payload = {
+      id_user: $('#vehicle-form-user').value,
+      plat_nomor: plate,
+      jenis_kendaraan: $('#vehicle-form-type').value,
+      warna: $('#vehicle-form-color').value.trim() || '—',
+      pemilik: $('#vehicle-form-owner').value.trim() || 'Tanpa nama',
+    };
+
+    if (plate.length < 3) return toast('Nomor polisi minimal 3 karakter.', 'err');
+    if (!payload.jenis_kendaraan) return toast('Pilih jenis kendaraan.', 'err');
+    if (!payload.id_user) return toast('Pilih petugas / pemilik data.', 'err');
+    const dup = getVehicles().find((v) => normPlate(v.plat_nomor) === plate && `${v.id_kendaraan}` !== `${editingId}`);
+    if (dup) return toast(`Plat ${plate} sudah terdaftar.`, 'err');
+
+    setBusy(submit, true, 'Menyimpan…');
+    try {
+      const res = editingId
+        ? await api(`/api/kendaraans/${editingId}`, { method: 'PUT', body: payload })
+        : await api('/api/kendaraans', { method: 'POST', body: payload });
+      toast(res.message || 'Data kendaraan tersimpan.');
+      closeModal();
+      await refresh();
+    } catch (e) {
+      toast(e.message, 'err');
+    } finally {
+      setBusy(submit, false);
+    }
+  });
+
+  const grid = $('#vehicle-grid');
+  if (!grid) return;
+  grid.addEventListener('click', async (e) => {
+    const editBtn = e.target.closest('[data-edit]');
+    const delBtn = e.target.closest('[data-del]');
+
+    if (editBtn) {
+      const v = getVehicles().find((x) => `${x.id_kendaraan}` === `${editBtn.dataset.edit}`);
+      if (v) openModal(v);
+    } else if (delBtn) {
+      const v = getVehicles().find((x) => `${x.id_kendaraan}` === `${delBtn.dataset.del}`);
+      if (!v) return;
+      if (!confirm(`Hapus kendaraan "${v.plat_nomor}"?`)) return;
+      setBusy(delBtn, true, '…');
+      try {
+        const res = await api(`/api/kendaraans/${v.id_kendaraan}`, { method: 'DELETE' });
+        toast(res.message || 'Kendaraan dihapus.');
+        await refresh();
+      } catch (err) {
+        toast(err.message, 'err');
+        setBusy(delBtn, false);
+      }
+    }
+  });
 }
 
 // ------------------------------------------------------------

@@ -19,7 +19,7 @@
                     </svg>
                 </span>
                 <span class="leading-tight">
-                    <span class="block text-base font-bold text-primary-700">ParkEase</span>
+                    <span class="block text-base font-bold text-primary-700">park.</span>
                     <span class="block text-[11px] uppercase tracking-widest text-slate-400">Tiket Parkir</span>
                 </span>
             </a>
@@ -70,10 +70,6 @@
                         Masuk
                     </a>
                 @endif
-                <div class="hidden items-center gap-1.5 rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-[11px] font-medium text-primary-700 sm:flex">
-                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 live-dot"></span>
-                    <span class="font-mono" id="nav-clock">--:--:--</span>
-                </div>
                 <button id="nav-toggle" type="button" aria-label="Menu"
                         class="grid h-9 w-9 place-items-center rounded-lg border border-primary-200 text-primary-700 md:hidden">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -87,10 +83,6 @@
     <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         @yield('content', '')
     </main>
-
-    <footer class="border-t border-primary-100 py-6 text-center text-xs text-slate-400">
-        <span class="font-semibold text-primary-600">ParkEase</span> — aplikasi tiket parkir sederhana · dibuat dengan Laravel
-    </footer>
 
     <div id="toast-wrap" class="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2"></div>
 </body>
