@@ -72,7 +72,14 @@ class ApiError extends Error {
 
 async function api(path, opts = {}) {
   const init = { headers: { Accept: 'application/json' }, ...opts };
-  if (opts.body) init.headers['Content-Type'] = 'application/json';
+
+  // Serialize plain-object payloads as JSON. Without this, fetch would send
+  // the literal string "[object Object]", the API would see an empty request
+  // and every "required" validation rule would fail.
+  if (init.body && typeof init.body === 'object' && !(init.body instanceof FormData)) {
+    init.body = JSON.stringify(init.body);
+    init.headers['Content-Type'] = 'application/json';
+  }
 
   let res;
   try {
