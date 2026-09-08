@@ -6,10 +6,6 @@
 @section('content')
     {{-- Banner utama ----------------------------------------------- --}}
     <section class="rounded-2xl bg-primary-500 p-8 shadow-sm sm:p-10">
-        <span class="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white">
-            <span class="h-1.5 w-1.5 rounded-full bg-emerald-300 live-dot"></span>
-            LANGSUNG · Sistem Tiket Parkir
-        </span>
 
         <h1 class="mt-4 text-3xl font-extrabold text-white sm:text-4xl">
             Masuk. Parkir. Bayar &amp; selesai.
