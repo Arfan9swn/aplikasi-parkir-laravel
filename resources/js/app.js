@@ -574,27 +574,43 @@ async function transaksi() {
   });
 }
 // ============================================================
-// AREAS — live occupancy cards
+// AREAS — live occupancy cards + admin/petugas management
 // ============================================================
 async function area() {
   const grid = $('#area-grid');
+  const modal = $('#area-modal');
+  const form = $('#area-form');
+  const title = $('#area-modal-title');
+  const submit = $('#area-submit');
+  const managed = canManageAreas();
   let areas = [];
 
-  try {
-    areas = (await api('/api/areas')).data || [];
-  } catch (e) {
-    toast(e.message, 'err');
-  }
+  const load = async () => {
+    try {
+      areas = (await api('/api/areas')).data || [];
+    } catch (e) {
+      toast(e.message, 'err');
+      return;
+    }
+    render();
+  };
 
-  const spots = areas.reduce((s, a) => s + num(a.kapasitas), 0);
-  const occupied = areas.reduce((s, a) => s + num(a.terisi), 0);
-  const free = Math.max(0, spots - occupied);
-  countUp($('#area-sum-spots'), spots);
-  countUp($('#area-sum-occupied'), occupied);
-  countUp($('#area-sum-free'), free);
+  const render = () => {
+    const spots = areas.reduce((s, a) => s + num(a.kapasitas), 0);
+    const occupied = areas.reduce((s, a) => s + num(a.terisi), 0);
+    const free = Math.max(0, spots - occupied);
+    countUp($('#area-sum-spots'), spots);
+    countUp($('#area-sum-occupied'), occupied);
+    countUp($('#area-sum-free'), free);
 
-  if (!grid) return;
-  grid.innerHTML = areas.map((a, i) => {
+    if (!grid) return;
+    if (!areas.length) {
+      grid.innerHTML =
+        '<div class="rounded-2xl border border-primary-100 bg-white p-10 text-center text-sm text-slate-400 rise">Belum ada area parkir.</div>';
+      return;
+    }
+
+    grid.innerHTML = areas.map((a, i) => {
     const cap = num(a.kapasitas);
     const use = num(a.terisi);
     const pct = cap ? (use / cap) * 100 : 0;
@@ -608,6 +624,12 @@ async function area() {
       chip = '<span class="inline-flex items-center rounded-full bg-amber-100 text-amber-700 px-2.5 py-0.5 text-[11px] font-semibold">HAMPIR PENUH</span>';
       barTone = 'bg-amber-400';
     }
+
+    const actions = managed ? `
+      <div class="mt-auto flex gap-2 border-t border-primary-50 pt-3">
+        <button type="button" data-edit="${a.id_area}" class="flex-1 rounded-lg border border-primary-200 bg-white px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-50">Ubah</button>
+        <button type="button" data-del="${a.id_area}" class="flex-1 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50">Hapus</button>
+      </div>` : '';
 
     return `
       <div class="rise flex flex-col gap-3 rounded-2xl border border-primary-100 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" style="animation-delay:${i * 60}ms">
@@ -628,10 +650,99 @@ async function area() {
           <span class="font-semibold text-primary-700">${fmtInt(use)} <span class="text-xs text-slate-400">dari ${fmtInt(cap)} terisi</span></span>
           <span class="text-slate-500">${Math.max(0, cap - use)} slot kosong</span>
         </div>
+        ${actions}
       </div>`;
   }).join('');
 
-  $$('#area-grid [data-bar]').forEach((b) => setBar(b, num(b.dataset.bar)));
+    $$('#area-grid [data-bar]').forEach((b) => setBar(b, num(b.dataset.bar)));
+  };
+
+  wireAreaManagement({ modal, form, title, submit, managed, getAreas: () => areas, refresh: load });
+
+  await load();
+}
+
+// ------------------------------------------------------------
+// area management modal — add / edit / delete (admin & petugas)
+// ------------------------------------------------------------
+function wireAreaManagement({ modal, form, title, submit, managed, getAreas, refresh }) {
+  if (!managed || !modal || !form) return;
+
+  const openModal = (a = null) => {
+    form.dataset.editing = a ? a.id_area : '';
+    $('#area-form-nama').value = a ? a.nama_area : '';
+    $('#area-form-kapasitas').value = a ? a.kapasitas : '';
+    $('#area-form-terisi').value = a ? a.terisi : 0;
+    if (title) title.textContent = a ? `Ubah Area — ${a.nama_area}` : 'Tambah Area Parkir';
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    $('#area-form-nama').focus();
+  };
+
+  const closeModal = () => {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  };
+
+  $('#area-add')?.addEventListener('click', () => openModal());
+  $('#area-cancel')?.addEventListener('click', closeModal);
+  $('#area-close')?.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+
+    const editingId = form.dataset.editing || '';
+    const payload = {
+      nama_area: $('#area-form-nama').value.trim(),
+      kapasitas: Math.round(num($('#area-form-kapasitas').value)),
+      terisi: Math.round(num($('#area-form-terisi').value)),
+    };
+
+    if (!payload.nama_area) return toast('Nama area wajib diisi.', 'err');
+    if (payload.kapasitas < 1) return toast('Kapasitas minimal 1 slot.', 'err');
+    if (payload.terisi < 0) return toast('Jumlah terisi tidak boleh negatif.', 'err');
+    if (payload.terisi > payload.kapasitas) return toast('Jumlah terisi tidak boleh melebihi kapasitas.', 'err');
+
+    setBusy(submit, true, 'Menyimpan…');
+    try {
+      const res = editingId
+        ? await api(`/api/areas/${editingId}`, { method: 'PUT', body: payload })
+        : await api('/api/areas', { method: 'POST', body: payload });
+      toast(res.message || 'Data area tersimpan.');
+      closeModal();
+      await refresh();
+    } catch (e) {
+      toast(e.message, 'err');
+    } finally {
+      setBusy(submit, false);
+    }
+  });
+
+  const grid = $('#area-grid');
+  if (!grid) return;
+  grid.addEventListener('click', async (e) => {
+    const editBtn = e.target.closest('[data-edit]');
+    const delBtn = e.target.closest('[data-del]');
+
+    if (editBtn) {
+      const a = getAreas().find((x) => `${x.id_area}` === `${editBtn.dataset.edit}`);
+      if (a) openModal(a);
+    } else if (delBtn) {
+      const a = getAreas().find((x) => `${x.id_area}` === `${delBtn.dataset.del}`);
+      if (!a) return;
+      if (!confirm(`Hapus area "${a.nama_area}"?`)) return;
+      setBusy(delBtn, true, '…');
+      try {
+        const res = await api(`/api/areas/${a.id_area}`, { method: 'DELETE' });
+        toast(res.message || 'Area parkir dihapus.');
+        await refresh();
+      } catch (err) {
+        toast(err.message, 'err');
+        setBusy(delBtn, false);
+      }
+    }
+  });
 }
 
 // ============================================================
@@ -691,10 +802,49 @@ async function kendaraan() {
 }
 
 // ------------------------------------------------------------
+// auth — session user injected by the layout (<body data-auth-*>)
+// ------------------------------------------------------------
+const AUTH_ROLE = document.body ? document.body.dataset.authRole || '' : '';
+const canManageAreas = () => AUTH_ROLE === 'admin' || AUTH_ROLE === 'petugas';
+
+// ============================================================
+// LOGIN
+// ============================================================
+function login() {
+  const form = $('#login-form');
+  if (!form) return;
+
+  const username = $('#login-username');
+  const password = $('#login-password');
+  const submit = $('#login-submit');
+
+  form.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+
+    const u = username.value.trim();
+    const p = password.value;
+    if (!u || !p) return toast('Isi username dan password terlebih dahulu.', 'err');
+
+    setBusy(submit, true, 'Memeriksa…');
+    try {
+      const res = await api('/api/login', {
+        method: 'POST',
+        body: { username: u, password: p },
+      });
+      toast(res.message || 'Login berhasil.');
+      setTimeout(() => { window.location.href = '/'; }, 500);
+    } catch (e) {
+      toast(e.message, 'err');
+      setBusy(submit, false);
+    }
+  });
+}
+
+// ------------------------------------------------------------
 // boot
 // ------------------------------------------------------------
 const PAGE = document.body ? document.body.dataset.page : '';
-const PAGES = { beranda, masuk, keluar, transaksi, area, kendaraan };
+const PAGES = { beranda, masuk, keluar, transaksi, area, kendaraan, login };
 
 startClock();
 

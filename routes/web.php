@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TicketController;
 
 /*
@@ -27,8 +28,13 @@ Route::get('/kendaraan', [TicketController::class, 'ticketKendaraan'])->name('ti
 */
 
 Route::get('/login', function () {
-    return view('auth.masuk');
-});
+    if (session('auth_user')) {
+        return redirect()->route('beranda');
+    }
+    return view('auth.login');
+})->name('login');
+
+Route::post('/logout', [AuthController::class, 'logoutWeb'])->name('logout');
 
 Route::get('/registrasi', function () {
     return view('auth.registrasi');

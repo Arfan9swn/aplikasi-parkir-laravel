@@ -6,7 +6,7 @@
     <title>@yield('title', 'ParkEase — Aplikasi Tiket Parkir')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body data-page="@yield('page', '')" class="min-h-screen bg-primary-50 font-sans text-slate-800 antialiased">
+<body data-page="@yield('page', '')" data-auth-role="{{ session('auth_user.role') ?? '' }}" data-auth-name="{{ session('auth_user.nama') ?? '' }}" class="min-h-screen bg-primary-50 font-sans text-slate-800 antialiased">
     @php $path = request()->path(); @endphp
 
     <header class="sticky top-0 z-40 border-b border-primary-200/60 bg-white shadow-sm">
@@ -42,6 +42,30 @@
             </nav>
 
             <div class="ml-auto flex items-center gap-2">
+                @php $authUser = session('auth_user'); @endphp
+                @if ($authUser)
+                    <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 rounded-full border border-primary-200 bg-white py-1 pl-1 pr-3">
+                            <span class="grid h-7 w-7 place-items-center rounded-full bg-primary-500 text-[11px] font-bold text-white">{{ mb_strtoupper(mb_substr($authUser['nama'], 0, 1)) }}</span>
+                            <span class="hidden leading-tight sm:block">
+                                <span class="block text-[11px] font-semibold text-slate-700">{{ $authUser['nama'] }}</span>
+                                <span class="block text-[10px] font-semibold uppercase tracking-wide text-primary-600">{{ $authUser['role'] }}</span>
+                            </span>
+                        </div>
+                        <form method="POST" action="{{ route('logout') }}" class="m-0">
+                            @csrf
+                            <button type="submit"
+                                class="rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50">
+                                Keluar
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <a href="{{ route('login') }}"
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-primary-500 px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-600">
+                        Masuk
+                    </a>
+                @endif
                 <div class="hidden items-center gap-1.5 rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-[11px] font-medium text-primary-700 sm:flex">
                     <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 live-dot"></span>
                     <span class="font-mono" id="nav-clock">--:--:--</span>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\parkir_areas;
+use App\Models\parkir_transaksis;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -116,6 +117,13 @@ class AreasController extends Controller
                 'success' => false,
                 'message' => 'Area parkir tidak ditemukan'
             ], 404);
+        }
+
+        if (parkir_transaksis::where('id_area', $area->id_area)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Area tidak dapat dihapus karena masih memiliki riwayat transaksi.'
+            ], 422);
         }
 
         $area->delete();

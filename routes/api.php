@@ -5,10 +5,29 @@ use App\Http\Controllers\Api\LogsController;
 use App\Http\Controllers\Api\TarifsController;
 use App\Http\Controllers\Api\TransaksisController;
 use App\Http\Controllers\Api\UsersController;
+use App\Http\Controllers\AuthController;
 
+/*
+|--------------------------------------------------------------------------
+| Authentication — session-based, consumed by the ParkEase front-end
+|--------------------------------------------------------------------------
+*/
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/me', [AuthController::class, 'me']);
+Route::post('/logout', [AuthController::class, 'logout']);
+
+/*
+|--------------------------------------------------------------------------
+| Area parkir — view is public; add/update/delete only for admin & petugas
+|--------------------------------------------------------------------------
+*/
+Route::apiResource('areas', AreasController::class)->only(['index', 'show']);
+
+Route::middleware('role:admin,petugas')->group(function () {
+    Route::apiResource('areas', AreasController::class)->only(['store', 'update', 'destroy']);
+});
 
 Route::apiResources([
-    'areas'    => AreasController::class,
     'kendaraans' => KendaraansController::class,
     'logs' => LogsController::class,
     'tarifs' => TarifsController::class,
