@@ -171,7 +171,7 @@ class TransaksisController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Transaksi berhasil diperbarui',
-            'data' => $transaksi
+            'data' => $transaksi->fresh(['kendaraan', 'tarif', 'user', 'area'])
         ], 200);
     }
 

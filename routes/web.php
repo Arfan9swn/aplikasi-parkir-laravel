@@ -1,17 +1,37 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TicketController;
+
+/*
+|--------------------------------------------------------------------------
+| ParkEase — simple parking ticketing
+|--------------------------------------------------------------------------
+| Pages render here; all dynamic data is fetched client-side from /api/*.
+*/
 
 Route::get('/', function () {
     return view('beranda');
+})->name('beranda');
+
+Route::get('/masuk', [TicketController::class, 'ticketMasuk'])->name('ticket.masuk');
+Route::get('/keluar', [TicketController::class, 'ticketKeluar'])->name('ticket.keluar');
+Route::get('/transaksi', [TicketController::class, 'ticketIndex'])->name('ticket.index');
+Route::get('/area', [TicketController::class, 'ticketArea'])->name('ticket.area');
+Route::get('/kendaraan', [TicketController::class, 'ticketKendaraan'])->name('ticket.kendaraan');
+
+/*
+|--------------------------------------------------------------------------
+| Legacy pages (previous dashboard & auth views)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/login', function () {
+    return view('auth.masuk');
 });
 
 Route::get('/registrasi', function () {
     return view('auth.registrasi');
-});
-
-Route::get('/masuk', function () {
-    return view('auth.masuk');
 });
 
 Route::get('/dashboard', function () {
@@ -19,21 +39,9 @@ Route::get('/dashboard', function () {
 });
 
 Route::get('/riwayat-parkir', function () {
-    return view('dashboard.riwayat_parkir');
-});
-
-Route::get('/transaksi', function () {
-    return view('dashboard.transaksi');
+    return view('dashboard.riwayat.index');
 });
 
 Route::get('/log-aktivitas', function () {
-    return view('dashboard.log_aktivitas');
-});
-
-Route::get('/area', function () {
-    return view('dashboard.area');
-});
-
-Route::get('/kendaraan', function () {
-    return view('dashboard.kendaraan');
+    return view('dashboard.aktivitas.index');
 });

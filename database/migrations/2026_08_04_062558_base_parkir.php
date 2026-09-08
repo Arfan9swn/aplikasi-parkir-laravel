@@ -34,9 +34,9 @@ return new class extends Migration
             $table->integer('id_user')->references('id_user')->on('tb_user');
             $table->integer('id_area')->references('id_area')->on('tb_area_parkir');
             $table->datetime('waktu_masuk');
-            $table->datetime('waktu_keluar');
-            $table->integer('durasi_jam');
-            $table->decimal('biaya_total');
+            $table->datetime('waktu_keluar')->nullable();
+            $table->integer('durasi_jam')->nullable();
+            $table->decimal('biaya_total')->nullable();
             $table->enum('status', ['masuk', 'keluar']);
         });
 

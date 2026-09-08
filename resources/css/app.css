@@ -6,4 +6,108 @@
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-primary-50:  #eef3f8;
+    --color-primary-100: #e0eaf4;
+    --color-primary-200: #c2d5e9;
+    --color-primary-300: #9db8d8;
+    --color-primary-400: #6f95c0;
+    --color-primary-500: #395a7f;
+    --color-primary-600: #2f4c6b;
+    --color-primary-700: #263d56;
+    --color-primary-800: #1c2d41;
+    --color-primary-900: #111e2d;
+}
+
+/* =====================================================================
+   Little animations
+   ===================================================================== */
+@keyframes rise-in {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pop-in {
+    from { opacity: 0; transform: scale(0.92) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes live-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+}
+
+@keyframes shimmer-move {
+    from { background-position: 0% 50%; }
+    to   { background-position: 140% 50%; }
+}
+
+.rise   { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.rise-1 { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both; }
+.rise-2 { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both; }
+.rise-3 { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both; }
+.rise-4 { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both; }
+.rise-5 { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.30s both; }
+.rise-6 { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.36s both; }
+
+.pop { animation: pop-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+.live-dot { animation: live-pulse 1.8s ease-in-out infinite; }
+
+/* Loading skeleton */
+.skeleton {
+    background: linear-gradient(100deg, #e6edf6 30%, #d5e0ec 50%, #e6edf6 70%);
+    background-size: 200% 100%;
+    animation: shimmer-move 1.2s linear infinite;
+}
+
+/* Subtle parking-lot lane stripes for the hero */
+.hero-stripes {
+    background-image:
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1.5px, transparent 1.5px 28px),
+        repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0 1.5px, transparent 1.5px 28px);
+}
+
+/* Ticket-style dashed edge */
+.ticket-edge {
+    border: 1.5px dashed #a9c1de;
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+    .rise, .rise-1, .rise-2, .rise-3, .rise-4, .rise-5, .rise-6,
+    .pop, .live-dot, .skeleton {
+        animation: none !important;
+    }
+}
+
+/* Filter pills (tickets page) */
+.filter-pill {
+    background: #ffffff;
+    border: 1px solid #d8e2ee;
+    color: #395a7f;
+    transition: background-color 160ms ease, color 160ms ease;
+}
+.filter-pill:hover { background: #e0eaf4; }
+.filter-pill.is-active {
+    background: #395a7f;
+    border-color: #395a7f;
+    color: #ffffff;
+}
+
+/* Primary navigation link */
+.nav-link {
+    color: #6f95c0;
+    transition: color 160ms ease, background-color 160ms ease;
+}
+.nav-link:hover { color: #395a7f; background: #e0eaf4; }
+.nav-link.is-active { color: #ffffff; background: #395a7f; }
+
+/* =====================================================================
+   Print: only the ticket / receipt is printed
+   ===================================================================== */
+@media print {
+    body * { visibility: hidden; }
+    .print-area, .print-area * { visibility: visible; }
+    .print-area { position: absolute; left: 0; top: 0; width: 100%; }
 }
