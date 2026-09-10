@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'ParkEase — Aplikasi Tiket Parkir')
+@section('title', 'park.')
 @section('page', 'beranda')
 
 @section('content')

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Data Kendaraan — ParkEase')
+@section('title', 'park.')
 @section('page', 'kendaraan')
 
 @section('content')

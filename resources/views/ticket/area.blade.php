@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Area Parkir — ParkEase')
+@section('title', 'park.')
 @section('page', 'area')
 
 @section('content')
