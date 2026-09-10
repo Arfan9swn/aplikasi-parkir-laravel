@@ -4,7 +4,6 @@
 @section('page', 'beranda')
 
 @section('content')
-    {{-- Banner utama ----------------------------------------------- --}}
     <section class="rounded-2xl bg-primary-500 p-8 shadow-sm sm:p-10">
 
         <h1 class="mt-4 text-3xl font-extrabold text-white sm:text-4xl">
@@ -36,7 +35,6 @@
         <p class="mt-6 font-mono text-sm text-white/85" id="hero-clock">—</p>
     </section>
 
-    {{-- Kartu statistik --------------------------------------------- --}}
     <section class="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
             <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
@@ -96,7 +94,6 @@
         </div>
     </section>
 
-    {{-- Cara pakai --------------------------------------------------- --}}
     <section class="mt-10">
         <h2 class="text-xl font-bold text-slate-800">Cara Pakai</h2>
         <div class="mt-5 grid gap-5 md:grid-cols-3">
@@ -118,7 +115,6 @@
         </div>
     </section>
 
-    {{-- Pratinjau area ---------------------------------------------- --}}
     <section class="mt-10">
         <div class="flex items-center justify-between">
             <h2 class="text-xl font-bold text-slate-800">Kondisi Parkir Saat Ini</h2>

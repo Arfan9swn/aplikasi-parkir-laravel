@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'ParkEase — Aplikasi Tiket Parkir')</title>
+    <title>@yield('title', 'park.')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body data-page="@yield('page', '')" data-auth-role="{{ session('auth_user.role') ?? '' }}" data-auth-name="{{ session('auth_user.nama') ?? '' }}" class="min-h-screen bg-primary-50 font-sans text-slate-800 antialiased">
@@ -27,6 +27,7 @@
                         ['/transaksi', 'Transaksi', 'transaksi'],
                         ['/area',      'Area',      'area'],
                         ['/kendaraan', 'Kendaraan', 'kendaraan'],
+                        ['/log', 'Log', 'log']
                     ];
                 @endphp
                 @foreach ($nav as $item)
