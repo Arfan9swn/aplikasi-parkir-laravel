@@ -35,4 +35,12 @@ Route::apiResources([
     'transaksis' => TransaksisController::class,
     'users' => UsersController::class
 ]);
+
+/*
+|--------------------------------------------------------------------------
+| Log monitoring — reading the raw log files is restricted to staff roles.
+|--------------------------------------------------------------------------
+*/
+Route::get('/system-logs', [LogsController::class, 'systemLog'])
+    ->middleware('role:admin,petugas,owner');
 ?>

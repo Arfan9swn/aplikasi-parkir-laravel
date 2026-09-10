@@ -51,6 +51,10 @@ Route::get('/riwayat-parkir', function () {
     return view('dashboard.riwayat.index');
 });
 
+Route::get('/log', function () {
+    return view('dashboard.aktivitas.index');
+})->name('log');
+
 Route::get('/log-aktivitas', function () {
     return view('dashboard.aktivitas.index');
 });

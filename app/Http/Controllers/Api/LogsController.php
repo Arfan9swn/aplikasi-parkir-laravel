@@ -125,4 +125,64 @@ class LogsController extends Controller
             'message' => 'Log aktivitas berhasil dihapus'
         ], 200);
     }
+
+    /**
+     * Monitor the raw server log files — tail the newest *.log file found
+     * inside storage/logs (e.g. laravel.log) so operators can watch for
+     * errors, warnings and stack traces without touching the terminal.
+     * GET /api/system-logs
+     */
+    public function systemLog()
+    {
+        $dir   = new \DirectoryIterator(storage_path('logs'));
+        $candidate = null;
+
+        foreach ($dir as $fileInfo) {
+            if ($fileInfo->isFile() && $fileInfo->getExtension() === 'log') {
+                if (!$candidate || $fileInfo->getMTime() > $candidate->getMTime()) {
+                $candidate = clone $fileInfo;
+                }
+            }
+        }
+
+        if (!$candidate) {
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'file' => null,
+                    'size' => 0,
+                    'mtime' => null,
+                ],
+            ], 200);
+        }
+
+        $path  = $candidate->getPathname();
+        $size  = $candidate->getSize();
+        $mtime = $candidate->getMTime();
+
+        // Read only the tail (last ~200KB) and keep the newest MAX_LINES lines.
+        $lines = [];
+        $handle = fopen($path, 'r');
+        if ($handle) {
+            $offset = max(0, $size - (200 * 1024));
+            if ($offset > 0) {
+                fseek($handle, $offset);
+                fgets($handle); // drop the partial first line
+            }
+            while (($line = fgets($handle)) !== false) {
+                $lines[] = rtrim($line, "\r\n");
+            }
+            fclose($handle);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'file'  => $candidate->getFilename(),
+                'size'  => $size,
+                'mtime' => $mtime,
+                'tail'  => array_slice($lines, -300),
+            ],
+        ], 200);
+    }
 }

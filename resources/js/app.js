@@ -928,6 +928,219 @@ function wireVehicleManagement({ modal, form, getUsers, getVehicles, refresh }) 
   });
 }
 
+// ============================================================
+// LOG — live monitoring of activity & system log files
+// ============================================================
+const LOG_LEVEL_RE = /\b(local|production)\.(ALERT|CRITICAL|ERROR|WARNING|NOTICE|INFO|DEBUG)\b/;
+const LOG_LEVEL_TONE = {
+  ALERT: 'text-red-300 bg-red-500/40 px-1 rounded',
+  CRITICAL: 'text-red-300 bg-red-500/40 px-1 rounded',
+  ERROR: 'text-red-400',
+  WARNING: 'text-amber-300',
+  NOTICE: 'text-sky-300',
+  INFO: 'text-cyan-300',
+  DEBUG: 'text-slate-400',
+};
+
+async function log() {
+  const liveBadge = $('#log-live-badge');
+  const liveLabel = $('#log-live-label');
+  const intervalSel = $('#log-interval');
+  const refreshBtn = $('#log-refresh');
+  const searchIn = $('#log-search');
+  const body = $('#log-activity-body');
+  const countEl = $('#log-count');
+  const chip = $('#log-new-chip');
+  const fileMeta = $('#log-file-meta');
+  const fileSize = $('#log-file-size');
+  const fileBody = $('#log-file-body');
+
+  let all = [];
+  let sys = [];
+  let sysLoaded = false;
+  let q = '';
+  let live = true;
+  let timer = null;
+  let chipTimer = null;
+  let prevTopId = null;
+
+  const secs = () => num(intervalSel ? intervalSel.value : 5) || 0;
+  const isToday = (d) => d && d.toDateString() === new Date().toDateString();
+
+  const renderStats = () => {
+    const total = all.length;
+    const today = all.filter((l) => isToday(parseDb(l.waktu_aktivitas))).length;
+    const users = new Set(all.map((l) => l.user && l.user.id_user).filter(Boolean)).size;
+    const errors = sysLoaded && sys ? sys.filter((ln) => /\.(ALERT|CRITICAL|ERROR)\b/.test(ln)).length : 0;
+    const setTxt = (sel, txt) => { const el = $(sel); if (el) el.textContent = txt; };
+    setTxt('#log-stat-total', fmtInt(total));
+    setTxt('#log-stat-today', fmtInt(today));
+    setTxt('#log-stat-users', fmtInt(users));
+    setTxt('#log-stat-errors', sysLoaded ? (sys === null ? '—' : fmtInt(errors)) : '…');
+  };
+
+  const matches = (l) => {
+    if (!q) return true;
+    const u = l.user || {};
+    const hay = `${l.aktivitas} ${u.nama_lengkap} ${u.username} ${u.role}`.toLowerCase();
+    return hay.includes(q.toLowerCase());
+  };
+
+  const renderTable = () => {
+    const rows = all.filter(matches);
+    countEl.textContent = `${rows.length} dari ${all.length} log`;
+    if (!rows.length) {
+      body.innerHTML =
+        '<tr><td colspan="3" class="px-4 py-12 text-center text-sm text-slate-400">' +
+        'Tidak ada log yang cocok dengan pencarian.</td></tr>';
+      return;
+    }
+    body.innerHTML = rows.map((l, i) => {
+      const u = l.user || {};
+      const d = parseDb(l.waktu_aktivitas);
+      const ini = esc(`${u.nama_lengkap || '?'}`.trim().charAt(0).toUpperCase());
+      const tone = isToday(d)
+        ? 'bg-primary-100 text-primary-700 ring-primary-200'
+        : 'bg-slate-100 text-slate-500 ring-slate-200';
+      return `<tr class="rise border-b border-primary-100 hover:bg-primary-50" style="animation-delay:${Math.min(i * 30, 300)}ms">
+        <td class="px-4 py-3 whitespace-nowrap text-slate-600">${fmtDateTime(d)}</td>
+        <td class="px-4 py-3">
+          <div class="flex items-center gap-2.5">
+            <span class="grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-bold ring-1 ${tone}">${ini}</span>
+            <div>
+              <div class="text-xs font-semibold text-slate-800">${esc(u.nama_lengkap || '—')}</div>
+              <div class="text-[10px] text-slate-400">@${esc(u.username || '?')} · <span class="uppercase">${esc(u.role || '—')}</span></div>
+            </div>
+          </div>
+        </td>
+        <td class="px-4 py-3 text-slate-700">${esc(l.aktivitas)}</td>
+      </tr>`;
+    }).join('');
+  };
+
+  const renderFile = () => {
+    if (!sysLoaded) {
+      fileMeta.textContent = 'Memuat isi file log…';
+      fileSize.textContent = '';
+      fileBody.innerHTML = '<span class="text-slate-500">Menunggu data…</span>';
+      return;
+    }
+    if (sys === null) {
+      fileMeta.textContent = 'Akses dibatasi untuk admin / petugas / owner.';
+      fileSize.textContent = '';
+      fileBody.innerHTML =
+        '<div class="text-slate-400">Login dengan akun staff untuk membaca isi file log server — ' +
+        '<a href="/login" class="text-primary-300 underline hover:text-primary-200">masuk di sini</a>.</div>';
+      return;
+    }
+    if (!sys.length) {
+      fileMeta.textContent = 'Belum ada file log ditemukan.';
+      fileSize.textContent = '';
+      fileBody.innerHTML = '<span class="text-slate-500">Kosong.</span>';
+      return;
+    }
+    fileBody.innerHTML = sys.map((ln) => {
+      const m = ln.match(LOG_LEVEL_RE);
+      const tone = m ? (LOG_LEVEL_TONE[m[2]] || 'text-slate-300') : 'text-slate-500';
+      return `<div class="whitespace-pre-wrap break-all ${tone}">${esc(ln)}</div>`;
+    }).join('');
+  };
+const refresh = async () => {
+    await Promise.all([loadAktivitas(), loadSystem()]);
+  };
+
+  const loadAktivitas = async () => {
+    try {
+      const res = await api('/api/logs');
+      const list = res.data || [];
+      let fresh = 0;
+      if (prevTopId !== null && list.length) {
+        const idx = list.findIndex((l) => String(l.id_log) === String(prevTopId));
+        fresh = idx === -1 ? list.length : idx;
+      }
+      prevTopId = list.length ? String(list[0].id_log) : null;
+      all = list;
+      renderStats();
+      renderTable();
+      if (fresh > 0) {
+        chip.textContent = `+${fresh} log baru`;
+        chip.classList.remove('hidden');
+        clearTimeout(chipTimer);
+        chipTimer = setTimeout(() => chip.classList.add('hidden'), 5000);
+      }
+    } catch (e) {
+      body.innerHTML =
+        `<tr><td colspan="3" class="px-4 py-12 text-center text-sm text-red-400">${esc(e.message)}</td></tr>`;
+      toast(e.message, 'err');
+    }
+  };
+
+  const loadSystem = async () => {
+    try {
+      const res = await api('/api/system-logs');
+      const d = res.data || {};
+      sysLoaded = true;
+      sys = d.tail || [];
+      fileMeta.textContent = d.file
+        ? `${d.file} · diperbarui ${fmtDateTime(new Date(d.mtime * 1000))}`
+        : 'Tidak ditemukan file log';
+      fileSize.textContent = d.size ? `${fmtInt(d.size / 1024)} KB` : '';
+      renderFile();
+      renderStats();
+    } catch (e) {
+      sysLoaded = true;
+      sys = null;
+      renderFile();
+      renderStats();
+    }
+  };
+
+  const stopTimer = () => { if (timer) { clearInterval(timer); timer = null; } };
+  const startTimer = () => {
+    stopTimer();
+    const s = secs();
+    if (s > 0) timer = setInterval(() => { if (live) refresh(); }, s * 1000);
+  };
+
+  const updateBadge = () => {
+    const s = secs();
+    liveLabel.textContent = live ? (s > 0 ? `LIVE · ${s} dtk` : 'LIVE · Manual') : 'PAUSED';
+    liveBadge.className = live
+      ? 'inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1.5 text-xs font-bold text-emerald-800 transition hover:bg-emerald-200'
+      : 'inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-500 transition hover:bg-slate-200';
+  };
+
+  const manualRefresh = async () => {
+    setBusy(refreshBtn, true, 'Memuat…');
+    await refresh();
+    setBusy(refreshBtn, false);
+  };
+
+  if (intervalSel) intervalSel.addEventListener('change', () => { updateBadge(); startTimer(); });
+  if (liveBadge) liveBadge.addEventListener('click', () => {
+    live = !live;
+    updateBadge();
+    if (live) { startTimer(); refresh(); } else stopTimer();
+  });
+  if (refreshBtn) refreshBtn.addEventListener('click', manualRefresh);
+  if (searchIn) searchIn.addEventListener('input', (e) => { q = e.target.value; renderTable(); });
+
+  $$('#log-tabs button').forEach((b) => {
+    b.addEventListener('click', () => {
+      $$('#log-tabs button').forEach((x) => x.classList.toggle('is-active', x === b));
+      const active = b.dataset.tab;
+      ['aktivitas', 'sistem'].forEach((tab) => {
+        const panel = $('#panel-' + tab);
+        if (panel) panel.classList.toggle('hidden', tab !== active);
+      });
+    });
+  });
+
+  updateBadge();
+  startTimer();
+  refresh();
+}
+
 // ------------------------------------------------------------
 // auth — session user injected by the layout (<body data-auth-*>)
 // ------------------------------------------------------------
@@ -1017,7 +1230,7 @@ function register() {
 // boot
 // ------------------------------------------------------------
 const PAGE = document.body ? document.body.dataset.page : '';
-const PAGES = { beranda, masuk, keluar, transaksi, area, kendaraan, login, register };
+const PAGES = { beranda, masuk, keluar, transaksi, area, kendaraan, log, login, register };
 
 startClock();
 

@@ -95,6 +95,20 @@
     color: #ffffff;
 }
 
+/* Log page tabs */
+.tab-pill {
+    background: #ffffff;
+    border: 1px solid #d8e2ee;
+    color: #395a7f;
+    transition: background-color 160ms ease, color 160ms ease;
+}
+.tab-pill:hover { background: #e0eaf4; }
+.tab-pill.is-active {
+    background: #395a7f;
+    border-color: #395a7f;
+    color: #ffffff;
+}
+
 /* Primary navigation link */
 .nav-link {
     color: #6f95c0;
