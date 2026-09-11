@@ -53,7 +53,7 @@ class AuthController extends Controller
             'role'     => $user->role,
         ]);
 
-        $this->logActivity($user, 'Login ke sistem ParkEase');
+        $this->logActivity($user, 'Login ke sistem.');
 
         return response()->json([
             'success' => true,
@@ -154,7 +154,7 @@ class AuthController extends Controller
         if ($session) {
             $user = parkir_users::find($session['id_user'] ?? null);
             if ($user) {
-                $this->logActivity($user, 'Logout dari sistem ParkEase');
+                $this->logActivity($user, 'Logout dari sistem.');
             }
         }
 
