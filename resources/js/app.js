@@ -291,11 +291,30 @@ async function masuk() {
     });
 
     const users = (await api('/api/users')).data || [];
-    const operatorUser =
-      users.find((u) => u.role === 'petugas' && num(u.status_aktif) === 1) || users[0];
-    if (operatorUser) {
-      userId.value = operatorUser.id_user;
-      operator.textContent = operatorUser.nama_lengkap || operatorUser.username;
+    const petugasById = {};
+    users.forEach((u) => { petugasById[`${u.id_user}`] = u; });
+
+    // Each area has its own dedicated petugas — pick the one assigned
+    // to the selected area automatically.
+    const applyAreaPetugas = () => {
+      const area = areas.find((a) => `${a.id_area}` === `${areaSel.value}`);
+      const picked = area && petugasById[`${area.id_user}`];
+      if (picked) {
+        userId.value = picked.id_user;
+        operator.textContent = picked.nama_lengkap || picked.username;
+      }
+    };
+
+    areaSel.addEventListener('change', applyAreaPetugas);
+    applyAreaPetugas();
+
+    if (!userId.value) {
+      const fallback =
+        users.find((u) => u.role === 'petugas' && num(u.status_aktif) === 1) || users[0];
+      if (fallback) {
+        userId.value = fallback.id_user;
+        operator.textContent = fallback.nama_lengkap || fallback.username;
+      }
     }
   } catch (e) {
     toast(e.message, 'err');
@@ -584,6 +603,7 @@ async function area() {
   const submit = $('#area-submit');
   const managed = canManageAreas();
   let areas = [];
+  let users = [];
 
   const load = async () => {
     try {
@@ -614,6 +634,7 @@ async function area() {
     const cap = num(a.kapasitas);
     const use = num(a.terisi);
     const pct = cap ? (use / cap) * 100 : 0;
+    const petugas = (a.petugas && (a.petugas.nama_lengkap || a.petugas.username)) || '—';
 
     let chip = '<span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-0.5 text-[11px] font-semibold">TERSEDIA</span>';
     let barTone = 'bg-primary-500';
@@ -638,7 +659,7 @@ async function area() {
             <div class="grid h-8 w-8 place-items-center rounded-lg bg-primary-500 text-sm font-bold text-white">${esc(a.nama_area.slice(0, 1))}</div>
             <div>
               <h3 class="font-semibold text-slate-800">${esc(a.nama_area)}</h3>
-              <p class="text-xs text-slate-400">Slot P-${esc(a.nama_area.slice(-2))}</p>
+              <p class="text-xs text-slate-400">Slot P-${esc(a.nama_area.slice(-2))} · Petugas: <span class="font-medium text-primary-700">${esc(petugas)}</span></p>
             </div>
           </div>
           ${chip}
@@ -657,7 +678,11 @@ async function area() {
     $$('#area-grid [data-bar]').forEach((b) => setBar(b, num(b.dataset.bar)));
   };
 
-  wireAreaManagement({ modal, form, title, submit, managed, getAreas: () => areas, refresh: load });
+  try {
+    users = (await api('/api/users')).data || [];
+  } catch (e) { /* dropdown stays empty */ }
+
+  wireAreaManagement({ modal, form, title, submit, managed, getAreas: () => areas, getUsers: () => users, refresh: load });
 
   await load();
 }
@@ -665,14 +690,39 @@ async function area() {
 // ------------------------------------------------------------
 // area management modal — add / edit / delete (admin & petugas)
 // ------------------------------------------------------------
-function wireAreaManagement({ modal, form, title, submit, managed, getAreas, refresh }) {
+function wireAreaManagement({ modal, form, title, submit, managed, getAreas, getUsers, refresh }) {
   if (!managed || !modal || !form) return;
+
+  const fillPetugasOptions = (selectedId) => {
+    const sel = $('#area-form-petugas');
+    if (!sel) return;
+
+    const editingId = form.dataset.editing || '';
+    const taken = new Set(
+      getAreas()
+        .filter((a) => `${a.id_area}` !== `${editingId}` && a.id_user)
+        .map((a) => `${a.id_user}`)
+    );
+
+    const options = getUsers()
+      .filter((u) => u.role === 'petugas' && num(u.status_aktif) === 1)
+      .filter((u) => `${u.id_user}` === `${selectedId}` || !taken.has(`${u.id_user}`));
+
+    sel.innerHTML =
+      '<option value="">— Pilih petugas —</option>' +
+      options
+        .map((u) => `<option value="${u.id_user}">${esc(u.nama_lengkap || u.username)}</option>`)
+        .join('');
+
+    if (selectedId) sel.value = `${selectedId}`;
+  };
 
   const openModal = (a = null) => {
     form.dataset.editing = a ? a.id_area : '';
     $('#area-form-nama').value = a ? a.nama_area : '';
     $('#area-form-kapasitas').value = a ? a.kapasitas : '';
     $('#area-form-terisi').value = a ? a.terisi : 0;
+    fillPetugasOptions(a ? a.id_user : '');
     if (title) title.textContent = a ? `Ubah Area — ${a.nama_area}` : 'Tambah Area Parkir';
     modal.classList.remove('hidden');
     modal.classList.add('flex');
@@ -693,16 +743,19 @@ function wireAreaManagement({ modal, form, title, submit, managed, getAreas, ref
     ev.preventDefault();
 
     const editingId = form.dataset.editing || '';
+    const petugasSel = $('#area-form-petugas');
     const payload = {
       nama_area: $('#area-form-nama').value.trim(),
       kapasitas: Math.round(num($('#area-form-kapasitas').value)),
       terisi: Math.round(num($('#area-form-terisi').value)),
+      id_user: petugasSel ? petugasSel.value : '',
     };
 
     if (!payload.nama_area) return toast('Nama area wajib diisi.', 'err');
     if (payload.kapasitas < 1) return toast('Kapasitas minimal 1 slot.', 'err');
     if (payload.terisi < 0) return toast('Jumlah terisi tidak boleh negatif.', 'err');
     if (payload.terisi > payload.kapasitas) return toast('Jumlah terisi tidak boleh melebihi kapasitas.', 'err');
+    if (!payload.id_user) return toast('Pilih 1 petugas untuk area ini. Setiap area memerlukan petugas yang berbeda.', 'err');
 
     setBusy(submit, true, 'Menyimpan…');
     try {

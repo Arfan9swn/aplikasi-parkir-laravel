@@ -100,6 +100,13 @@
                                 placeholder="0" />
                         </div>
                     </div>
+                    <div>
+                        <label for="area-form-petugas" class="text-xs font-semibold uppercase tracking-wide text-slate-500">Petugas Area</label>
+                        <select id="area-form-petugas" required
+                            class="mt-1.5 w-full rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100">
+                            <option value="">— Pilih petugas —</option>
+                        </select>
+                    </div>
                     <div class="flex gap-2 pt-2">
                         <button type="button" id="area-cancel"
                             class="flex-1 rounded-xl border border-primary-200 bg-white py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-primary-50">

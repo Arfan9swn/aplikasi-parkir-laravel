@@ -44,13 +44,43 @@ class ParkingSeeder extends Seeder
         }
 
         // ------------------------------------------------------------------
-        // 2. Parking areas
+        // 2. Staff users — one dedicated petugas per parking area
+        // ------------------------------------------------------------------
+        $areaPetugas = [
+            'Area Utama'  => 'petugas',
+            'Area VIP'    => 'petugas2',
+            'Area Motor'  => 'petugas3',
+            'Area Servis' => 'petugas4',
+        ];
+
+        $petugas = null;
+
+        foreach ($areaPetugas as $areaName => $username) {
+            $user = parkir_users::where('username', $username)->first();
+
+            if (! $user) {
+                $user = parkir_users::create([
+                    'nama_lengkap' => 'Petugas ' . $areaName,
+                    'username'     => $username,
+                    'password'     => Hash::make('password'),
+                    'role'         => 'petugas',
+                    'status_aktif' => 1,
+                ]);
+            }
+
+            if ($username === 'petugas') {
+                $petugas = $user;
+            }
+        }
+
+        // ------------------------------------------------------------------
+        // 3. Parking areas — each with its own dedicated petugas
         // ------------------------------------------------------------------
         $areas = [
-            ['nama_area' => 'Area Utama',  'kapasitas' => 24, 'terisi' => 1],
-            ['nama_area' => 'Area VIP',    'kapasitas' => 6,  'terisi' => 0],
-            ['nama_area' => 'Area Motor',  'kapasitas' => 18, 'terisi' => 0],
-            ['nama_area' => 'Area Servis', 'kapasitas' => 10, 'terisi' => 0],
+            ['nama_area' => 'Area Utama',  'kapasitas' => 24, 'terisi' => 1, 'id_user' => $petugas->getKey()],
+            ['nama_area' => 'Area VIP',    'kapasitas' => 6,  'terisi' => 0, 'id_user' => parkir_users::where('username', 'petugas2')->value('id_user')],
+            ['nama_area' => 'Area Motor',  'kapasitas' => 18, 'terisi' => 0, 'id_user' => parkir_users::where('username', 'petugas3')->value('id_user')],
+            ['nama_area' => 'Area Servis', 'kapasitas' => 10, 'terisi' => 0, 'id_user' => parkir_users::where('username', 'petugas4')->value('id_user')],
         ];
 
         foreach ($areas as $data) {
@@ -58,22 +88,9 @@ class ParkingSeeder extends Seeder
 
             if (! $area) {
                 parkir_areas::create($data);
+            } elseif (! $area->id_user) {
+                $area->update(['id_user' => $data['id_user']]);
             }
-        }
-
-        // ------------------------------------------------------------------
-        // 3. Staff users
-        // ------------------------------------------------------------------
-        $petugas = parkir_users::where('username', 'petugas')->first();
-
-        if (! $petugas) {
-            $petugas = parkir_users::create([
-                'nama_lengkap' => 'Petugas Johari',
-                'username'     => 'petugas',
-                'password'     => Hash::make('password'),
-                'role'         => 'petugas',
-                'status_aktif' => 1,
-            ]);
         }
 
         if (parkir_users::where('username', 'admin')->doesntExist()) {
