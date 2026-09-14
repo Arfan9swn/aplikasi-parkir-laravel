@@ -113,7 +113,7 @@ class AuthController extends Controller
             'role'     => $user->role,
         ]);
 
-        $this->logActivity($user, 'Login ke sistem ParkEase');
+        $this->logActivity($user, 'Login ke sistem.');
 
         return response()->json([
             'success' => true,

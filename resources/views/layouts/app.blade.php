@@ -7,10 +7,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body data-page="@yield('page', '')" data-auth-role="{{ session('auth_user.role') ?? '' }}" data-auth-name="{{ session('auth_user.nama') ?? '' }}" class="min-h-screen bg-primary-50 font-sans text-slate-800 antialiased">
-    @php $path = request()->path(); @endphp
+    @php $path = trim(request()->path(), '/'); @endphp
 
     <header class="sticky top-0 z-40 border-b border-primary-200/60 bg-white shadow-sm">
-        <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 px-4 py-3 sm:px-6">
+        <div class="mx-auto flex flex-wrap gap-x-6 px-6 py-3">
             <a href="/" class="flex items-center gap-2.5">
                 <span class="leading-1 flex-column">
                     <span class="block font-bold text-primary-700 text-3xl">park.</span>
@@ -32,7 +32,7 @@
                 @endphp
                 @foreach ($nav as $item)
                     <a href="{{ $item[0] }}"
-                       class="nav-link rounded-lg px-3 py-1.5 {{ $path === $item[0] ? 'is-active' : '' }}">{{ $item[1] }}</a>
+                       class="nav-link rounded-lg px-3 py-1.5 {{ trim($item[0], '/') === $path ? 'is-active' : '' }}">{{ $item[1] }}</a>
                 @endforeach
             </nav>
 

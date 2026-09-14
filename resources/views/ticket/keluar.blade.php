@@ -8,7 +8,6 @@
         <h1 class="text-2xl font-bold text-slate-800">Kendaraan Keluar — Bayar &amp; Pulang</h1>
         <p class="mt-1 text-sm text-slate-500">Masukkan nomor polisi kendaraan yang akan keluar.</p>
 
-        {{-- Cari tiket ------------------------------------------------- --}}
         <form id="exit-search-form" autocomplete="off" class="mt-6 flex items-end gap-3">
             <div class="flex-1">
                 <label class="text-xs font-medium text-slate-500">Nomor Polisi</label>
@@ -24,7 +23,6 @@
             </button>
         </form>
 
-        {{-- Tiket tidak ditemukan --------------------------------------- --}}
         <div id="exit-empty" class="hidden">
             <div class="mt-7 rounded-2xl border border-primary-100 bg-white p-8 text-center shadow-sm">
                 <p class="text-sm text-slate-500">Tidak ada tiket aktif untuk plat</p>
@@ -34,7 +32,6 @@
             </div>
         </div>
 
-        {{-- Tiket aktif ------------------------------------------------- --}}
         <div id="exit-active" class="hidden">
             <div class="mt-7 rounded-2xl border border-primary-100 bg-white shadow-sm">
                 <div class="grid grid-cols-2 gap-4 p-5 sm:grid-cols-3">
@@ -81,7 +78,6 @@
             </div>
         </div>
 
-        {{-- Struk ------------------------------------------------------- --}}
         <div id="exit-receipt" class="hidden print-area">
             <div class="mx-auto mt-7 max-w-md rounded-2xl border-2 border-dashed border-primary-200 bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between">
