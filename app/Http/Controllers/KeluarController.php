@@ -11,11 +11,52 @@ use Illuminate\Support\Facades\Validator;
 class KeluarController extends Controller
 {
     /**
-     * Show the check-out form.
+     * Show the check-out form: the plate lookup plus a clickable list of every
+     * vehicle that is still parked, so a petugas can settle one in a single click.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('keluar.create');
+        $areaFilter = trim((string) $request->query('area', ''));
+        $mine       = $this->petugasAreaIds();
+
+        $query = parkir_transaksis::with(['kendaraan', 'tarif', 'area'])
+            ->where('status', 'masuk');
+
+        if ($areaFilter === 'mine') {
+            // No assigned area? Match nothing rather than leaking every ticket.
+            $query->whereIn('id_area', $mine !== [] ? $mine : [-1]);
+        } elseif ($areaFilter !== '' && ctype_digit($areaFilter)) {
+            $query->where('id_area', (int) $areaFilter);
+        }
+
+        // Longest-parked first: the oldest ticket is the one to settle next.
+        $parked = $query->orderBy('waktu_masuk')->get()
+            ->map(function (parkir_transaksis $ticket) {
+                $durasi = $this->durasi($ticket->waktu_masuk);
+
+                return [
+                    'ticket' => $ticket,
+                    'durasi' => $durasi,
+                    'fee'    => $this->biaya($ticket, $durasi),
+                ];
+            });
+
+        $filters = [['value' => '', 'label' => 'Semua area']];
+
+        if ($mine !== []) {
+            $filters[] = ['value' => 'mine', 'label' => 'Area saya'];
+        }
+
+        foreach (parkir_areas::orderBy('nama_area')->get() as $area) {
+            $filters[] = ['value' => (string) $area->id_area, 'label' => $area->nama_area];
+        }
+
+        return view('keluar.create', [
+            'parked'     => $parked,
+            'filters'    => $filters,
+            'areaFilter' => $areaFilter,
+            'areaQuery'  => $areaFilter === '' ? '' : '?area=' . urlencode($areaFilter),
+        ]);
     }
 
     /**
@@ -47,13 +88,24 @@ class KeluarController extends Controller
                 ->with('error', 'Tidak ada tiket aktif untuk nomor polisi ' . $plate . '.');
         }
 
-        $durasi = $this->durasi($ticket->waktu_masuk);
+        return $this->preview($ticket, $request);
+    }
 
-        return view('keluar.show', [
-            'ticket' => $ticket,
-            'durasi' => $durasi,
-            'fee'    => $this->biaya($ticket, $durasi),
-        ]);
+    /**
+     * Preview a check-out straight from the parked list — one click, no typing.
+     */
+    public function show(Request $request, string $id)
+    {
+        $ticket = parkir_transaksis::with(['kendaraan', 'tarif', 'area'])
+            ->where('status', 'masuk')
+            ->find($id);
+
+        if (! $ticket) {
+            return redirect()->route('ticket.keluar')
+                ->with('error', 'Tiket tidak ditemukan atau kendaraan sudah keluar.');
+        }
+
+        return $this->preview($ticket, $request);
     }
 
     /**
@@ -106,6 +158,37 @@ class KeluarController extends Controller
     // ------------------------------------------------------------
     // helpers
     // ------------------------------------------------------------
+
+    /**
+     * Render the duration + fee confirmation screen for one ticket.
+     * The active area filter is carried through so "back" returns to it.
+     */
+    private function preview(parkir_transaksis $ticket, Request $request)
+    {
+        $durasi     = $this->durasi($ticket->waktu_masuk);
+        $areaFilter = trim((string) $request->query('area', ''));
+
+        return view('keluar.show', [
+            'ticket'  => $ticket,
+            'durasi'  => $durasi,
+            'fee'     => $this->biaya($ticket, $durasi),
+            'backUrl' => url('/keluar' . ($areaFilter === '' ? '' : '?area=' . urlencode($areaFilter))),
+        ]);
+    }
+
+    /**
+     * Area ids assigned to the logged-in petugas (empty for admin / owner).
+     */
+    private function petugasAreaIds(): array
+    {
+        $idUser = session('auth_user.id_user');
+
+        if (! $idUser) {
+            return [];
+        }
+
+        return parkir_areas::where('id_user', $idUser)->pluck('id_area')->all();
+    }
 
     /**
      * Billed hours: rounded up, minimum 1 hour.

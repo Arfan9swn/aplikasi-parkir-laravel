@@ -57,7 +57,7 @@
         <form method="POST" action="{{ url('/keluar/pay') }}" class="mt-6 flex items-center justify-end gap-3">
             @csrf
             <input type="hidden" name="id_parkir" value="{{ $ticket->id_parkir }}">
-            <a href="{{ url('/keluar') }}"
+            <a href="{{ $backUrl }}"
                class="rounded-xl border border-primary-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-primary-50">
                 Batal / cari lain
             </a>

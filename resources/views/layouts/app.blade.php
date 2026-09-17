@@ -7,7 +7,7 @@
     @vite('resources/css/app.css')
 </head>
 <body class="min-h-screen bg-primary-50 font-sans text-slate-800 antialiased">
-    @php $path = trim(request()->path(), '/'); @endphp
+    @php $section = explode('/', trim(request()->path(), '/'))[0]; @endphp
 
     <header class="sticky top-0 z-40 border-b border-primary-200/60 bg-white shadow-sm">
         <div class="mx-auto flex flex-wrap gap-x-6 px-6 py-3">
@@ -33,7 +33,7 @@
             <nav class="hidden items-center gap-1 text-sm font-medium md:flex">
                 @foreach ($nav as $item)
                     <a href="{{ $item[0] }}"
-                       class="nav-link rounded-lg px-3 py-1.5 {{ trim($item[0], '/') === $path ? 'is-active' : '' }}">{{ $item[1] }}</a>
+                       class="nav-link rounded-lg px-3 py-1.5 {{ trim($item[0], '/') === $section ? 'is-active' : '' }}">{{ $item[1] }}</a>
                 @endforeach
             </nav>
 
@@ -78,7 +78,7 @@
                     <div class="absolute right-0 top-full mt-2 w-52 rounded-2xl border border-primary-100 bg-white p-2 shadow-xl">
                         @foreach ($nav as $item)
                             <a href="{{ $item[0] }}"
-                               class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-primary-50 hover:text-primary-700 {{ trim($item[0], '/') === $path ? 'bg-primary-50 text-primary-700' : '' }}">
+                               class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-primary-50 hover:text-primary-700 {{ trim($item[0], '/') === $section ? 'bg-primary-50 text-primary-700' : '' }}">
                                 {{ $item[1] }}
                             </a>
                         @endforeach

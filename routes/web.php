@@ -41,6 +41,7 @@ Route::get('/masuk', [MasukController::class, 'create'])->name('ticket.masuk');
 Route::post('/masuk', [MasukController::class, 'store']);
 
 Route::get('/keluar', [KeluarController::class, 'create'])->name('ticket.keluar');
+Route::get('/keluar/{ticket}', [KeluarController::class, 'show'])->whereNumber('ticket')->name('ticket.keluar.show');
 Route::post('/keluar/check', [KeluarController::class, 'check']);
 Route::post('/keluar/pay', [KeluarController::class, 'pay']);
 
