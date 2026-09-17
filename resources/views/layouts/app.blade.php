@@ -19,22 +19,36 @@
             </a>
 
             @php
+                /*
+                | Guests (no session) only see what they may actually use:
+                | the landing page, the areas and the reservation form.
+                | Staff links appear once a session exists.
+                */
                 $nav = [
-                    ['/',          'Beranda',   'beranda'],
-                    ['/masuk',     'Masuk',     'masuk'],
-                    ['/keluar',    'Keluar',    'keluar'],
-                    ['/transaksi', 'Transaksi', 'transaksi'],
+                    ['/',          'Beranda',   ''],
                     ['/area',      'Area',      'area'],
-                    ['/kendaraan', 'Kendaraan', 'kendaraan'],
-                    ['/tarif',     'Tarif',     'tarif'],
-                    ['/log',       'Log',       'log'],
+                    ['/reservasi', 'Reservasi', 'reservasi'],
                 ];
+
+                if (session('auth_user')) {
+                    $nav = [
+                        ['/',                 'Beranda',   ''],
+                        ['/masuk',            'Masuk',     'masuk'],
+                        ['/keluar',           'Keluar',    'keluar'],
+                        ['/transaksi',        'Transaksi', 'transaksi'],
+                        ['/area',             'Area',      'area'],
+                        ['/kendaraan',        'Kendaraan', 'kendaraan'],
+                        ['/tarif',            'Tarif',     'tarif'],
+                        ['/reservasi/daftar', 'Reservasi', 'reservasi'],
+                        ['/log',              'Log',       'log'],
+                    ];
+                }
             @endphp
 
             <nav class="hidden items-center gap-1 text-sm font-medium md:flex">
                 @foreach ($nav as $item)
                     <a href="{{ $item[0] }}"
-                       class="nav-link rounded-lg px-3 py-1.5 {{ trim($item[0], '/') === $section ? 'is-active' : '' }}">{{ $item[1] }}</a>
+                       class="nav-link rounded-lg px-3 py-1.5 {{ $item[2] === $section ? 'is-active' : '' }}">{{ $item[1] }}</a>
                 @endforeach
             </nav>
 
@@ -79,7 +93,7 @@
                     <div class="absolute right-0 top-full mt-2 w-52 rounded-2xl border border-primary-100 bg-white p-2 shadow-xl">
                         @foreach ($nav as $item)
                             <a href="{{ $item[0] }}"
-                               class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-primary-50 hover:text-primary-700 {{ trim($item[0], '/') === $section ? 'bg-primary-50 text-primary-700' : '' }}">
+                               class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-primary-50 hover:text-primary-700 {{ $item[2] === $section ? 'bg-primary-50 text-primary-700' : '' }}">
                                 {{ $item[1] }}
                             </a>
                         @endforeach

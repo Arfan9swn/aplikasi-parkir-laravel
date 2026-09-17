@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\parkir_areas;
 use App\Models\parkir_logs;
+use App\Models\parkir_reservasis;
 use App\Models\parkir_transaksis;
 use App\Models\parkir_users;
 use Illuminate\Http\Request;
@@ -21,6 +22,50 @@ class AreaController extends Controller
         return view('area.index', [
             'areas'    => $areas,
             'canManage' => $this->canManage(),
+        ]);
+    }
+
+    /**
+     * Public area detail — which vehicles are in this area right now.
+     * Guests may see this page (it is one of the two things a visitor
+     * can browse); staff additionally get the pending-reservation count.
+     */
+    public function show(string $id)
+    {
+        $area = parkir_areas::with('petugas')->find($id);
+
+        if (! $area) {
+            return redirect()->route('ticket.area')->with('error', 'Area parkir tidak ditemukan.');
+        }
+
+        $sekarang = \Carbon\Carbon::now();
+
+        $parkir = parkir_transaksis::with(['kendaraan', 'tarif'])
+            ->where('status', 'masuk')
+            ->where('id_area', $area->id_area)
+            ->orderBy('waktu_masuk')
+            ->get()
+            ->map(function ($t) use ($sekarang) {
+                $masuk  = $t->waktu_masuk ? \Carbon\Carbon::parse($t->waktu_masuk) : $sekarang;
+                $menit  = max(0, (int) ceil($masuk->diffInSeconds($sekarang, false) / 60));
+                $durasi = max(1, (int) ceil($menit / 60));
+
+                return (object) [
+                    'transaksi'   => $t,
+                    'kendaraan'   => $t->kendaraan,
+                    'waktu_masuk' => $masuk,
+                    'durasi_jam'  => $durasi,
+                    'estimasi'    => round($durasi * (float) ($t->tarif->tarif_per_jam ?? 0), 2),
+                ];
+            });
+
+        return view('area.show', [
+            'area'              => $area,
+            'parkir'            => $parkir,
+            'reservasiMenunggu' => parkir_reservasis::where('id_area', $area->id_area)
+                ->where('status', 'menunggu')
+                ->count(),
+            'canManage'         => $this->canManage(),
         ]);
     }
 

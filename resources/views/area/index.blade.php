@@ -73,7 +73,9 @@
                         @endphp
                         <tr class="border-b border-primary-100 last:border-0">
                             <td class="px-4 py-3">
-                                <p class="font-semibold text-slate-800">{{ $a->nama_area }}</p>
+                                <a href="{{ route('ticket.area.show', $a->id_area) }}"
+                                   class="font-semibold text-slate-800 transition hover:text-primary-700">{{ $a->nama_area }}</a>
+                                <p class="mt-0.5 text-[11px] text-slate-400">Lihat kendaraan di area ini →</p>
                             </td>
                             <td class="px-4 py-2 text-slate-600">{{ $a->petugas->nama_lengkap ?? '-' }}</td>
                             <td class="px-4 py-2">{{ $a->kapasitas }}</td>

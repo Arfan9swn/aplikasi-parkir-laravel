@@ -15,21 +15,38 @@
         </p>
 
         <div class="mt-6 flex flex-wrap gap-3">
-            <a href="/masuk"
-               class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-primary-700 shadow-sm transition hover:bg-primary-50">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
-                    <path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
-                </svg>
-                Masuk Terbitkan Tiket
-            </a>
-            <a href="/keluar"
-               class="inline-flex items-center gap-2 rounded-xl border border-white/40 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>
-                </svg>
-                Keluar Bayar &amp; Pulang
-            </a>
+            @if (session('auth_user'))
+                <a href="/masuk"
+                   class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-primary-700 shadow-sm transition hover:bg-primary-50">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
+                        <path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
+                    </svg>
+                    Masuk Terbitkan Tiket
+                </a>
+                <a href="/keluar"
+                   class="inline-flex items-center gap-2 rounded-xl border border-white/40 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>
+                    </svg>
+                    Keluar Bayar &amp; Pulang
+                </a>
+            @else
+                <a href="{{ route('reservasi.create') }}"
+                   class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-primary-700 shadow-sm transition hover:bg-primary-50">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+                    </svg>
+                    Reservasi Slot Parkir
+                </a>
+                <a href="/area"
+                   class="inline-flex items-center gap-2 rounded-xl border border-white/40 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>
+                    </svg>
+                    Lihat Area &amp; Kendaraan
+                </a>
+            @endif
         </div>
 
         <p class="mt-6 font-mono text-sm text-white/85">{{ now()->format('l, d F Y · H:i:s') }}</p>
@@ -72,18 +89,20 @@
             <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ number_format($active, 0, ',', '.') }}</p>
             <p class="mt-1 text-[11px] text-slate-300">Sedang parkir</p>
         </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
-            <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary-50 text-primary-600">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>
-                    </svg>
-                </span>
-                Pendapatan Hari Ini
-            </p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">Rp {{ number_format($revenue, 0, ',', '.') }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">Total bayar</p>
-        </div>
+        @if (session('auth_user'))
+            <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
+                <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary-50 text-primary-600">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>
+                        </svg>
+                    </span>
+                    Pendapatan Hari Ini
+                </p>
+                <p class="mt-1.5 text-2xl font-extrabold text-primary-700">Rp {{ number_format($revenue, 0, ',', '.') }}</p>
+                <p class="mt-1 text-[11px] text-slate-300">Total bayar</p>
+            </div>
+        @endif
     </section>
 
     <section class="mt-10">
