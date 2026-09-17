@@ -18,7 +18,7 @@ class AreaController extends Controller
     {
         $areas = parkir_areas::with('petugas')->get();
 
-        return view('ticket.area', [
+        return view('area.index', [
             'areas'    => $areas,
             'canManage' => $this->canManage(),
         ]);
@@ -28,7 +28,7 @@ class AreaController extends Controller
     {
         $this->authorizeManage();
 
-        return view('ticket.area-form', [
+        return view('area.create', [
             'area'           => null,
             'petugasOptions' => $this->petugasOptions(),
         ]);
@@ -71,7 +71,7 @@ class AreaController extends Controller
             return redirect()->route('ticket.area')->with('error', 'Area parkir tidak ditemukan.');
         }
 
-        return view('ticket.area-form', [
+        return view('area.edit', [
             'area'           => $area,
             'petugasOptions' => $this->petugasOptions($area->id_area),
         ]);

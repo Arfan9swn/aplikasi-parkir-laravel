@@ -41,7 +41,7 @@ class LogController extends Controller
         // System log tail (only for staff roles).
         $sysLog = $staff ? $this->tailSystemLog() : null;
 
-        return view('dashboard.aktivitas.index', [
+        return view('aktivitas.index', [
             'logs'   => $logs,
             'q'      => $q,
             'total'  => $total,

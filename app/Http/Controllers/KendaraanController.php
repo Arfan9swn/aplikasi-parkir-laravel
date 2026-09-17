@@ -29,7 +29,7 @@ class KendaraanController extends Controller
 
         $parked = parkir_transaksis::where('status', 'masuk')->get();
 
-        return view('ticket.kendaraan', [
+        return view('kendaraan.index', [
             'vehicles'  => $all,
             'parkedNow' => $parked->pluck('id_kendaraan')->mapWithKeys(function ($id) {
                 return [$id => true];
@@ -43,7 +43,7 @@ class KendaraanController extends Controller
     {
         $this->authorizeManage();
 
-        return view('ticket.kendaraan-form', [
+        return view('kendaraan.create', [
             'vehicle' => null,
             'users'   => parkir_users::all(),
         ]);
@@ -86,7 +86,7 @@ class KendaraanController extends Controller
             return redirect()->route('ticket.kendaraan')->with('error', 'Kendaraan tidak ditemukan.');
         }
 
-        return view('ticket.kendaraan-form', [
+        return view('kendaraan.edit', [
             'vehicle' => $kendaraan,
             'users'   => parkir_users::all(),
         ]);

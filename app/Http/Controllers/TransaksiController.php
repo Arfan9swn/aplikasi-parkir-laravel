@@ -32,7 +32,7 @@ class TransaksiController extends Controller
             })->values();
         }
 
-        return view('ticket.index', [
+        return view('transaksi.index', [
             'tickets' => $all,
             'q'       => $q,
             'status'  => $status,

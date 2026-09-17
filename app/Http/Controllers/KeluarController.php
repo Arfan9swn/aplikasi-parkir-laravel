@@ -15,7 +15,7 @@ class KeluarController extends Controller
      */
     public function create()
     {
-        return view('ticket.keluar');
+        return view('keluar.create');
     }
 
     /**
@@ -49,7 +49,7 @@ class KeluarController extends Controller
 
         $durasi = $this->durasi($ticket->waktu_masuk);
 
-        return view('ticket.keluar', [
+        return view('keluar.show', [
             'ticket' => $ticket,
             'durasi' => $durasi,
             'fee'    => $this->biaya($ticket, $durasi),
@@ -98,7 +98,7 @@ class KeluarController extends Controller
                 . ' untuk ' . ($ticket->kendaraan->plat_nomor ?? '-')
         );
 
-        return view('ticket.keluar', [
+        return view('keluar.receipt', [
             'receipt' => $ticket->fresh(['kendaraan', 'tarif', 'user', 'area']),
         ]);
     }

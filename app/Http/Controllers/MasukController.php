@@ -20,7 +20,7 @@ class MasukController extends Controller
         $areas = parkir_areas::with('petugas')->get();
         $tarifs = parkir_tarifs::all();
 
-        return view('ticket.masuk', compact('areas', 'tarifs'));
+        return view('masuk.create', compact('areas', 'tarifs'));
     }
 
     /**
@@ -90,7 +90,7 @@ class MasukController extends Controller
 
         $this->log($request, 'Menerbitkan tiket ' . $this->ticketNo($ticket->id_parkir) . ' untuk ' . $plate);
 
-        return view('ticket.masuk', [
+        return view('masuk.show', [
             'areas'  => parkir_areas::with('petugas')->get(),
             'tarifs' => parkir_tarifs::all(),
             'ticket' => parkir_transaksis::with(['kendaraan', 'tarif', 'area'])->find($ticket->id_parkir),
