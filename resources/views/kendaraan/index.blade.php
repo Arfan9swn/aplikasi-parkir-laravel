@@ -8,7 +8,7 @@
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold text-slate-800">Data Kendaraan</h1>
-            <p class="mt-1 text-sm text-slate-500">Semua kendaraan yang terdaftar di gerbang.</p>
+            <p class="mt-1 text-sm text-slate-500">Semua kendaraan yang terdaftar di gerbang. Klik nomor polisi untuk melihat riwayat parkirnya.</p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
             <form method="GET" action="{{ url('/kendaraan') }}" class="flex items-center gap-2">
@@ -20,6 +20,10 @@
                 </button>
             </form>
             @if ($canManage)
+                <a href="{{ route('ticket.tarif') }}"
+                   class="inline-flex items-center gap-1.5 rounded-lg border border-primary-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-primary-50">
+                    Jenis &amp; Tarif
+                </a>
                 <a href="{{ route('ticket.kendaraan.create') }}"
                    class="inline-flex items-center gap-1.5 rounded-lg bg-primary-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-600">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -53,7 +57,10 @@
                             $parked = isset($parkedNow[$v->id_kendaraan]);
                         @endphp
                         <tr class="border-b border-primary-100 last:border-0">
-                            <td class="px-4 py-2 font-mono font-semibold text-slate-800">{{ $v->plat_nomor }}</td>
+                            <td class="px-4 py-2">
+                                <a href="{{ route('ticket.kendaraan.show', $v->id_kendaraan) }}"
+                                   class="font-mono font-semibold text-primary-700 transition hover:text-primary-800 hover:underline">{{ $v->plat_nomor }}</a>
+                            </td>
                             <td class="px-4 py-2">{{ ucfirst($v->jenis_kendaraan) }}</td>
                             <td class="px-4 py-2">{{ $v->warna }}</td>
                             <td class="px-4 py-2">{{ $v->pemilik }}</td>
@@ -68,6 +75,10 @@
                             @if ($canManage)
                                 <td class="px-4 py-2 text-right">
                                     <div class="flex items-center justify-end gap-1">
+                                        <a href="{{ route('ticket.kendaraan.show', $v->id_kendaraan) }}"
+                                           class="rounded-lg border border-primary-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-600 transition hover:bg-primary-50">
+                                            Riwayat
+                                        </a>
                                         <a href="{{ route('ticket.kendaraan.edit', $v->id_kendaraan) }}"
                                            class="rounded-lg border border-primary-200 bg-white px-2.5 py-1 text-xs font-semibold text-primary-700 transition hover:bg-primary-50">
                                             Edit

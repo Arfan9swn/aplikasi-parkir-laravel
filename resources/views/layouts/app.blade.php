@@ -26,6 +26,7 @@
                     ['/transaksi', 'Transaksi', 'transaksi'],
                     ['/area',      'Area',      'area'],
                     ['/kendaraan', 'Kendaraan', 'kendaraan'],
+                    ['/tarif',     'Tarif',     'tarif'],
                     ['/log',       'Log',       'log'],
                 ];
             @endphp

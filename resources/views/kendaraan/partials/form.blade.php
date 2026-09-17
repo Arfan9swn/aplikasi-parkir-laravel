@@ -4,6 +4,8 @@
     Expects:
       $item   parkir_kendaraans model being edited, or null when creating
       $users  collection of parkir_users selectable as the data owner
+      $tarifs collection of parkir_tarifs — the source of truth for the types
+              a petugas may choose (add one on /tarif and it shows up here)
 --}}
 <form method="POST"
       action="{{ $item ? url('/kendaraan/' . $item->id_kendaraan) : url('/kendaraan') }}"
@@ -29,13 +31,18 @@
             <select name="jenis_kendaraan" required
                     class="mt-1 block w-full rounded-xl border border-primary-200 px-4 py-2.5 text-sm text-slate-800 focus:border-primary-500 focus:ring-2 focus:ring-primary-200">
                 <option value="">— Pilih jenis —</option>
-                @foreach (['motor' => 'Motor', 'mobil' => 'Mobil', 'lainnya' => 'Lainnya'] as $val => $lbl)
-                    <option value="{{ $val }}"
-                        @selected(old('jenis_kendaraan', $item->jenis_kendaraan ?? '') === $val)>
-                        {{ $lbl }}
+                @foreach ($tarifs as $t)
+                    <option value="{{ $t->jenis_kendaraan }}"
+                        @selected(old('jenis_kendaraan', $item->jenis_kendaraan ?? '') === $t->jenis_kendaraan)>
+                        {{ ucfirst($t->jenis_kendaraan) }} — Rp {{ number_format((float) $t->tarif_per_jam, 0, ',', '.') }}/jam
                     </option>
                 @endforeach
             </select>
+            @if ($tarifs->isEmpty())
+                <p class="mt-1 text-xs font-medium text-amber-600">
+                    Belum ada jenis kendaraan. <a href="{{ route('ticket.tarif.create') }}" class="underline">Tambah jenis</a> terlebih dahulu.
+                </p>
+            @endif
             @error('jenis_kendaraan')
                 <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
             @enderror

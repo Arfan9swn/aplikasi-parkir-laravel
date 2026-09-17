@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\parkir_kendaraans;
 use App\Models\parkir_logs;
+use App\Models\parkir_tarifs;
 use App\Models\parkir_transaksis;
 use App\Models\parkir_users;
 use Illuminate\Http\Request;
@@ -39,6 +40,77 @@ class KendaraanController extends Controller
         ]);
     }
 
+    /**
+     * One vehicle's parking history, grouped by the area it was parked in.
+     */
+    public function show(string $id)
+    {
+        $kendaraan = parkir_kendaraans::with('user')->find($id);
+
+        if (! $kendaraan) {
+            return redirect()->route('ticket.kendaraan')->with('error', 'Kendaraan tidak ditemukan.');
+        }
+
+        $riwayat = parkir_transaksis::with(['area', 'tarif'])
+            ->where('id_kendaraan', $kendaraan->id_kendaraan)
+            ->get()
+            ->sortByDesc('waktu_masuk')
+            ->values();
+
+        $visits = $riwayat->map(function ($t) {
+            $selesai = $t->status === 'keluar' && $t->waktu_keluar;
+
+            return [
+                'ticket'  => $t,
+                'ongoing' => ! $selesai,
+                // Settled tickets carry their billed hours; an active one is
+                // still running, so bill it the same way check-out would.
+                'durasi'  => $selesai ? (int) ($t->durasi_jam ?? 0) : $this->durasiJam($t->waktu_masuk),
+                'biaya'   => (float) ($t->biaya_total ?? 0),
+            ];
+        });
+
+        $perArea = [];
+
+        foreach ($visits as $visit) {
+            $nama = $visit['ticket']->area->nama_area ?? 'Tanpa area';
+
+            if (! isset($perArea[$nama])) {
+                $perArea[$nama] = [
+                    'nama_area'     => $nama,
+                    'kunjungan'     => 0,
+                    'total_jam'     => 0,
+                    'total_biaya'   => 0.0,
+                    'sedang_parkir' => false,
+                    'visits'        => [],
+                ];
+            }
+
+            $perArea[$nama]['kunjungan']++;
+            $perArea[$nama]['total_jam'] += $visit['durasi'];
+            $perArea[$nama]['total_biaya'] += $visit['biaya'];
+            $perArea[$nama]['sedang_parkir'] = $perArea[$nama]['sedang_parkir'] || $visit['ongoing'];
+            $perArea[$nama]['visits'][] = $visit;
+        }
+
+        // Busiest area first — that is where this vehicle usually goes.
+        usort($perArea, fn ($a, $b) => $b['kunjungan'] <=> $a['kunjungan']);
+
+        $kunjungan = $visits->count();
+        $totalJam  = (int) $visits->sum('durasi');
+
+        return view('kendaraan.show', [
+            'vehicle'      => $kendaraan,
+            'perArea'      => $perArea,
+            'kunjungan'    => $kunjungan,
+            'totalJam'     => $totalJam,
+            'totalBiaya'   => (float) $visits->sum('biaya'),
+            'sedangParkir' => $visits->contains('ongoing', true),
+            'rataRata'     => $kunjungan > 0 ? round($totalJam / $kunjungan, 1) : 0,
+            'canManage'    => $this->canManage(),
+        ]);
+    }
+
     public function create()
     {
         $this->authorizeManage();
@@ -46,6 +118,7 @@ class KendaraanController extends Controller
         return view('kendaraan.create', [
             'vehicle' => null,
             'users'   => parkir_users::all(),
+            'tarifs'  => parkir_tarifs::all(),
         ]);
     }
 
@@ -55,7 +128,7 @@ class KendaraanController extends Controller
 
         $validator = Validator::make($request->all(), [
             'plat_nomor'      => 'required|string|unique:tb_kendaraan,plat_nomor',
-            'jenis_kendaraan' => 'required|string',
+            'jenis_kendaraan' => 'required|string|in:' . implode(',', parkir_tarifs::pluck('jenis_kendaraan')->all()),
             'warna'           => 'nullable|string',
             'pemilik'         => 'nullable|string',
             'id_user'         => 'required|integer|exists:tb_user,id_user',
@@ -89,6 +162,7 @@ class KendaraanController extends Controller
         return view('kendaraan.edit', [
             'vehicle' => $kendaraan,
             'users'   => parkir_users::all(),
+            'tarifs'  => parkir_tarifs::all(),
         ]);
     }
 
@@ -104,7 +178,7 @@ class KendaraanController extends Controller
 
         $validator = Validator::make($request->all(), [
             'plat_nomor'      => 'required|string|unique:tb_kendaraan,plat_nomor,' . $id . ',id_kendaraan',
-            'jenis_kendaraan' => 'required|string',
+            'jenis_kendaraan' => 'required|string|in:' . implode(',', parkir_tarifs::pluck('jenis_kendaraan')->all()),
             'warna'           => 'nullable|string',
             'pemilik'         => 'nullable|string',
             'id_user'         => 'required|integer|exists:tb_user,id_user',
@@ -144,6 +218,21 @@ class KendaraanController extends Controller
     // ------------------------------------------------------------
     // helpers
     // ------------------------------------------------------------
+    /**
+     * Hours a vehicle has been (or was) parked, rounded up, minimum 1.
+     * Mirrors the check-out billing so the history matches the receipt.
+     */
+    private function durasiJam($waktuMasuk): int
+    {
+        if (! $waktuMasuk) {
+            return 0;
+        }
+
+        $menit = (int) ceil(abs(\Carbon\Carbon::parse($waktuMasuk)->diffInSeconds(\Carbon\Carbon::now(), false)) / 60);
+
+        return max(1, (int) ceil($menit / 60));
+    }
+
     private function canManage(): bool
     {
         $role = session('auth_user.role') ?? '';
