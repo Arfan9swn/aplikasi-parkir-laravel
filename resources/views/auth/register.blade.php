@@ -20,18 +20,25 @@
                 </div>
             </div>
 
-            <form id="register-form" class="mt-6 space-y-4" novalidate>
+            <form method="POST" action="{{ url('/registrasi') }}" class="mt-6 space-y-4">
+                @csrf
                 <div>
                     <label for="register-nama" class="text-xs font-semibold uppercase tracking-wide text-slate-500">Nama Lengkap</label>
-                    <input id="register-nama" name="nama_lengkap" type="text" autocomplete="name" required
+                    <input id="register-nama" name="nama_lengkap" type="text" autocomplete="name" required value="{{ old('nama_lengkap') }}"
                         class="mt-1.5 w-full rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
                         placeholder="cth: Budi Santoso" />
+                    @error('nama_lengkap')
+                        <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div>
                     <label for="register-username" class="text-xs font-semibold uppercase tracking-wide text-slate-500">Username</label>
-                    <input id="register-username" name="username" type="text" autocomplete="username" required
+                    <input id="register-username" name="username" type="text" autocomplete="username" required value="{{ old('username') }}"
                         class="mt-1.5 w-full rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
                         placeholder="cth: budi" />
+                    @error('username')
+                        <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -39,6 +46,9 @@
                         <input id="register-password" name="password" type="password" autocomplete="new-password" required
                             class="mt-1.5 w-full rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
                             placeholder="min. 8 karakter" />
+                        @error('password')
+                            <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
                         <label for="register-password2" class="text-xs font-semibold uppercase tracking-wide text-slate-500">Konfirmasi</label>
@@ -47,7 +57,7 @@
                             placeholder="ulangi password" />
                     </div>
                 </div>
-                <button id="register-submit" type="submit"
+                <button type="submit"
                     class="w-full rounded-xl bg-primary-500 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-600 disabled:opacity-60">
                     Daftar
                 </button>

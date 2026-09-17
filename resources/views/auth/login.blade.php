@@ -19,20 +19,27 @@
                 </div>
             </div>
 
-            <form id="login-form" class="mt-6 space-y-4" novalidate>
+            <form method="POST" action="{{ url('/login') }}" class="mt-6 space-y-4">
+                @csrf
                 <div>
                     <label for="login-username" class="text-xs font-semibold uppercase tracking-wide text-slate-500">Username</label>
-                    <input id="login-username" name="username" type="text" autocomplete="username" required
+                    <input id="login-username" name="username" type="text" autocomplete="username" required value="{{ old('username') }}"
                         class="mt-1.5 w-full rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
                         placeholder="cth: petugas" />
+                    @error('username')
+                        <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
                 <div>
                     <label for="login-password" class="text-xs font-semibold uppercase tracking-wide text-slate-500">Password</label>
                     <input id="login-password" name="password" type="password" autocomplete="current-password" required
                         class="mt-1.5 w-full rounded-xl border border-primary-200 bg-white px-4 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
                         placeholder="••••••••" />
+                    @error('password')
+                        <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
-                <button id="login-submit" type="submit"
+                <button type="submit"
                     class="w-full rounded-xl bg-primary-500 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-600 disabled:opacity-60">
                     Masuk
                 </button>

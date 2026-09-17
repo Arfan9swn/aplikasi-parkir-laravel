@@ -147,6 +147,92 @@ class AuthController extends Controller
         return redirect()->route('beranda');
     }
 
+    /**
+     * Server-side login form handler (no JavaScript).
+     * POST /login
+     */
+    public function loginWeb(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ], [
+            'username.required' => 'Username wajib diisi.',
+            'password.required' => 'Password wajib diisi.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('login')->withInput()->withErrors($validator);
+        }
+
+        $user = parkir_users::where('username', $request->username)->first();
+
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            return redirect()->route('login')->withInput()->with('error', 'Username atau password salah.');
+        }
+
+        if ((int) $user->status_aktif !== 1) {
+            return redirect()->route('login')->withInput()->with('error', 'Akun ini dinonaktifkan. Silakan hubungi admin.');
+        }
+
+        $request->session()->put(self::SESSION_KEY, [
+            'id_user'  => $user->id_user,
+            'nama'     => $user->nama_lengkap,
+            'username' => $user->username,
+            'role'     => $user->role,
+        ]);
+
+        $this->logActivity($user, 'Login ke sistem.');
+
+        return redirect()->route('beranda');
+    }
+
+    /**
+     * Server-side registration form handler (no JavaScript).
+     * POST /registrasi
+     */
+    public function registerWeb(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nama_lengkap' => 'required|string|max:255',
+            'username'     => 'required|string|min:3|max:255|unique:tb_user,username',
+            'password'     => 'required|string|min:8|confirmed',
+        ], [
+            'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+            'username.required'     => 'Username wajib diisi.',
+            'username.min'          => 'Username minimal 3 karakter.',
+            'username.unique'       => 'Username sudah digunakan.',
+            'password.required'     => 'Password wajib diisi.',
+            'password.min'          => 'Password minimal 8 karakter.',
+            'password.confirmed'    => 'Konfirmasi password tidak cocok.',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withInput()->withErrors($validator);
+        }
+
+        $user = parkir_users::create([
+            'nama_lengkap' => $request->nama_lengkap,
+            'username'     => $request->username,
+            'password'     => Hash::make($request->password),
+            'role'         => 'petugas',
+            'status_aktif' => 1,
+        ]);
+
+        $this->logActivity($user, 'Registrasi akun baru');
+
+        $request->session()->put(self::SESSION_KEY, [
+            'id_user'  => $user->id_user,
+            'nama'     => $user->nama_lengkap,
+            'username' => $user->username,
+            'role'     => $user->role,
+        ]);
+
+        $this->logActivity($user, 'Login ke sistem.');
+
+        return redirect()->route('beranda');
+    }
+
     private function flushSession(Request $request): void
     {
         $session = $request->session()->get(self::SESSION_KEY);

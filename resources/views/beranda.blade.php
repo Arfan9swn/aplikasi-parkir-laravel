@@ -32,7 +32,7 @@
             </a>
         </div>
 
-        <p class="mt-6 font-mono text-sm text-white/85" id="hero-clock">—</p>
+        <p class="mt-6 font-mono text-sm text-white/85">{{ now()->format('l, d F Y · H:i:s') }}</p>
     </section>
 
     <section class="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -45,9 +45,7 @@
                 </span>
                 Total Slot
             </p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700" id="stat-spots">
-                <span class="skeleton inline-block h-7 w-16 rounded stat-skeleton"></span>
-            </p>
+            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ number_format($spots, 0, ',', '.') }}</p>
             <p class="mt-1 text-[11px] text-slate-300">Kapasitas parkir</p>
         </div>
         <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
@@ -59,9 +57,7 @@
                 </span>
                 Terisi Saat Ini
             </p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700" id="stat-occupied">
-                <span class="skeleton inline-block h-7 w-16 rounded stat-skeleton"></span>
-            </p>
+            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ number_format($occupied, 0, ',', '.') }}</p>
             <p class="mt-1 text-[11px] text-slate-300">Slot terpakai</p>
         </div>
         <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
@@ -73,9 +69,7 @@
                 </span>
                 Tiket Aktif
             </p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700" id="stat-active">
-                <span class="skeleton inline-block h-7 w-16 rounded stat-skeleton"></span>
-            </p>
+            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ number_format($active, 0, ',', '.') }}</p>
             <p class="mt-1 text-[11px] text-slate-300">Sedang parkir</p>
         </div>
         <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
@@ -87,9 +81,7 @@
                 </span>
                 Pendapatan Hari Ini
             </p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700" id="stat-revenue">
-                <span class="skeleton inline-block h-7 w-16 rounded stat-skeleton"></span>
-            </p>
+            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">Rp {{ number_format($revenue, 0, ',', '.') }}</p>
             <p class="mt-1 text-[11px] text-slate-300">Total bayar</p>
         </div>
     </section>
@@ -120,9 +112,22 @@
             <h2 class="text-xl font-bold text-slate-800">Kondisi Parkir Saat Ini</h2>
             <a href="/area" class="text-sm font-semibold text-primary-600 transition hover:text-primary-700">Lihat semua area →</a>
         </div>
-        <div id="area-mini" class="mt-5 space-y-4">
-            <div class="skeleton h-4 w-full rounded"></div>
-            <div class="skeleton h-4 w-full rounded"></div>
+        <div class="mt-5 space-y-4">
+            @forelse ($areas as $a)
+                <div class="rise">
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="font-medium text-slate-700">{{ $a->nama_area }}</span>
+                        <span class="text-xs text-slate-500">{{ $a->terisi }} / {{ $a->kapasitas }}</span>
+                    </div>
+                    <div class="mt-1.5 h-2 rounded-full bg-primary-100 overflow-hidden">
+                        @php $pct = $a->kapasitas > 0 ? min(100, ($a->terisi / $a->kapasitas) * 100) : 0; @endphp
+                        <div class="h-full rounded-full {{ $a->terisi >= $a->kapasitas ? 'bg-red-400' : 'bg-primary-500' }}"
+                             style="width: {{ $pct }}%"></div>
+                    </div>
+                </div>
+            @empty
+                <p class="rounded-2xl border border-primary-100 bg-white p-8 text-center text-sm text-slate-400">Belum ada area parkir.</p>
+            @endforelse
         </div>
     </section>
 @endsection

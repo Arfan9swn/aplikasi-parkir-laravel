@@ -1,32 +1,30 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AreaController;
+use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\TicketController;
+use App\Http\Controllers\KeluarController;
+use App\Http\Controllers\KendaraanController;
+use App\Http\Controllers\LogController;
+use App\Http\Controllers\MasukController;
+use App\Http\Controllers\TransaksiController;
 
 /*
 |--------------------------------------------------------------------------
-| ParkEase — simple parking ticketing
+| ParkEase — simple parking ticketing (server-rendered, no JavaScript)
 |--------------------------------------------------------------------------
-| Pages render here; all dynamic data is fetched client-side from /api/*.
+| All pages render server-side with Blade; every action is a standard
+| GET / POST form submission with validation & redirects.
 */
 
-Route::get('/', function () {
-    return view('beranda');
-})->name('beranda');
-
-Route::get('/masuk', [TicketController::class, 'ticketMasuk'])->name('ticket.masuk');
-Route::get('/keluar', [TicketController::class, 'ticketKeluar'])->name('ticket.keluar');
-Route::get('/transaksi', [TicketController::class, 'ticketIndex'])->name('ticket.index');
-Route::get('/area', [TicketController::class, 'ticketArea'])->name('ticket.area');
-Route::get('/kendaraan', [TicketController::class, 'ticketKendaraan'])->name('ticket.kendaraan');
+Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 
 /*
 |--------------------------------------------------------------------------
-| Legacy pages (previous dashboard & auth views)
+| Authentication
 |--------------------------------------------------------------------------
 */
-
 Route::get('/login', function () {
     if (session('auth_user')) {
         return redirect()->route('beranda');
@@ -34,7 +32,7 @@ Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
 
-Route::post('/logout', [AuthController::class, 'logoutWeb'])->name('logout');
+Route::post('/login', [AuthController::class, 'loginWeb']);
 
 Route::get('/registrasi', function () {
     if (session('auth_user')) {
@@ -43,18 +41,57 @@ Route::get('/registrasi', function () {
     return view('auth.register');
 })->name('register');
 
-Route::get('/dashboard', function () {
-    return view('dashboard.dashboard');
-});
+Route::post('/registrasi', [AuthController::class, 'registerWeb']);
 
-Route::get('/riwayat-parkir', function () {
-    return view('dashboard.riwayat.index');
-});
+Route::post('/logout', [AuthController::class, 'logoutWeb'])->name('logout');
 
-Route::get('/log', function () {
-    return view('dashboard.aktivitas.index');
-})->name('log');
+/*
+|--------------------------------------------------------------------------
+| Check-in / check-out
+|--------------------------------------------------------------------------
+*/
+Route::get('/masuk', [MasukController::class, 'create'])->name('ticket.masuk');
+Route::post('/masuk', [MasukController::class, 'store']);
 
-Route::get('/log-aktivitas', function () {
-    return view('dashboard.aktivitas.index');
-});
+Route::get('/keluar', [KeluarController::class, 'create'])->name('ticket.keluar');
+Route::post('/keluar/check', [KeluarController::class, 'check']);
+Route::post('/keluar/pay', [KeluarController::class, 'pay']);
+
+/*
+|--------------------------------------------------------------------------
+| History
+|--------------------------------------------------------------------------
+*/
+Route::get('/transaksi', [TransaksiController::class, 'index'])->name('ticket.index');
+
+/*
+|--------------------------------------------------------------------------
+| Parking areas — every area has its own dedicated petugas
+|--------------------------------------------------------------------------
+*/
+Route::get('/area', [AreaController::class, 'index'])->name('ticket.area');
+Route::get('/area/create', [AreaController::class, 'create'])->name('ticket.area.create');
+Route::post('/area', [AreaController::class, 'store']);
+Route::get('/area/{area}/edit', [AreaController::class, 'edit'])->name('ticket.area.edit');
+Route::put('/area/{area}', [AreaController::class, 'update']);
+Route::delete('/area/{area}', [AreaController::class, 'destroy']);
+
+/*
+|--------------------------------------------------------------------------
+| Vehicles
+|--------------------------------------------------------------------------
+*/
+Route::get('/kendaraan', [KendaraanController::class, 'index'])->name('ticket.kendaraan');
+Route::get('/kendaraan/create', [KendaraanController::class, 'create'])->name('ticket.kendaraan.create');
+Route::post('/kendaraan', [KendaraanController::class, 'store']);
+Route::get('/kendaraan/{kendaraan}/edit', [KendaraanController::class, 'edit'])->name('ticket.kendaraan.edit');
+Route::put('/kendaraan/{kendaraan}', [KendaraanController::class, 'update']);
+Route::delete('/kendaraan/{kendaraan}', [KendaraanController::class, 'destroy']);
+
+/*
+|--------------------------------------------------------------------------
+| Logs
+|--------------------------------------------------------------------------
+*/
+Route::get('/log', [LogController::class, 'index'])->name('log');
+Route::get('/log-aktivitas', [LogController::class, 'index']);
