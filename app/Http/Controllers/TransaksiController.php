@@ -15,7 +15,7 @@ class TransaksiController extends Controller
         $q      = trim((string) $request->query('q', ''));
         $status = (string) $request->query('status', 'all');
 
-        $query = parkir_transaksis::with('kendaraan'), 'tarif', 'user', 'area');
+        $query = parkir_transaksis::with(['kendaraan', 'tarif', 'user', 'area']);
 
         if (in_array($status, ['masuk', 'keluar'], true)) {
             $query->where('status', $status);

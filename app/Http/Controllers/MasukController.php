@@ -93,7 +93,7 @@ class MasukController extends Controller
         return view('ticket.masuk', [
             'areas'  => parkir_areas::with('petugas')->get(),
             'tarifs' => parkir_tarifs::all(),
-            'ticket' => parkir_transaksis::with('kendaraan'), 'tarif', 'area')->find($ticket->id_parkir),
+            'ticket' => parkir_transaksis::with(['kendaraan', 'tarif', 'area'])->find($ticket->id_parkir),
         ]);
     }
 

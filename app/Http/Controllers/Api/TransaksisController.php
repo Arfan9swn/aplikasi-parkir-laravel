@@ -16,7 +16,7 @@ class TransaksisController extends Controller
      */
     public function index()
     {
-        $transaksis = parkir_transaksis::with('kendaraan'), 'tarif', 'user', 'area')->get();
+        $transaksis = parkir_transaksis::with(['kendaraan', 'tarif', 'user', 'area'])->get();
         return response()->json([
             'success' => true,
             'data' => $transaksis
@@ -92,7 +92,7 @@ class TransaksisController extends Controller
      */
     public function show(string $id)
     {
-        $transaksi = parkir_transaksis::with('kendaraan'), 'tarif', 'user', 'area')->find($id);
+        $transaksi = parkir_transaksis::with(['kendaraan', 'tarif', 'user', 'area'])->find($id);
 
         if (!$transaksi) {
             return response()->json([

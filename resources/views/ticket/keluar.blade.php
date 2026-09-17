@@ -83,7 +83,7 @@
                     </div>
                     <div>
                         <p class="text-xs text-slate-400">Jenis</p>
-                        <p class="text-slate-800">{{ ucfirst($ticket->kendaraan->jenis_kendarawan ?? '-') }}</p>
+                        <p class="text-slate-800">{{ ucfirst($ticket->kendaraan->jenis_kendaraan ?? '-') }}</p>
                     </div>
                     <div>
                         <p class="text-xs text-slate-400">Jam Masuk</p>
@@ -98,7 +98,7 @@
                         <p class="font-mono text-3xl font-extrabold text-primary-700">{{ $durasi }} jam</p>
                         @if (($ticket->tarif->tarif_per_jam ?? 0) > 0)
                             <p class="mt-0.5 text-xs text-slate-500">
-                                Tarif {{ ucfirst($ticket->tarif->jenis_kendarawan ?? '-') }}:
+                                Tarif {{ ucfirst($ticket->tarif->jenis_kendaraan ?? '-') }}:
                                 Rp {{ number_format((float) $ticket->tarif->tarif_per_jam, 0, ',', '.') }}/jam
                             </p>
                         @endif

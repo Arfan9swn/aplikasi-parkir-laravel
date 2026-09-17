@@ -23,7 +23,7 @@ class parkir_users extends Model
         'password'
     ];
 
-    public function kendaraans(): HasMany
+    public function kendaraan(): HasMany
     {
         return $this->hasMany(parkir_kendaraans::class, 'id_user', 'id_user');
     }

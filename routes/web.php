@@ -10,14 +10,6 @@ use App\Http\Controllers\LogController;
 use App\Http\Controllers\MasukController;
 use App\Http\Controllers\TransaksiController;
 
-/*
-|--------------------------------------------------------------------------
-| ParkEase — simple parking ticketing (server-rendered, no JavaScript)
-|--------------------------------------------------------------------------
-| All pages render server-side with Blade; every action is a standard
-| GET / POST form submission with validation & redirects.
-*/
-
 Route::get('/', [BerandaController::class, 'index'])->name('beranda');
 
 /*
@@ -45,11 +37,6 @@ Route::post('/registrasi', [AuthController::class, 'registerWeb']);
 
 Route::post('/logout', [AuthController::class, 'logoutWeb'])->name('logout');
 
-/*
-|--------------------------------------------------------------------------
-| Check-in / check-out
-|--------------------------------------------------------------------------
-*/
 Route::get('/masuk', [MasukController::class, 'create'])->name('ticket.masuk');
 Route::post('/masuk', [MasukController::class, 'store']);
 
@@ -57,18 +44,8 @@ Route::get('/keluar', [KeluarController::class, 'create'])->name('ticket.keluar'
 Route::post('/keluar/check', [KeluarController::class, 'check']);
 Route::post('/keluar/pay', [KeluarController::class, 'pay']);
 
-/*
-|--------------------------------------------------------------------------
-| History
-|--------------------------------------------------------------------------
-*/
 Route::get('/transaksi', [TransaksiController::class, 'index'])->name('ticket.index');
 
-/*
-|--------------------------------------------------------------------------
-| Parking areas — every area has its own dedicated petugas
-|--------------------------------------------------------------------------
-*/
 Route::get('/area', [AreaController::class, 'index'])->name('ticket.area');
 Route::get('/area/create', [AreaController::class, 'create'])->name('ticket.area.create');
 Route::post('/area', [AreaController::class, 'store']);
@@ -76,11 +53,6 @@ Route::get('/area/{area}/edit', [AreaController::class, 'edit'])->name('ticket.a
 Route::put('/area/{area}', [AreaController::class, 'update']);
 Route::delete('/area/{area}', [AreaController::class, 'destroy']);
 
-/*
-|--------------------------------------------------------------------------
-| Vehicles
-|--------------------------------------------------------------------------
-*/
 Route::get('/kendaraan', [KendaraanController::class, 'index'])->name('ticket.kendaraan');
 Route::get('/kendaraan/create', [KendaraanController::class, 'create'])->name('ticket.kendaraan.create');
 Route::post('/kendaraan', [KendaraanController::class, 'store']);
@@ -88,10 +60,5 @@ Route::get('/kendaraan/{kendaraan}/edit', [KendaraanController::class, 'edit'])-
 Route::put('/kendaraan/{kendaraan}', [KendaraanController::class, 'update']);
 Route::delete('/kendaraan/{kendaraan}', [KendaraanController::class, 'destroy']);
 
-/*
-|--------------------------------------------------------------------------
-| Logs
-|--------------------------------------------------------------------------
-*/
 Route::get('/log', [LogController::class, 'index'])->name('log');
 Route::get('/log-aktivitas', [LogController::class, 'index']);

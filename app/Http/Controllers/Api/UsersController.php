@@ -15,7 +15,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $users = parkir_users::with('kendaraan'), 'transaksis', 'logs')->get();
+        $users = parkir_users::with(['kendaraan', 'transaksis', 'logs'])->get();
         return response()->json([
             'success' => true,
             'data' => $users
@@ -59,7 +59,7 @@ class UsersController extends Controller
      */
     public function show(string $id)
     {
-        $user = parkir_users::with('kendaraan'), 'transaksis', 'logs')->find($id);
+        $user = parkir_users::with(['kendaraan', 'transaksis', 'logs'])->find($id);
 
         if (!$user) {
             return response()->json([

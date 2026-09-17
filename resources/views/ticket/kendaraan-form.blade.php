@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'park.')
-@section('page', 'kendarawan')
+@section('page', 'kendaraan')
 
 @section('content')
     <div class="flex items-center justify-between">
@@ -11,14 +11,14 @@
                 {{ $vehicle ? 'Perbarui data kendaraan ini.' : 'Daftarkan kendaraan baru.' }}
             </p>
         </div>
-        <a href="{{ route('ticket.kendarawan') }}"
+        <a href="{{ route('ticket.kendaraan') }}"
            class="rounded-xl border border-primary-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-primary-50">
             Batal
         </a>
     </div>
 
     <form method="POST"
-          action="{{ $vehicle ? url('/kendarawan/' . $vehicle->id_kendaraan) : url('/kendarawan') }}"
+          action="{{ $vehicle ? url('/kendaraan/' . $vehicle->id_kendaraan) : url('/kendaraan') }}"
           class="mt-6 rounded-2xl border border-primary-100 bg-white p-6 shadow-sm sm:p-8">
         @csrf
         @if ($vehicle)
@@ -38,17 +38,17 @@
 
             <div>
                 <label class="block text-xs font-medium text-slate-500">Jenis Kendaraan</label>
-                <select name="jenis_kendarawan" required
+                <select name="jenis_kendaraan" required
                         class="mt-1 block w-full rounded-xl border border-primary-200 px-4 py-2.5 text-sm text-slate-800 focus:border-primary-500 focus:ring-2 focus:ring-primary-200">
                     <option value="">— Pilih jenis —</option>
                     @foreach (['motor' => 'Motor', 'mobil' => 'Mobil', 'lainnya' => 'Lainnya'] as $val => $lbl)
                         <option value="{{ $val }}"
-                            @selected(old('jenis_kendarawan', $vehicle->jenis_kendaraan ?? '') === $val)>
+                            @selected(old('jenis_kendaraan', $vehicle->jenis_kendaraan ?? '') === $val)>
                             {{ $lbl }}
                         </option>
                     @endforeach
                 </select>
-                @error('jenis_kendarawan')
+                @error('jenis_kendaraan')
                     <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
                 @enderror
             </div>
@@ -88,7 +88,7 @@
         </div>
 
         <div class="mt-6 flex items-center justify-end gap-3 border-t border-primary-100 pt-4">
-            <a href="{{ route('ticket.kendarawan') }}"
+            <a href="{{ route('ticket.kendaraan') }}"
                class="rounded-xl border border-primary-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-primary-50">
                 Batal
             </a>

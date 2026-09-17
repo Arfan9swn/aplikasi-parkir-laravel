@@ -35,6 +35,7 @@ class KendaraanController extends Controller
                 return [$id => true];
             })->all(),
             'q'         => $q,
+            'canManage' => $this->canManage(),
         ]);
     }
 
@@ -143,10 +144,15 @@ class KendaraanController extends Controller
     // ------------------------------------------------------------
     // helpers
     // ------------------------------------------------------------
-    private function authorizeManage()
+    private function canManage(): bool
     {
         $role = session('auth_user.role') ?? '';
-        if (! in_array($role, ['admin', 'petugas'], true)) {
+        return in_array($role, ['admin', 'petugas'], true);
+    }
+
+    private function authorizeManage()
+    {
+        if (! $this->canManage()) {
             abort(403, 'Akses dibatasi untuk admin / petugas.');
         }
     }
