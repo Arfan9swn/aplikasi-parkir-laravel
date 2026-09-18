@@ -9,7 +9,7 @@
 
     --color-primary-50:  #eef3f8;
     --color-primary-100: #e0eaf4;
-    --color-primary-200: #c2d5e9;
+    --color-primary-200: #b8cdf9;
     --color-primary-300: #9db8d8;
     --color-primary-400: #6f95c0;
     --color-primary-500: #395a7f;
@@ -19,11 +19,15 @@
     --color-primary-900: #111e2d;
 }
 
+body {
+    background-color: rgb(228, 227, 255);
+}
+
 /* =====================================================================
    Little animations
    ===================================================================== */
 @keyframes rise-in {
-    from { opacity: 0; transform: translateY(18px); }
+    from { opacity: 0; transform: translateY(13px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -155,11 +159,11 @@ body[data-sidebar-collapsed="true"] { --sidebar-width: 4.5rem; }
     transition: background-color 160ms ease, color 160ms ease;
 }
 .sidebar-action[hidden] { display: none; }
-.sidebar-action:hover { background: var(--color-primary-100); color: var(--color-primary-800); }
+.sidebar-action:hover { border: solid 2px #395a7f; box-shadow: 2px 3px 8px #395a7f10; }
 .sidebar-action.is-active, .sidebar-login { background: var(--color-primary-500); color: white; box-shadow: 0 3px 8px #395a7f20; }
 .sidebar-action.is-active:hover, .sidebar-login:hover { background: var(--color-primary-600); color: white; }
 .sidebar-logout { color: #dc2626; }
-.sidebar-logout:hover { color: #b91c1c; background: #fef2f2; }
+.sidebar-logout:hover { color: #b91c1c; background: #e1c1c1; }
 .sidebar-toggle { background: var(--color-primary-50); }
 .sidebar-icon { flex-shrink: 0; }
 .sidebar-account { display: flex; flex-direction: column; gap: .5rem; margin-top: auto; border-top: 1px solid var(--color-primary-100); padding-top: 1rem; }

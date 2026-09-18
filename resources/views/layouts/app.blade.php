@@ -13,10 +13,10 @@
     <aside id="app-sidebar" class="app-sidebar" aria-label="Sidebar">
         <div class="sidebar-inner">
             <a href="/" class="sidebar-brand" aria-label="park. — Beranda" data-tooltip="Beranda">
-                <span class="sidebar-logo" aria-hidden="true">p.</span>
+                <span class="sidebar-logo" aria-hidden="true">P</span>
                 <span class="sidebar-label leading-tight">
                     <span class="block font-bold text-primary-700 text-2xl">park.</span>
-                    <span class="block text-[11px] tracking-widest text-slate-400">tiket parkir.</span>
+                    <span class="block text-[11px] tracking-widest text-slate-400">aplikasi tiket parkir.</span>
                 </span>
             </a>
             <button type="button" id="sidebar-toggle" class="sidebar-action sidebar-toggle" aria-controls="sidebar-navigation" aria-expanded="true" aria-label="Ciutkan sidebar" data-tooltip="Ciutkan sidebar" hidden>
@@ -25,11 +25,6 @@
             </button>
 
             @php
-                /*
-                | Guests (no session) only see what they may actually use:
-                | the landing page, the areas and the reservation form.
-                | Staff links appear once a session exists.
-                */
                 $nav = [
                     ['/',          'Beranda',   ''],
                     ['/area',      'Area',      'area'],

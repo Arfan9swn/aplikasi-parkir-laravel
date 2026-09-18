@@ -53,7 +53,7 @@
     </section>
 
     <section class="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm hover:-translate-y-0.5 transition-all duration-400 ease-in-out">
             <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary-50 text-primary-600">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -63,9 +63,9 @@
                 Total Slot
             </p>
             <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ number_format($spots, 0, ',', '.') }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">Kapasitas parkir</p>
+            <p class="mt-1 text-[11px] text-slate-500">Kapasitas parkir</p>
         </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm hover:-translate-y-0.5 transition-all duration-400 ease-in-out">
             <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary-50 text-primary-600">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -75,9 +75,9 @@
                 Terisi Saat Ini
             </p>
             <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ number_format($occupied, 0, ',', '.') }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">Slot terpakai</p>
+            <p class="mt-1 text-[11px] text-slate-500">Slot terpakai</p>
         </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
+        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm hover:-translate-y-0.5 transition-all duration-400 ease-in-out">
             <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary-50 text-primary-600">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -87,10 +87,10 @@
                 Tiket Aktif
             </p>
             <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ number_format($active, 0, ',', '.') }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">Sedang parkir</p>
+            <p class="mt-1 text-[11px] text-slate-500">Sedang parkir</p>
         </div>
         @if (session('auth_user'))
-            <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
+            <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm hover:-translate-y-0.5 transition-all duration-400 ease-in-out">
                 <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
                     <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary-50 text-primary-600">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -100,7 +100,7 @@
                     Pendapatan Hari Ini
                 </p>
                 <p class="mt-1.5 text-2xl font-extrabold text-primary-700">Rp {{ number_format($revenue, 0, ',', '.') }}</p>
-                <p class="mt-1 text-[11px] text-slate-300">Total bayar</p>
+                <p class="mt-1 text-[11px] text-slate-500">Total bayar</p>
             </div>
         @endif
     </section>
