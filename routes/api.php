@@ -27,5 +27,5 @@ Route::apiResources([
 ]);
 
 Route::get('/system-logs', [LogsController::class, 'systemLog'])
-    ->middleware('role:admin,petugas,owner');
+    ->middleware('role:admin,owner');
 ?>

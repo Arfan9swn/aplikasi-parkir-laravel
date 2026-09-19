@@ -41,7 +41,7 @@
             <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ number_format((int) $users, 0, ',', '.') }}</p>
             <p class="mt-1 text-[11px] text-slate-300">Pengguna terdaftar</p>
         </div>
-        @if ($staff)
+        @if ($admin)
             <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Error Sistem</p>
                 <p class="mt-1.5 text-2xl font-extrabold text-red-600">{{ number_format((int) $errorCount, 0, ',', '.') }}</p>
@@ -90,8 +90,8 @@
         </div>
     </section>
 
-    @if ($staff)
-        @if ($sysLog)
+        @if ($admin)
+            @if ($sysLog)
             <section class="mt-8">
                 <div class="mb-3 flex items-center justify-between">
                     <div>

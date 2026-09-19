@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\parkir_logs;
 use App\Models\parkir_users;
+use App\Support\SortHelper;
 use Illuminate\Http\Request;
 
 class LogController extends Controller
@@ -15,6 +16,7 @@ class LogController extends Controller
     {
         $role = session('auth_user.role') ?? '';
         $staff = in_array($role, ['admin', 'petugas', 'owner'], true);
+        $admin = $role === 'admin' || $role === 'owner';
 
         $q = trim((string) $request->query('q', ''));
 
@@ -49,8 +51,8 @@ class LogController extends Controller
         $today = parkir_logs::where('waktu_aktivitas', 'like', date('Y-m-d') . '%')->count();
         $users = parkir_users::count();
 
-        // System log tail (only for staff roles).
-        $sysLog = $staff ? $this->tailSystemLog() : null;
+        // System log tail — admins only, petugas must not see server internals.
+        $sysLog = $admin ? $this->tailSystemLog() : null;
 
         return view('aktivitas.index', [
             'logs'   => $logs,
@@ -60,6 +62,7 @@ class LogController extends Controller
             'users'  => $users,
             'sysLog' => $sysLog,
             'staff'  => $staff,
+            'admin'  => $admin,
             'allowed' => $allowed,
         ]);
     }
