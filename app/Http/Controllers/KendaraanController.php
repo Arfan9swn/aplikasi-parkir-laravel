@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\parkir_kendaraans;
+use App\Support\SortHelper;
 use App\Models\parkir_logs;
 use App\Models\parkir_tarifs;
 use App\Models\parkir_transaksis;
-use App\Models\parkir_users;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,12 +14,24 @@ class KendaraanController extends Controller
 {
     /**
      * Server-rendered vehicle registry.
+     *
+     * Sortable columns: plat_nomor, jenis, warna, pemilik, created_at.
      */
     public function index(Request $request)
     {
         $q = trim((string) $request->query('q', ''));
 
-        $all = parkir_kendaraans::with('user')->get();
+        $allowed = ['plat_nomor', 'jenis_kendaraan', 'warna', 'pemilik', 'created_at'];
+        $sort    = SortHelper::field((string) $request->query('sort'), $allowed);
+        $dir     = SortHelper::direction((string) $request->query('dir'));
+
+        $query = parkir_kendaraans::with('user');
+        if (! $request->has('sort')) {
+            $query->orderBy('plat_nomor');
+        } else {
+            $query->orderBy($sort, $dir);
+        }
+        $all = $query->get();
 
         if ($q !== '') {
             $needle = strtoupper($q);
@@ -37,6 +49,9 @@ class KendaraanController extends Controller
             })->all(),
             'q'         => $q,
             'canManage' => $this->canManage(),
+            'sort'      => $sort,
+            'dir'       => $dir,
+            'allowed'   => $allowed,
         ]);
     }
 

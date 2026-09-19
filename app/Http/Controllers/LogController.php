@@ -18,7 +18,11 @@ class LogController extends Controller
 
         $q = trim((string) $request->query('q', ''));
 
-        $query = parkir_logs::with('user')->orderBy('waktu_aktivitas', 'desc');
+        $query = parkir_logs::with('user');
+
+        $allowed = ['waktu_aktivitas', 'petugas', 'aktivitas'];
+        $sort    = SortHelper::field((string) $request->query('sort'), $allowed);
+        $dir     = SortHelper::direction((string) $request->query('dir'));
 
         if ($q !== '') {
             $needle = strtolower($q);
@@ -33,7 +37,14 @@ class LogController extends Controller
             $query = $query->get();
         }
 
-        $logs = $query;
+        $getters = [
+            'waktu_aktivitas' => fn ($l) => (string) $l->waktu_aktivitas,
+            'petugas'         => fn ($l) => (string) ($l->user->nama_lengkap ?? ''),
+            'aktivitas'       => fn ($l) => (string) $l->aktivitas,
+        ];
+        $logs = $dir === 'asc'
+            ? $query->sortBy($getters[$sort], SORT_REGULAR)->values()
+            : $query->sortByDesc($getters[$sort])->values();
         $total = parkir_logs::count();
         $today = parkir_logs::where('waktu_aktivitas', 'like', date('Y-m-d') . '%')->count();
         $users = parkir_users::count();
@@ -49,6 +60,7 @@ class LogController extends Controller
             'users'  => $users,
             'sysLog' => $sysLog,
             'staff'  => $staff,
+            'allowed' => $allowed,
         ]);
     }
 

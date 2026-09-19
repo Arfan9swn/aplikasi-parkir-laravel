@@ -54,10 +54,10 @@
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b border-primary-100 bg-primary-50 text-[11px] uppercase tracking-wider text-slate-400">
-                        <th class="px-4 py-3 font-semibold">Area</th>
-                        <th class="px-4 py-3 font-semibold">Petugas</th>
-                        <th class="px-4 py-3 font-semibold">Kapasitas</th>
-                        <th class="px-4 py-3 font-semibold">Terisi / Kosong</th>
+                        <x-table-sort column="nama_area" label="Area" :allowed="$allowed" />
+                        <x-table-sort column="petugas" label="Petugas" :allowed="$allowed" />
+                        <x-table-sort column="kapasitas" label="Kapasitas" :allowed="$allowed" />
+                        <x-table-sort column="terisi" label="Terisi / Kosong" :allowed="$allowed" />
                         <th class="px-4 py-3 font-semibold">Status</th>
                         @if ($canManage)
                             <th class="px-4 py-3 font-semibold text-right">Aksi</th>

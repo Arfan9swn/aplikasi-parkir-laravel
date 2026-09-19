@@ -7,6 +7,7 @@ use App\Models\parkir_logs;
 use App\Models\parkir_reservasis;
 use App\Models\parkir_transaksis;
 use App\Models\parkir_users;
+use App\Support\SortHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -15,13 +16,28 @@ class AreaController extends Controller
     /**
      * Server-rendered list of parking areas — one petugas per area.
      */
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
+        $allowed = ['nama_area', 'petugas', 'kapasitas', 'terisi'];
+        $sort    = SortHelper::field((string) $request->query('sort'), $allowed);
+        $dir     = SortHelper::direction((string) $request->query('dir'));
+
         $areas = parkir_areas::with('petugas')->get();
+
+        $getters = [
+            'nama_area' => fn ($a) => (string) $a->nama_area,
+            'petugas'   => fn ($a) => (string) ($a->petugas->nama_lengkap ?? ''),
+            'kapasitas' => fn ($a) => (int) $a->kapasitas,
+            'terisi'    => fn ($a) => (int) $a->terisi,
+        ];
+        $areas = $dir === 'asc'
+            ? $areas->sortBy($getters[$sort], SORT_REGULAR)->values()
+            : $areas->sortByDesc($getters[$sort])->values();
 
         return view('area.index', [
             'areas'    => $areas,
             'canManage' => $this->canManage(),
+            'allowed'  => $allowed,
         ]);
     }
 

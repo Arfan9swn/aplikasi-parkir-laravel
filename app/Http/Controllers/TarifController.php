@@ -6,6 +6,7 @@ use App\Models\parkir_kendaraans;
 use App\Models\parkir_logs;
 use App\Models\parkir_tarifs;
 use App\Models\parkir_transaksis;
+use App\Support\SortHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -20,6 +21,10 @@ class TarifController extends Controller
     public function index(Request $request)
     {
         $q = trim((string) $request->query('q', ''));
+
+        $allowed = ['jenis_kendaraan', 'tarif_per_jam', 'vehicles', 'tickets', 'revenue'];
+        $sort    = SortHelper::field((string) $request->query('sort'), $allowed);
+        $dir     = SortHelper::direction((string) $request->query('dir'));
 
         $tarifs = parkir_tarifs::all();
 
@@ -47,11 +52,24 @@ class TarifController extends Controller
             ];
         }
 
+        // Usage columns live in $usage, not on the model — sort via getters.
+        $getters = [
+            'jenis_kendaraan' => fn ($t) => (string) $t->jenis_kendaraan,
+            'tarif_per_jam'   => fn ($t) => (float) $t->tarif_per_jam,
+            'vehicles'        => fn ($t) => $usage[$t->id_tarif]['vehicles'],
+            'tickets'         => fn ($t) => $usage[$t->id_tarif]['tickets'],
+            'revenue'         => fn ($t) => $usage[$t->id_tarif]['revenue'],
+        ];
+        $tarifs = $dir === 'asc'
+            ? $tarifs->sortBy($getters[$sort], SORT_REGULAR)->values()
+            : $tarifs->sortByDesc($getters[$sort])->values();
+
         return view('tarif.index', [
             'tarifs'    => $tarifs,
             'usage'     => $usage,
             'q'         => $q,
             'canManage' => $this->canManage(),
+            'allowed'   => $allowed,
         ]);
     }
 

@@ -38,12 +38,12 @@
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b border-primary-100 bg-primary-50 text-[11px] uppercase tracking-wider text-slate-400">
-                        <th class="px-4 py-3 font-semibold">Jenis</th>
-                        <th class="px-4 py-3 font-semibold">Tarif / Jam</th>
-                        <th class="px-4 py-3 font-semibold">Kendaraan</th>
+                        <x-table-sort column="jenis_kendaraan" label="Jenis" :allowed="$allowed" />
+                        <x-table-sort column="tarif_per_jam" label="Tarif / Jam" :allowed="$allowed" />
+                        <x-table-sort column="vehicles" label="Kendaraan" :allowed="$allowed" />
                         <th class="px-4 py-3 font-semibold">Sedang Parkir</th>
-                        <th class="px-4 py-3 font-semibold">Total Tiket</th>
-                        <th class="px-4 py-3 font-semibold">Pendapatan</th>
+                        <x-table-sort column="tickets" label="Total Tiket" :allowed="$allowed" />
+                        <x-table-sort column="revenue" label="Pendapatan" :allowed="$allowed" />
                         @if ($canManage)
                             <th class="px-4 py-3 text-right font-semibold">Aksi</th>
                         @endif

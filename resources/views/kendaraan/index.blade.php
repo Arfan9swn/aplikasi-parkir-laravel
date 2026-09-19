@@ -40,10 +40,10 @@
             <table class="w-full text-left text-sm">
                 <thead>
                     <tr class="border-b border-primary-100 bg-primary-50 text-[11px] uppercase tracking-wider text-slate-400">
-                        <th class="px-4 py-3 font-semibold">Plat</th>
-                        <th class="px-4 py-3 font-semibold">Jenis</th>
-                        <th class="px-4 py-3 font-semibold">Warna</th>
-                        <th class="px-4 py-3 font-semibold">Pemilik</th>
+                        <x-table-sort column="plat_nomor" label="Plat" :allowed="$allowed" />
+                        <x-table-sort column="jenis_kendaraan" label="Jenis" :allowed="$allowed" />
+                        <x-table-sort column="warna" label="Warna" :allowed="$allowed" />
+                        <x-table-sort column="pemilik" label="Pemilik" :allowed="$allowed" />
                         <th class="px-4 py-3 font-semibold">Petugas / Pemilik Data</th>
                         <th class="px-4 py-3 font-semibold">Status</th>
                         @if ($canManage)

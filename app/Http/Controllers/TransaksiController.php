@@ -3,17 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\parkir_transaksis;
+use App\Support\SortHelper;
 use Illuminate\Http\Request;
 
 class TransaksiController extends Controller
 {
     /**
-     * Server-rendered ticket history with search + status filters.
+     * Server-rendered ticket history with search + status + sort filters.
+     *
+     * Sortable columns: waktu_masuk, waktu_keluar, biaya_total, durasi_jam.
      */
     public function index(Request $request)
     {
         $q      = trim((string) $request->query('q', ''));
         $status = (string) $request->query('status', 'all');
+
+        $allowed = ['waktu_masuk', 'waktu_keluar', 'biaya_total', 'durasi_jam'];
+        $sort    = SortHelper::field((string) $request->query('sort'), $allowed);
+        $dir     = SortHelper::direction((string) $request->query('dir'));
 
         $query = parkir_transaksis::with(['kendaraan', 'tarif', 'user', 'area']);
 
@@ -21,7 +28,14 @@ class TransaksiController extends Controller
             $query->where('status', $status);
         }
 
-        $all = $query->get()->sortByDesc('waktu_masuk')->values();
+        // Default ordering only when no explicit sort is requested.
+        if (! $request->has('sort')) {
+            $query->orderByDesc('waktu_masuk');
+        } else {
+            $query->orderBy($sort, $dir);
+        }
+
+        $all = $query->get()->values();
 
         if ($q !== '') {
             $needle = strtoupper($q);
@@ -36,6 +50,9 @@ class TransaksiController extends Controller
             'tickets' => $all,
             'q'       => $q,
             'status'  => $status,
+            'sort'    => $sort,
+            'dir'     => $dir,
+            'allowed' => $allowed,
         ]);
     }
 }

@@ -60,9 +60,9 @@
                 <table class="w-full text-left text-sm">
                     <thead>
                         <tr class="border-b border-primary-100 bg-primary-50 text-[11px] uppercase tracking-wider text-slate-400">
-                            <th class="px-4 py-3 font-semibold">Waktu</th>
-                            <th class="px-4 py-3 font-semibold">Petugas</th>
-                            <th class="px-4 py-3 font-semibold">Aktivitas</th>
+                            <x-table-sort column="waktu_aktivitas" label="Waktu" :allowed="$allowed" />
+                            <x-table-sort column="petugas" label="Petugas" :allowed="$allowed" />
+                            <x-table-sort column="aktivitas" label="Aktivitas" :allowed="$allowed" />
                         </tr>
                     </thead>
                     <tbody>

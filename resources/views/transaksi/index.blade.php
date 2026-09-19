@@ -12,20 +12,16 @@
         <form method="GET" action="{{ url('/transaksi') }}" class="flex flex-wrap items-center gap-3">
             <input name="q" type="text" value="{{ $q }}" placeholder="Cari plat atau nomor tiket…"
                    class="w-60 rounded-xl border border-primary-200 px-4 py-2 text-sm text-slate-800 placeholder-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200" />
-            <div class="flex items-center gap-1 text-xs">
+            <div class="mb-2 flex items-center gap-1 text-xs">
                 <span class="text-slate-400">Filter:</span>
-                @php
-                    $bq = http_build_query(['q' => $q]);
-                @endphp
-                <a href="{{ url('/transaksi?' . http_build_query(['q' => $q, 'status' => 'all'])) }}"
-                   class="rounded-full px-3 py-1.5 font-semibold {{ $status === 'all' ? 'bg-primary-500 text-white' : 'bg-slate-100 text-slate-600' }}">Semua</a>
-                <a href="{{ url('/transaksi?' . http_build_query(['q' => $q, 'status' => 'masuk'])) }}"
-                   class="rounded-full px-3 py-1.5 font-semibold {{ $status === 'masuk' ? 'bg-primary-500 text-white' : 'bg-slate-100 text-slate-600' }}">Aktif</a>
-                <a href="{{ url('/transaksi?' . http_build_query(['q' => $q, 'status' => 'keluar'])) }}"
-                   class="rounded-full px-3 py-1.5 font-semibold {{ $status === 'keluar' ? 'bg-primary-500 text-white' : 'bg-slate-100 text-slate-600' }}">Selesai</a>
+                <x-sort-tabs field="status" :current="$status" :tabs="[
+                    ['value' => 'all', 'label' => 'Semua', 'description' => 'Semua tiket, aktif maupun selesai'],
+                    ['value' => 'masuk', 'label' => 'Aktif', 'description' => 'Kendaraan yang sedang parkir'],
+                    ['value' => 'keluar', 'label' => 'Selesai', 'description' => 'Tiket yang sudah lunas'],
+                ]" />
             </div>
-            <button type="submit"
-                    class="rounded-xl bg-primary-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-600">Terapkan</button>
+            <button type="submit" data-tooltip="Jalankan pencarian dan filter"
+                    class="micro-hover rounded-xl bg-primary-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-600">Terapkan</button>
         </form>
     </div>
 
@@ -37,14 +33,14 @@
                 <thead>
                     <tr class="border-b border-primary-100 bg-primary-50 text-[11px] uppercase tracking-wider text-slate-400">
                         <th class="px-4 py-3 font-semibold">Tiket</th>
-                        <th class="px-4 py-3 font-semibold">Plat</th>
+                        <x-table-sort column="plat" label="Plat" :allowed="$allowed" />
                         <th class="px-4 py-3 font-semibold">Area</th>
                         <th class="px-4 py-3 font-semibold">Petugas</th>
-                        <th class="px-4 py-3 font-semibold">Masuk</th>
-                        <th class="px-4 py-3 font-semibold">Keluar</th>
-                        <th class="px-4 py-3 font-semibold">Durasi</th>
-                        <th class="px-4 py-3 font-semibold">Biaya</th>
-                        <th class="px-4 py-3 font-semibold">Status</th>
+                        <x-table-sort column="waktu_masuk" label="Masuk" :allowed="$allowed" />
+                        <x-table-sort column="waktu_keluar" label="Keluar" :allowed="$allowed" />
+                        <x-table-sort column="durasi_jam" label="Durasi" :allowed="$allowed" />
+                        <x-table-sort column="biaya_total" label="Biaya" :allowed="$allowed" />
+                        <x-table-sort column="status" label="Status" :allowed="$allowed" />
                     </tr>
                 </thead>
                 <tbody>

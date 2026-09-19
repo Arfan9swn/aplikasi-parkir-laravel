@@ -194,8 +194,53 @@ body[data-sidebar-collapsed="true"] .sidebar-toggle svg { transform: rotate(180d
     .app-sidebar, .sidebar-content, .sidebar-action { transition: none; }
 }
 
-/* =====================================================================
-   Print: only the ticket / receipt is printed
+/* Filter pills (sort tabs / status chips) */
+.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background-color: var(--color-slate-100, #f1f5f9);
+    color: var(--color-slate-600, #475569);
+    cursor: pointer;
+}
+.filter-pill:hover { background-color: var(--color-primary-50, #eff6ff); color: var(--color-primary-700); }
+.filter-pill.is-active {
+    background-color: var(--color-primary-500);
+    color: #fff;
+    box-shadow: 0 4px 12px #395a7f33;
+}
+.filter-pill.is-active:hover { background-color: var(--color-primary-600); }
+
+/* Table sort header */
+.sort-header { padding: 0; }
+.sort-header a { display: flex; align-items: center; padding: 0.75rem 1rem; }
+.sort-header a:hover { background-color: var(--color-primary-50, #eff6ff); }
+.sort-header.is-active a { color: var(--color-primary-700); }
+.sort-arrow {
+    opacity: 0;
+    transition: transform 150ms ease, opacity 150ms ease;
+}
+.sort-header a:hover .sort-arrow,
+.sort-header a:focus-visible .sort-arrow { opacity: 0.6; }
+.sort-arrow.is-active { opacity: 1; }
+.sort-arrow.is-asc { transform: rotate(180deg); }
+
+/* Micro-actions: hover lift / glow */
+.micro-hover {
+    transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+}
+.micro-hover:hover { transform: translateY(-1px); box-shadow: 0 6px 16px #395a7f1a; }
+.filter-pill, .tab-pill {
+    transition: background-color 160ms ease, color 160ms ease, transform 150ms ease, box-shadow 150ms ease;
+}
+.filter-pill:hover, .tab-pill:hover { transform: translateY(-1px); box-shadow: 0 4px 10px #395a7f12; }
+.card-hover {
+    transition: box-shadow 150ms ease, transform 150ms ease;
+}
+.card-hover:hover { box-shadow: 0 10px 24px #395a7f18; transform: translateY(-2px); }
+.icon-btn:hover { color: var(--color-primary-700); }
+
+/* Print styles
    ===================================================================== */
 @media print {
     .app-sidebar, .sidebar-tooltip, .sidebar-skip { display: none !important; }

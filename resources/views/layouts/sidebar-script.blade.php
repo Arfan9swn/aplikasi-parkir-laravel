@@ -27,16 +27,41 @@
         toggle.querySelector('.sidebar-label').textContent = label;
     }
 
-    function showTooltip(element) {
+    function showTooltip(element, position) {
         hideTooltip();
-        if (document.body.dataset.sidebarCollapsed !== 'true') return;
         target = element;
         tooltip.textContent = element.dataset.tooltip;
         tooltip.hidden = false;
         element.setAttribute('aria-describedby', tooltip.id);
+        tooltip.style.left = `${position.left}px`;
+        tooltip.style.top = `${position.top}px`;
+    }
+
+    function showSidebarTooltip(element) {
+        if (document.body.dataset.sidebarCollapsed !== 'true') return;
         const rect = element.getBoundingClientRect();
-        tooltip.style.left = `${Math.min(sidebar.getBoundingClientRect().right + 8, window.innerWidth - tooltip.offsetWidth - 8)}px`;
-        tooltip.style.top = `${Math.max(8, Math.min(rect.top + (rect.height - tooltip.offsetHeight) / 2, window.innerHeight - tooltip.offsetHeight - 8))}px`;
+        showTooltip(element, {
+            left: Math.min(sidebar.getBoundingClientRect().right + 8, window.innerWidth - tooltip.offsetWidth - 8),
+            top: Math.max(8, Math.min(rect.top + (rect.height - tooltip.offsetHeight) / 2, window.innerHeight - tooltip.offsetHeight - 8)),
+        });
+    }
+
+    function showPageTooltip(element) {
+        const rect = element.getBoundingClientRect();
+        showTooltip(element, {
+            left: Math.max(8, Math.min(rect.left + (rect.width - tooltip.offsetWidth) / 2, window.innerWidth - tooltip.offsetWidth - 8)),
+            top: Math.max(8, rect.top - tooltip.offsetHeight - 8),
+        });
+    }
+
+    function bind(elements, show) {
+        elements.forEach(element => {
+            element.addEventListener('mouseenter', () => show(element));
+            element.addEventListener('mouseleave', scheduleHide);
+            element.addEventListener('focus', () => show(element));
+            element.addEventListener('blur', hideTooltip);
+            element.addEventListener('click', hideTooltip);
+        });
     }
 
     setCollapsed(mobile.matches || preference);
@@ -49,13 +74,8 @@
             try { localStorage.setItem('park.sidebar.collapsed', String(collapsed)); } catch (_) {}
         }
     });
-    sidebar.querySelectorAll('[data-tooltip]').forEach(element => {
-        element.addEventListener('mouseenter', () => showTooltip(element));
-        element.addEventListener('mouseleave', scheduleHide);
-        element.addEventListener('focus', () => showTooltip(element));
-        element.addEventListener('blur', hideTooltip);
-        element.addEventListener('click', hideTooltip);
-    });
+    bind(Array.from(sidebar.querySelectorAll('[data-tooltip]')), showSidebarTooltip);
+    bind(Array.from(document.querySelectorAll('[data-tooltip]')).filter(el => !sidebar.contains(el) && el !== toggle), showPageTooltip);
     tooltip.addEventListener('mouseenter', () => clearTimeout(hideTimer));
     tooltip.addEventListener('mouseleave', hideTooltip);
     sidebar.addEventListener('scroll', hideTooltip);
