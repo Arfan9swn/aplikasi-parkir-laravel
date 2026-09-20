@@ -106,6 +106,106 @@
     </section>
 
     <section class="mt-10">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 class="text-xl font-bold text-slate-800">Performa Area</h2>
+            <span class="text-xs text-slate-400">14 hari terakhir · seluruh area</span>
+        </div>
+
+        @php
+            $max    = max($daily->max('tickets'), 1);
+            $w      = 600;
+            $h      = 190;
+            $padX   = 26;
+            $padTop = 16;
+            $padBot = 30;
+            $step   = count($daily) > 1 ? ($w - 2 * $padX) / (count($daily) - 1) : 0;
+            $pts    = $daily->map(fn ($d, $i) => [
+                'x' => round($padX + $i * $step, 1),
+                'y' => round($padTop + (1 - $d['tickets'] / $max) * ($h - $padTop - $padBot), 1),
+                'v' => $d['tickets'],
+                'l' => $d['label'],
+            ]);
+            $line = $pts->map(fn ($p) => "{$p['x']},{$p['y']}")->implode(' ');
+            $fill = $padX . ',' . ($h - $padBot) . ' ' . $line . ' '
+                . round($padX + (count($daily) - 1) * $step, 1) . ',' . ($h - $padBot);
+        @endphp
+
+        <div class="mt-5 grid gap-5 lg:grid-cols-3">
+            <div class="card-hover rounded-2xl border border-primary-100 bg-white p-6 shadow-sm lg:col-span-2">
+                <p class="text-sm font-bold text-slate-700">Kendaraan Masuk per Hari</p>
+                <p class="mt-0.5 text-[11px] text-slate-400">Arahkan kursor ke titik untuk detail harian.</p>
+                <svg viewBox="0 0 600 190" class="mt-3 w-full" role="img" aria-label="Grafik kendaraan masuk per hari">
+                    @for ($i = 0; $i <= 2; $i++)
+                        <line x1="{{ $padX }}" x2="{{ $w - $padX }}"
+                              y1="{{ round($padTop + $i * (($h - $padTop - $padBot) / 2), 1) }}"
+                              y2="{{ round($padTop + $i * (($h - $padTop - $padBot) / 2), 1) }}"
+                              stroke="#e4ecf4" stroke-dasharray="3 4" stroke-width="1" />
+                    @endfor
+                    <polygon points="{{ $fill }}" fill="#395a7f14" />
+                    <polyline points="{{ $line }}" fill="none" stroke="#395a7f" stroke-width="2.5"
+                              stroke-linecap="round" stroke-linejoin="round" />
+                    @foreach ($pts as $p)
+                        <circle class="chart-dot" cx="{{ $p['x'] }}" cy="{{ $p['y'] }}" r="4"
+                                fill="#ffffff" stroke="#395a7f" stroke-width="2"
+                                data-tooltip="{{ $p['l'] }} — {{ $p['v'] }} kendaraan masuk" />
+                    @endforeach
+                    @foreach ($pts as $p)
+                        @if ($loop->iteration % 4 === 1 || $loop->last)
+                            <text x="{{ $p['x'] }}" y="{{ $h - 8 }}" text-anchor="middle" font-size="10" fill="#94a3b8">{{ $p['l'] }}</text>
+                        @endif
+                    @endforeach
+                </svg>
+            </div>
+            @php
+                $slices  = $areaPerf->filter(fn ($a) => $a['revenue'] > 0)->values();
+                $total   = (float) $slices->sum('revenue');
+                $r       = 45;
+                $circ    = round(2 * M_PI * $r, 2);
+                $offset  = 0.0;
+                $palette = ['#395a7f', '#5b84b1', '#7fa8cd', '#66a68a', '#d9a86a', '#b98ea6', '#8fb6c9'];
+            @endphp
+
+            <div class="card-hover rounded-2xl border border-primary-100 bg-white p-6 shadow-sm">
+                <p class="text-sm font-bold text-slate-700">Pangsa Pendapatan Area</p>
+                <p class="mt-0.5 text-[11px] text-slate-400">Dari tiket yang sudah selesai.</p>
+
+                @if ($total > 0)
+                    <div class="mt-3 flex items-center gap-5">
+                        <svg viewBox="0 0 120 120" class="-rotate-90 h-32 w-32 shrink-0" role="img" aria-label="Pangsa pendapatan per area">
+                            <circle cx="60" cy="60" r="{{ $r }}" fill="none" stroke="#eef3f8" stroke-width="16" />
+                            @foreach ($slices as $slice)
+                                <circle class="pie-slice" cx="60" cy="60" r="{{ $r }}" fill="none"
+                                        stroke="{{ $palette[$loop->index % count($palette)] }}" stroke-width="16"
+                                        stroke-dasharray="{{ round($circ * $slice['revenue'] / $total, 2) }} {{ $circ }}"
+                                        stroke-dashoffset="{{ round(-$offset, 2) }}"
+                                        data-tooltip="{{ $slice['name'] }} — Rp {{ number_format($slice['revenue'], 0, ',', '.') }} ({{ round($slice['revenue'] / $total * 100) }}%)" />
+                                @php $offset += $circ * $slice['revenue'] / $total; @endphp
+                            @endforeach
+                        </svg>
+                        <ul class="min-w-0 flex-1 space-y-2">
+                            @foreach ($slices as $slice)
+                                <li class="flex items-center gap-2 text-xs">
+                                    <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background: {{ $palette[$loop->index % count($palette)] }}"></span>
+                                    <span class="min-w-0 flex-1 truncate font-medium text-slate-600">{{ $slice['name'] }}</span>
+                                    <span class="font-mono text-slate-400">{{ round($slice['revenue'] / $total * 100) }}%</span>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <p class="mt-3 text-[11px] text-slate-400">
+                        Total <span class="font-semibold text-slate-600">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                        dari {{ $slices->sum('tickets') }} tiket selesai.
+                    </p>
+                @else
+                    <p class="mt-6 rounded-xl border border-dashed border-primary-200 p-6 text-center text-xs text-slate-400">
+                        Belum ada tiket selesai — grafik akan terisi setelah ada pembayaran.
+                    </p>
+                @endif
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-10">
         <h2 class="text-xl font-bold text-slate-800">Cara Pakai</h2>
         <div class="mt-5 grid gap-5 md:grid-cols-3">
             <div class="rounded-2xl border border-primary-100 bg-white p-6 shadow-sm">

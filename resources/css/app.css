@@ -240,6 +240,26 @@ body[data-sidebar-collapsed="true"] .sidebar-toggle svg { transform: rotate(180d
     outline-offset: 1px;
 }
 
+/* Chart micro-interactions */
+.chart-dot {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: transform 150ms ease, stroke-width 150ms ease;
+    cursor: pointer;
+}
+.chart-dot:hover {
+    transform: scale(1.5);
+    stroke-width: 3;
+}
+.pie-slice {
+    transition: opacity 150ms ease, stroke-width 150ms ease;
+    cursor: pointer;
+}
+.pie-slice:hover {
+    opacity: 0.82;
+    stroke-width: 19;
+}
+
 /* Table sort header */
 .sort-header { padding: 0; }
 .sort-header a { display: flex; align-items: center; padding: 0.75rem 1rem; }
