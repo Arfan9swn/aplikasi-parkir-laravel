@@ -13,8 +13,10 @@
         'login' => 'M15 3h6v18h-6 M3 12h12 M9 6l6 6-6 6',
         'logout' => 'M9 3H3v18h6 M9 12h12 M15 6l6 6-6 6',
         'register' => 'M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8 M2 21v-2a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v2 M20 8v6 M17 11h6',
+        'moon' => 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z',
+        'sun' => 'M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10 M12 1v2 M12 21v2 M4.2 4.2l1.4 1.4 M18.4 18.4l1.4 1.4 M1 12h2 M21 12h2 M4.2 19.8l1.4-1.4 M18.4 5.6l1.4-1.4',
     ];
 @endphp
-<svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+<svg class="{{ $iconClass ?? 'sidebar-icon' }}" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
     <path d="{{ $icons[$icon] }}"/>
 </svg>

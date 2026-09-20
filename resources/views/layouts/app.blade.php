@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'park.')</title>
+    <script>
+        (function () {
+            var stored = null;
+            try { stored = localStorage.getItem('park.theme'); } catch (_) {}
+            var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (dark) document.documentElement.classList.add('dark');
+        })();
+    </script>
     @vite('resources/css/app.css')
 </head>
 <body class="min-h-screen bg-primary-50 font-sans text-slate-800 antialiased">
@@ -56,6 +64,13 @@
                     </a>
                 @endforeach
             </nav>
+
+            <button type="button" id="theme-toggle" class="sidebar-action sidebar-toggle"
+                    aria-pressed="false" aria-label="Ganti mode gelap / terang" data-tooltip="Mode Gelap">
+                @include('layouts.sidebar-icon', ['icon' => 'moon', 'iconClass' => 'sidebar-icon theme-icon-moon'])
+                @include('layouts.sidebar-icon', ['icon' => 'sun', 'iconClass' => 'sidebar-icon theme-icon-sun'])
+                <span class="sidebar-label">Mode Gelap</span>
+            </button>
 
             <div class="sidebar-account">
                 @php $authUser = session('auth_user'); @endphp

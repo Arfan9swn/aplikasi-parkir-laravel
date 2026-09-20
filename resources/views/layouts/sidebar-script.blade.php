@@ -92,5 +92,35 @@
     document.addEventListener('click', event => {
         if (mobile.matches && !sidebar.contains(event.target)) setCollapsed(true);
     });
+
+    // ---- Dark mode toggle (persists; falls back to system preference) ----
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeRoot = document.documentElement;
+    const storedTheme = (() => { try { return localStorage.getItem('park.theme'); } catch (_) { return null; } })();
+
+    function syncThemeToggle() {
+        const dark = themeRoot.classList.contains('dark');
+        themeToggle.setAttribute('aria-pressed', String(dark));
+        themeToggle.dataset.tooltip = dark ? 'Mode Terang' : 'Mode Gelap';
+        themeToggle.setAttribute('aria-label', dark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap');
+        const label = themeToggle.querySelector('.sidebar-label');
+        if (label) label.textContent = dark ? 'Mode Terang' : 'Mode Gelap';
+    }
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const dark = themeRoot.classList.toggle('dark');
+            try { localStorage.setItem('park.theme', dark ? 'dark' : 'light'); } catch (_) {}
+            syncThemeToggle();
+        });
+        syncThemeToggle();
+
+        // Follow OS changes only while the user has not picked a theme.
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (storedTheme) return;
+            themeRoot.classList.toggle('dark', event.matches);
+            syncThemeToggle();
+        });
+    }
 })();
 </script>

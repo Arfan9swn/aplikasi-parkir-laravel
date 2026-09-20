@@ -136,13 +136,13 @@
                 <p class="mt-0.5 text-[11px] text-slate-400">Arahkan kursor ke titik untuk detail harian.</p>
                 <svg viewBox="0 0 600 190" class="mt-3 w-full" role="img" aria-label="Grafik kendaraan masuk per hari">
                     @for ($i = 0; $i <= 2; $i++)
-                        <line x1="{{ $padX }}" x2="{{ $w - $padX }}"
+                        <line class="chart-grid" x1="{{ $padX }}" x2="{{ $w - $padX }}"
                               y1="{{ round($padTop + $i * (($h - $padTop - $padBot) / 2), 1) }}"
                               y2="{{ round($padTop + $i * (($h - $padTop - $padBot) / 2), 1) }}"
                               stroke="#e4ecf4" stroke-dasharray="3 4" stroke-width="1" />
                     @endfor
-                    <polygon points="{{ $fill }}" fill="#395a7f14" />
-                    <polyline points="{{ $line }}" fill="none" stroke="#395a7f" stroke-width="2.5"
+                    <polygon class="chart-fill" points="{{ $fill }}" fill="#395a7f14" />
+                    <polyline class="chart-line" points="{{ $line }}" fill="none" stroke="#395a7f" stroke-width="2.5"
                               stroke-linecap="round" stroke-linejoin="round" />
                     @foreach ($pts as $p)
                         <circle class="chart-dot" cx="{{ $p['x'] }}" cy="{{ $p['y'] }}" r="4"
@@ -151,7 +151,7 @@
                     @endforeach
                     @foreach ($pts as $p)
                         @if ($loop->iteration % 4 === 1 || $loop->last)
-                            <text x="{{ $p['x'] }}" y="{{ $h - 8 }}" text-anchor="middle" font-size="10" fill="#94a3b8">{{ $p['l'] }}</text>
+                            <text class="chart-label" x="{{ $p['x'] }}" y="{{ $h - 8 }}" text-anchor="middle" font-size="10" fill="#94a3b8">{{ $p['l'] }}</text>
                         @endif
                     @endforeach
                 </svg>
@@ -172,7 +172,7 @@
                 @if ($total > 0)
                     <div class="mt-3 flex items-center gap-5">
                         <svg viewBox="0 0 120 120" class="-rotate-90 h-32 w-32 shrink-0" role="img" aria-label="Pangsa pendapatan per area">
-                            <circle cx="60" cy="60" r="{{ $r }}" fill="none" stroke="#eef3f8" stroke-width="16" />
+                            <circle class="pie-track" cx="60" cy="60" r="{{ $r }}" fill="none" stroke="#eef3f8" stroke-width="16" />
                             @foreach ($slices as $slice)
                                 <circle class="pie-slice" cx="60" cy="60" r="{{ $r }}" fill="none"
                                         stroke="{{ $palette[$loop->index % count($palette)] }}" stroke-width="16"
