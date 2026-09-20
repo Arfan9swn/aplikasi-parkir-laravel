@@ -211,6 +211,35 @@ body[data-sidebar-collapsed="true"] .sidebar-toggle svg { transform: rotate(180d
 }
 .filter-pill.is-active:hover { background-color: var(--color-primary-600); }
 
+/* Filter dropdown (area selectors that would overflow as pills) */
+.filter-select select {
+    appearance: none;
+    background-color: #ffffff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    border: 1px solid #d8e2ee;
+    border-radius: 9999px;
+    color: #475569;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.4rem 2rem 0.4rem 0.9rem;
+    transition: background-color 160ms ease, border-color 160ms ease, box-shadow 150ms ease, color 160ms ease;
+}
+.filter-select select:hover,
+.filter-select select:focus {
+    background-color: #eff6ff;
+    border-color: var(--color-primary-300, #93b4d8);
+    box-shadow: 0 4px 10px #395a7f12;
+    color: var(--color-primary-700);
+}
+.filter-select select:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 1px;
+}
+
 /* Table sort header */
 .sort-header { padding: 0; }
 .sort-header a { display: flex; align-items: center; padding: 0.75rem 1rem; }

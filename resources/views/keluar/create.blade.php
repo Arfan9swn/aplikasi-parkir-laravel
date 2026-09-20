@@ -36,14 +36,8 @@
             </p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-1.5">
-            @foreach ($filters as $f)
-                <a href="{{ url('/keluar') . ($f['value'] === '' ? '' : '?area=' . urlencode($f['value'])) }}"
-                   class="filter-pill rounded-full px-3 py-1.5 text-xs font-semibold {{ (string) $areaFilter === (string) $f['value'] ? 'is-active' : '' }}">
-                    {{ $f['label'] }}
-                </a>
-            @endforeach
-        </div>
+        <x-filter-select :options="$filters" :current="$areaFilter" base-url="{{ url('/keluar') }}"
+                         param="area" label="Filter area parkir" />
     </div>
 
     @if ($parked->isEmpty())
