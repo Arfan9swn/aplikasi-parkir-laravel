@@ -65,11 +65,10 @@
                 @endforeach
             </nav>
 
-            <button type="button" id="theme-toggle" class="sidebar-action sidebar-toggle"
+            <button type="button" id="theme-toggle" class="flex justify-center text-slate-700 hover:-translate-y-[5px] hover:bg-slate-500 rounded w-fit p-[10px] transition-all 200ms ease-in-out"
                     aria-pressed="false" aria-label="Ganti mode gelap / terang" data-tooltip="Mode Gelap">
                 @include('layouts.sidebar-icon', ['icon' => 'moon', 'iconClass' => 'sidebar-icon theme-icon-moon'])
                 @include('layouts.sidebar-icon', ['icon' => 'sun', 'iconClass' => 'sidebar-icon theme-icon-sun'])
-                <span class="sidebar-label">Mode Gelap</span>
             </button>
 
             <div class="sidebar-account">
