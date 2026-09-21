@@ -113,6 +113,8 @@ Route::middleware('auth.web')->group(function () {
         Route::put('/users/{user}/role', [UserController::class, 'updateRole'])->whereNumber('user')->name('pengguna.role');
         Route::put('/users/{user}/password', [UserController::class, 'updatePassword'])->whereNumber('user')->name('pengguna.password');
         Route::put('/users/{user}/profile', [UserController::class, 'updateProfile'])->whereNumber('user')->name('pengguna.profile');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->whereNumber('user')->name('pengguna.destroy');
+        Route::put('/users/ownership', [UserController::class, 'transferOwnership'])->name('pengguna.ownership');
     });
 
     Route::get('/log', [LogController::class, 'index'])->name('log');

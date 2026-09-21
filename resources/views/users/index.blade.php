@@ -35,12 +35,42 @@
                             <td class="px-4 py-2 font-mono">{{ $u->username }}@if ((int) $u->id_user === $me)<span class="ml-1.5 rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-semibold text-primary-700">Anda</span>@endif</td>
                             <td class="px-4 py-2">{{ $u->nama_lengkap }}</td>
                             <td class="px-4 py-2">
-                                <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $u->role === 'owner' ? 'bg-purple-100 text-purple-800' : ($u->role === 'admin' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') }}">{{ $u->role }}</span>
+                                @php
+                                    $isOwner  = $u->role === 'owner';
+                                    $isAdmin  = $u->role === 'admin';
+                                    $canTouch = $actorRole === 'owner' || $u->role === 'petugas';
+                                @endphp
+                                <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $isOwner ? 'bg-purple-100 text-purple-800' : ($isAdmin ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') }}">{{ $u->role }}</span>
+                                @if ((int) $u->status_aktif !== 1)
+                                    <span class="ml-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700">nonaktif</span>
+                                @endif
                             </td>
                             <td class="px-4 py-2">
                                 @if ((int) $u->id_user === $me)
                                     <span class="text-xs text-slate-300">— akun Anda —</span>
-                                @else
+                                @elseif ($isOwner)
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <details class="relative">
+                                            <summary class="micro-hover cursor-pointer list-none rounded-lg bg-primary-500 px-2.5 py-1 text-xs font-semibold text-white transition hover:bg-primary-600"
+                                                     data-tooltip="Pindahkan status owner ke akun lain — hanya boleh ada satu owner">Transfer Owner</summary>
+                                            <form method="POST" action="{{ route('pengguna.ownership') }}"
+                                                  class="absolute right-0 z-20 mt-1 w-60 space-y-2 rounded-xl border border-primary-100 bg-white p-3 shadow-lg"
+                                                  onsubmit="return confirm('Pindahkan kepemilikan? Owner saat ini akan menjadi admin.')">
+                                                @csrf
+                                                @method('PUT')
+                                                <label class="block text-[10px] font-semibold uppercase tracking-wide text-slate-400">Owner baru
+                                                    <select name="target_id" required
+                                                            class="filter-select mt-1 w-full px-2 py-1.5 text-xs">
+                                                        @foreach ($users->where('role', '!==', 'owner') as $candidate)
+                                                            <option value="{{ $candidate->id_user }}">{{ $candidate->username }} — {{ $candidate->nama_lengkap }} ({{ $candidate->role }})</option>
+                                                        @endforeach
+                                                    </select>
+                                                </label>
+                                                <button type="submit" class="w-full rounded-lg bg-primary-500 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-primary-600">Pindahkan</button>
+                                            </form>
+                                        </details>
+                                    </div>
+                                @elseif ($canTouch)
                                     <div class="flex flex-wrap items-center gap-2">
                                         <form method="POST" action="{{ route('pengguna.role', $u->id_user) }}" class="m-0 flex items-center gap-1.5">
                                             @csrf
@@ -48,7 +78,7 @@
                                             <select name="role" aria-label="Role untuk {{ $u->username }}"
                                                     data-tooltip="Ubah role {{ $u->username }}"
                                                     class="filter-select rounded-lg border border-primary-200 px-2 py-1 text-xs">
-                                                @foreach (['petugas', 'admin', 'owner'] as $r)
+                                                @foreach (['petugas', 'admin'] as $r)
                                                     <option value="{{ $r }}" @selected($u->role === $r)>{{ $r }}</option>
                                                 @endforeach
                                             </select>
@@ -87,7 +117,18 @@
                                                 <button type="submit" class="w-full rounded-lg bg-primary-500 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-primary-600">Simpan Profil</button>
                                             </form>
                                         </details>
+                                        @if ($u->role === 'petugas')
+                                            <form method="POST" action="{{ route('pengguna.destroy', $u->id_user) }}" class="m-0"
+                                                  onsubmit="return confirm('Hapus akun {{ $u->username }}? Akun dengan riwayat data akan dinonaktifkan saja.')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="micro-hover rounded-lg border border-red-200 bg-white px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50"
+                                                        data-tooltip="Hapus akun worker ini">Hapus</button>
+                                            </form>
+                                        @endif
                                     </div>
+                                @else
+                                    <span class="text-xs text-slate-300" data-tooltip="Akun admin lain tidak dapat diubah — hanya worker (petugas)">Terkunci</span>
                                 @endif
                             </td>
                         </tr>

@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\parkir_areas;
+use App\Models\parkir_kendaraans;
 use App\Models\parkir_logs;
+use App\Models\parkir_transaksis;
 use App\Models\parkir_users;
 use App\Support\SortHelper;
 use Illuminate\Http\Request;
@@ -38,16 +41,18 @@ class UserController extends Controller
             ->get();
 
         return view('users.index', [
-            'users'   => $users,
-            'q'       => $q,
-            'sortKey' => $sort . ' ' . $dir,
-            'me'      => $me,
+            'users'     => $users,
+            'q'         => $q,
+            'sortKey'   => $sort . ' ' . $dir,
+            'me'        => $me,
+            'actorRole' => session('auth_user.role'),
         ]);
     }
 
     /**
-     * Change a user's role. Admins may assign petugas/admin; only an owner
-     * can grant the owner role, and nobody can change their own role.
+     * Change a user's role between petugas and admin.
+     * The owner role is NOT assignable here — ownership moves only through
+     * transferOwnership() so the system always has exactly one owner.
      */
     public function updateRole(Request $request, string $id)
     {
@@ -62,15 +67,19 @@ class UserController extends Controller
             return redirect()->route('pengguna.index')->with('error', 'Anda tidak dapat mengubah role akun sendiri.');
         }
 
-        $assignable = $actor['role'] === 'owner'
-            ? ['petugas', 'admin', 'owner']
-            : ['petugas', 'admin'];
+        if ($target->role === 'owner') {
+            return redirect()->route('pengguna.index')->with('error', 'Gunakan Transfer Owner untuk mengubah status kepemilikan.');
+        }
+
+        if ($target->role === 'admin' && $actor['role'] !== 'owner') {
+            return redirect()->route('pengguna.index')->with('error', 'Akun admin lain tidak dapat diubah.');
+        }
 
         $validator = Validator::make($request->all(), [
-            'role' => 'required|in:' . implode(',', $assignable),
+            'role' => 'required|in:petugas,admin',
         ], [
             'role.required' => 'Role wajib dipilih.',
-            'role.in'       => 'Role tidak valid untuk akun Anda.',
+            'role.in'       => 'Role hanya boleh petugas atau admin.',
         ]);
 
         if ($validator->fails()) {
@@ -84,16 +93,102 @@ class UserController extends Controller
 
         return redirect()->route('pengguna.index')->with('success', 'Role ' . $target->username . ' diubah menjadi ' . $request->role . '.');
     }
+
+    /**
+     * Move ownership to another account. The previous owner (all of them, in
+     * case of a data anomaly) is demoted to admin, guaranteeing that exactly
+     * one owner exists at any time. Available to admins and the owner.
+     */
+    public function transferOwnership(Request $request)
+    {
+        $this->authorizeAdmin();
+
+        $target = parkir_users::find($request->input('target_id'));
+
+        if (! $target) {
+            return redirect()->route('pengguna.index')->with('error', 'Pengguna tidak ditemukan.');
+        }
+
+        if ($target->role === 'owner') {
+            return redirect()->route('pengguna.index')->with('error', $target->username . ' sudah menjadi owner.');
+        }
+
+        $previous = parkir_users::where('role', 'owner')->get();
+        $previousNames = $previous->pluck('username')->implode(', ');
+
+        parkir_users::where('role', 'owner')->update(['role' => 'admin']);
+        $target->update(['role' => 'owner']);
+
+        $this->log($request, 'Memindahkan kepemilikan dari ' . $previousNames . ' ke ' . $target->username);
+
+        return redirect()->route('pengguna.index')->with('success', 'Kepemilikan dipindahkan ke ' . $target->username . '. Owner sebelumnya menjadi admin.');
+    }
+
+    /**
+     * Remove a worker account. Workers with related history (logs, tickets,
+     * vehicles, assigned areas) are deactivated instead of deleted so records
+     * keep pointing at a real account. Admin and owner accounts can never be
+     * removed through this endpoint.
+     */
+    public function destroy(Request $request, string $id)
+    {
+        $actor  = $this->authorizeAdmin();
+        $target = parkir_users::find($id);
+
+        if (! $target) {
+            return redirect()->route('pengguna.index')->with('error', 'Pengguna tidak ditemukan.');
+        }
+
+        if ($target->role === 'owner') {
+            return redirect()->route('pengguna.index')->with('error', 'Owner tidak dapat dihapus. Transfer kepemilikan terlebih dahulu.');
+        }
+
+        if ($target->role === 'admin' && $actor['role'] !== 'owner') {
+            return redirect()->route('pengguna.index')->with('error', 'Akun admin lain tidak dapat dihapus.');
+        }
+
+        if ((int) $target->id_user === (int) $actor['id_user']) {
+            return redirect()->route('pengguna.index')->with('error', 'Anda tidak dapat menghapus akun sendiri.');
+        }
+
+        $hasHistory = parkir_logs::where('id_user', $target->id_user)->exists()
+            || parkir_transaksis::where('id_user', $target->id_user)->exists()
+            || parkir_kendaraans::where('id_user', $target->id_user)->exists()
+            || parkir_areas::where('id_user', $target->id_user)->exists();
+
+        if ($hasHistory) {
+            $target->update(['status_aktif' => 0]);
+            $this->log($request, 'Menonaktifkan akun ' . $target->username . ' (masih memiliki data terkait).');
+
+            return redirect()->route('pengguna.index')->with('success', $target->username . ' dinonaktifkan karena masih memiliki data terkait.');
+        }
+
+        $name = $target->username;
+        $target->delete();
+
+        $this->log($request, 'Menghapus akun ' . $name);
+
+        return redirect()->route('pengguna.index')->with('success', 'Akun ' . $name . ' dihapus.');
+    }
+
     /**
      * Change a user's username and/or display name.
      */
     public function updateProfile(Request $request, string $id)
     {
-        $this->authorizeAdmin();
+        $actor  = $this->authorizeAdmin();
         $target = parkir_users::find($id);
 
         if (! $target) {
             return redirect()->route('pengguna.index')->with('error', 'Pengguna tidak ditemukan.');
+        }
+
+        if ($target->role === 'owner') {
+            return redirect()->route('pengguna.index')->with('error', 'Gunakan Transfer Owner untuk mengubah status kepemilikan.');
+        }
+
+        if ($target->role === 'admin' && $actor['role'] !== 'owner') {
+            return redirect()->route('pengguna.index')->with('error', 'Akun admin lain tidak dapat diubah.');
         }
 
         $validator = Validator::make($request->all(), [
@@ -126,11 +221,19 @@ class UserController extends Controller
      */
     public function updatePassword(Request $request, string $id)
     {
-        $this->authorizeAdmin();
+        $actor  = $this->authorizeAdmin();
         $target = parkir_users::find($id);
 
         if (! $target) {
             return redirect()->route('pengguna.index')->with('error', 'Pengguna tidak ditemukan.');
+        }
+
+        if ($target->role === 'owner') {
+            return redirect()->route('pengguna.index')->with('error', 'Gunakan Transfer Owner untuk mengubah status kepemilikan.');
+        }
+
+        if ($target->role === 'admin' && $actor['role'] !== 'owner') {
+            return redirect()->route('pengguna.index')->with('error', 'Akun admin lain tidak dapat diubah.');
         }
 
         $validator = Validator::make($request->all(), [
