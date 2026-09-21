@@ -25,10 +25,17 @@ class EnsureRole
         }
 
         if (!empty($roles) && !in_array($user['role'], $roles, true)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Akses ditolak. Hanya admin atau petugas yang dapat mengelola area parkir.',
-            ], 403);
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Akses ditolak. Anda tidak memiliki izin untuk halaman ini.',
+                ], 403);
+            }
+
+            // Web pages get a friendly redirect instead of raw JSON.
+            return redirect()
+                ->route('beranda')
+                ->with('error', 'Akses ditolak — halaman ini bukan bagian dari panel Anda.');
         }
 
         return $next($request);

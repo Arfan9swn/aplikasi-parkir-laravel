@@ -19,7 +19,7 @@ test('guests see an accessible sidebar with public links and account actions', f
 });
 
 test('staff retain their navigation profile and csrf protected logout', function () {
-    session(['auth_user' => ['nama' => 'Petugas Parkir', 'role' => 'admin']]);
+    session(['auth_user' => ['nama' => 'Petugas Parkir', 'role' => 'petugas']]);
 
     $this->view('layouts.app', ['errors' => new ViewErrorBag])
         ->assertSee('Petugas Parkir')
@@ -31,4 +31,20 @@ test('staff retain their navigation profile and csrf protected logout', function
         ->assertSee('name="_token"', false)
         ->assertSee('data-tooltip="Keluar dari akun"', false)
         ->assertDontSee('data-tooltip="Daftar"', false);
+});
+
+test('admins only see the account management and log navigation', function () {
+    session(['auth_user' => ['nama' => 'Admin Sistem', 'role' => 'admin']]);
+
+    $this->view('layouts.app', ['errors' => new ViewErrorBag])
+        ->assertSee('Admin Sistem')
+        ->assertSee('href="/users"', false)
+        ->assertSee('href="/log"', false)
+        ->assertDontSee('href="/masuk"', false)
+        ->assertDontSee('href="/keluar"', false)
+        ->assertDontSee('href="/transaksi"', false)
+        ->assertDontSee('href="/area"', false)
+        ->assertDontSee('href="/kendaraan"', false)
+        ->assertDontSee('href="/tarif"', false)
+        ->assertDontSee('href="/reservasi/daftar"', false);
 });

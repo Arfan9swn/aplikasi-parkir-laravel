@@ -43,17 +43,28 @@
                 ];
 
                 if (session('auth_user')) {
-                    $nav = [
-                        ['/',                 'Beranda',   ''],
-                        ['/masuk',            'Masuk',     'masuk'],
-                        ['/keluar',           'Keluar',    'keluar'],
-                        ['/transaksi',        'Transaksi', 'transaksi'],
-                        ['/area',             'Area',      'area'],
-                        ['/kendaraan',        'Kendaraan', 'kendaraan'],
-                        ['/tarif',            'Tarif',     'tarif'],
-                        ['/reservasi/daftar', 'Reservasi', 'reservasi'],
-                        ['/log',              'Log',       'log'],
-                    ];
+                    $role = session('auth_user.role');
+
+                    if ($role === 'admin') {
+                        // Admin panel: accounts + logs only — no parking data.
+                        $nav = [
+                            ['/',      'Beranda', ''],
+                            ['/users', 'Akun',    'users'],
+                            ['/log',   'Log',     'log'],
+                        ];
+                    } else {
+                        $nav = [
+                            ['/',                 'Beranda',   ''],
+                            ['/masuk',            'Masuk',     'masuk'],
+                            ['/keluar',           'Keluar',    'keluar'],
+                            ['/transaksi',        'Transaksi', 'transaksi'],
+                            ['/area',             'Area',      'area'],
+                            ['/kendaraan',        'Kendaraan', 'kendaraan'],
+                            ['/tarif',            'Tarif',     'tarif'],
+                            ['/reservasi/daftar', 'Reservasi', 'reservasi'],
+                            ['/log',              'Log',       'log'],
+                        ];
+                    }
                 }
             @endphp
 
