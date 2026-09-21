@@ -108,10 +108,11 @@ Route::middleware('auth.web')->group(function () {
     | Admin panel — role admin manages accounts only (plus the system logs).
     */
     Route::middleware('role:admin')->group(function () {
-        Route::get('/users', [UserController::class, 'index'])->name('users.index');
-        Route::put('/users/{user}/role', [UserController::class, 'updateRole'])->whereNumber('user')->name('users.role');
-        Route::put('/users/{user}/password', [UserController::class, 'updatePassword'])->whereNumber('user')->name('users.password');
-        Route::put('/users/{user}/profile', [UserController::class, 'updateProfile'])->whereNumber('user')->name('users.profile');
+        // Named pengguna.* to avoid clashing with the api/users resource names.
+        Route::get('/users', [UserController::class, 'index'])->name('pengguna.index');
+        Route::put('/users/{user}/role', [UserController::class, 'updateRole'])->whereNumber('user')->name('pengguna.role');
+        Route::put('/users/{user}/password', [UserController::class, 'updatePassword'])->whereNumber('user')->name('pengguna.password');
+        Route::put('/users/{user}/profile', [UserController::class, 'updateProfile'])->whereNumber('user')->name('pengguna.profile');
     });
 
     Route::get('/log', [LogController::class, 'index'])->name('log');

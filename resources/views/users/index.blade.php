@@ -42,7 +42,7 @@
                                     <span class="text-xs text-slate-300">— akun Anda —</span>
                                 @else
                                     <div class="flex flex-wrap items-center gap-2">
-                                        <form method="POST" action="{{ route('users.role', $u->id_user) }}" class="m-0 flex items-center gap-1.5">
+                                        <form method="POST" action="{{ route('pengguna.role', $u->id_user) }}" class="m-0 flex items-center gap-1.5">
                                             @csrf
                                             @method('PUT')
                                             <select name="role" aria-label="Role untuk {{ $u->username }}"
@@ -58,7 +58,7 @@
                                         <details class="relative">
                                             <summary class="micro-hover cursor-pointer list-none rounded-lg border border-primary-200 px-2.5 py-1 text-xs font-semibold text-primary-700 transition hover:bg-primary-50"
                                                      data-tooltip="Ganti password {{ $u->username }}">Reset Password</summary>
-                                            <form method="POST" action="{{ route('users.password', $u->id_user) }}"
+                                            <form method="POST" action="{{ route('pengguna.password', $u->id_user) }}"
                                                   class="absolute right-0 z-20 mt-1 w-60 space-y-2 rounded-xl border border-primary-100 bg-white p-3 shadow-lg">
                                                 @csrf
                                                 @method('PUT')
@@ -72,7 +72,7 @@
                                         <details class="relative">
                                             <summary class="micro-hover cursor-pointer list-none rounded-lg border border-primary-200 px-2.5 py-1 text-xs font-semibold text-primary-700 transition hover:bg-primary-50"
                                                      data-tooltip="Edit username dan nama {{ $u->username }}">Edit</summary>
-                                            <form method="POST" action="{{ route('users.profile', $u->id_user) }}"
+                                            <form method="POST" action="{{ route('pengguna.profile', $u->id_user) }}"
                                                   class="absolute right-0 z-20 mt-1 w-60 space-y-2 rounded-xl border border-primary-100 bg-white p-3 shadow-lg">
                                                 @csrf
                                                 @method('PUT')

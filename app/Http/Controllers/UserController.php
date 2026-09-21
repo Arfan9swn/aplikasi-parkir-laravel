@@ -55,11 +55,11 @@ class UserController extends Controller
         $target = parkir_users::find($id);
 
         if (! $target) {
-            return redirect()->route('users.index')->with('error', 'Pengguna tidak ditemukan.');
+            return redirect()->route('pengguna.index')->with('error', 'Pengguna tidak ditemukan.');
         }
 
         if ((int) $target->id_user === (int) $actor['id_user']) {
-            return redirect()->route('users.index')->with('error', 'Anda tidak dapat mengubah role akun sendiri.');
+            return redirect()->route('pengguna.index')->with('error', 'Anda tidak dapat mengubah role akun sendiri.');
         }
 
         $assignable = $actor['role'] === 'owner'
@@ -74,7 +74,7 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('users.index')->withErrors($validator);
+            return redirect()->route('pengguna.index')->withErrors($validator);
         }
 
         $old = $target->role;
@@ -82,7 +82,7 @@ class UserController extends Controller
 
         $this->log($request, 'Mengubah role ' . $target->username . ' dari ' . $old . ' menjadi ' . $request->role);
 
-        return redirect()->route('users.index')->with('success', 'Role ' . $target->username . ' diubah menjadi ' . $request->role . '.');
+        return redirect()->route('pengguna.index')->with('success', 'Role ' . $target->username . ' diubah menjadi ' . $request->role . '.');
     }
     /**
      * Change a user's username and/or display name.
@@ -93,7 +93,7 @@ class UserController extends Controller
         $target = parkir_users::find($id);
 
         if (! $target) {
-            return redirect()->route('users.index')->with('error', 'Pengguna tidak ditemukan.');
+            return redirect()->route('pengguna.index')->with('error', 'Pengguna tidak ditemukan.');
         }
 
         $validator = Validator::make($request->all(), [
@@ -107,7 +107,7 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('users.index')->withErrors($validator);
+            return redirect()->route('pengguna.index')->withErrors($validator);
         }
 
         $old = $target->username;
@@ -118,7 +118,7 @@ class UserController extends Controller
 
         $this->log($request, 'Mengubah profil akun ' . $old . ' menjadi ' . $request->username);
 
-        return redirect()->route('users.index')->with('success', 'Profil akun diperbarui.');
+        return redirect()->route('pengguna.index')->with('success', 'Profil akun diperbarui.');
     }
 
     /**
@@ -130,7 +130,7 @@ class UserController extends Controller
         $target = parkir_users::find($id);
 
         if (! $target) {
-            return redirect()->route('users.index')->with('error', 'Pengguna tidak ditemukan.');
+            return redirect()->route('pengguna.index')->with('error', 'Pengguna tidak ditemukan.');
         }
 
         $validator = Validator::make($request->all(), [
@@ -142,14 +142,14 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('users.index')->withErrors($validator);
+            return redirect()->route('pengguna.index')->withErrors($validator);
         }
 
         $target->update(['password' => Hash::make($request->password)]);
 
         $this->log($request, 'Mengatur ulang password akun ' . $target->username);
 
-        return redirect()->route('users.index')->with('success', 'Password ' . $target->username . ' diperbarui.');
+        return redirect()->route('pengguna.index')->with('success', 'Password ' . $target->username . ' diperbarui.');
     }
 
     private function authorizeAdmin(): array
