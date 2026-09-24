@@ -45,7 +45,7 @@
                     @forelse ($tickets as $t)
                         <tr>
                             <td class="font-mono font-semibold text-primary-700">P-{{ str_pad($t->id_parkir, 6, '0', STR_PAD_LEFT) }}</td>
-                            <td class="font-mono text-ink">{{ $t->kendaraan->plat_nomor ?? '-' }}</td>
+                            <td class="text-ink"><x-plate :value="$t->kendaraan->plat_nomor ?? null" /></td>
                             <td>{{ $t->area->nama_area ?? '-' }}</td>
                             <td class="text-slate-600">{{ $t->user->nama_lengkap ?? '-' }}</td>
                             <td class="num text-slate-600">{{ $t->waktu_masuk ? \Carbon\Carbon::parse($t->waktu_masuk)->format('d M · H:i') : '-' }}</td>

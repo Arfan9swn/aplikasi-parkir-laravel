@@ -16,6 +16,7 @@
                     <label for="masuk-plat" class="text-xs font-semibold text-slate-600">Nomor Polisi</label>
                     <input id="masuk-plat" name="plat_nomor" required type="text" placeholder="B 1234 ABC" value="{{ old('plat_nomor') }}"
                            class="field mt-1 font-mono text-base" />
+                    <p class="mt-1 text-xs text-slate-600">Tulis berurutan: kode area, nomor, lalu huruf belakang. Contoh: B 1234 ABC.</p>
                 </div>
                 <div>
                     <label for="masuk-jenis" class="text-xs font-semibold text-slate-600">Jenis Kendaraan</label>

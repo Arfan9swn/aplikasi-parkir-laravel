@@ -23,7 +23,7 @@
             </div>
             <div>
                 <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Plat</dt>
-                <dd class="font-mono font-semibold text-ink">{{ $receipt->kendaraan->plat_nomor ?? '-' }}</dd>
+                <dd class="text-ink"><x-plate :value="$receipt->kendaraan->plat_nomor ?? null" /></dd>
             </div>
             <div>
                 <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Area</dt>

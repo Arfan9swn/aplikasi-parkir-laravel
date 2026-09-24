@@ -65,7 +65,7 @@
                             <tr>
                                 <td>
                                     <a href="{{ url('/keluar/' . $t->id_parkir) . $areaQuery }}"
-                                       class="font-mono font-semibold text-primary-700 transition hover:text-primary-800 hover:underline">{{ $t->kendaraan->plat_nomor ?? '-' }}</a>
+                                       class="transition hover:underline"><x-plate :value="$t->kendaraan->plat_nomor ?? null" /></a>
                                 </td>
                                 <td class="text-slate-600">{{ ucfirst($t->kendaraan->jenis_kendaraan ?? '-') }}</td>
                                 <td>{{ $t->area->nama_area ?? '-' }}</td>

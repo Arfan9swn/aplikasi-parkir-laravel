@@ -21,7 +21,7 @@
                 <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
                     <div>
                         <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Plat</dt>
-                        <dd class="font-mono font-semibold text-ink">{{ $ticket->kendaraan->plat_nomor }}</dd>
+                        <dd class="text-ink"><x-plate :value="$ticket->kendaraan->plat_nomor" /></dd>
                     </div>
                     <div>
                         <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Jenis</dt>

@@ -51,7 +51,7 @@
                         <tr>
                             <td>
                                 <a href="{{ route('ticket.kendaraan.show', $v->id_kendaraan) }}"
-                                   class="font-mono font-semibold text-primary-700 transition hover:text-primary-800 hover:underline">{{ $v->plat_nomor }}</a>
+                                   class="transition hover:underline"><x-plate :value="$v->plat_nomor" /></a>
                             </td>
                             <td>{{ ucfirst($v->jenis_kendaraan) }}</td>
                             <td class="text-slate-600">{{ $v->warna }}</td>

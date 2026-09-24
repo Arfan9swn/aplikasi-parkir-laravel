@@ -33,7 +33,7 @@
                             {{ $label }}
                         </span>
                     </div>
-                    <p class="mt-1 font-mono text-base font-bold text-ink">{{ $r->plat_nomor }}</p>
+                    <p class="mt-1 text-base text-ink"><x-plate :value="$r->plat_nomor" /></p>
                     <p class="num mt-0.5 text-sm text-slate-600">
                         {{ $r->area->nama_area ?? '-' }} · Datang
                         {{ $r->waktu_datang ? \Carbon\Carbon::parse($r->waktu_datang)->format('d M Y · H:i') : '-' }}

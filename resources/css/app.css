@@ -186,6 +186,23 @@ body {
    ticket numbers, times, counts. */
 .num { font-variant-numeric: tabular-nums; }
 
+/* A plate is three fields, separated: region code, serial, series. The gap is
+   what lets a plate be read aloud, dictated, and ticked off against a ticket in
+   one pass. Monospace keeps serials aligned down a column. */
+.plate {
+    display: inline-flex;
+    align-items: baseline;
+    gap: .4em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+    font-weight: 600;
+    letter-spacing: .02em;
+    white-space: nowrap;
+}
+/* The serial is the part being matched, so it carries the weight. Colour is
+   inherited, which keeps the plate readable inside a link on either theme. */
+.plate-serial { font-variant-numeric: tabular-nums; font-weight: 700; }
+.plate-lg { font-size: 1.5rem; }
+
 /* A state is a marked word, not a floating capsule. Colour here always means a
    real state and never decoration (DESIGN.md, Palette). */
 .state {
@@ -555,6 +572,12 @@ html.dark .text-purple-800 { color: #c3a8f0; }
 
 /* Register info card (bg-primary-50/60) */
 html.dark .bg-primary-50\/60 { background-color: #0f1a29; }
+
+/* Primary text on the dark ground: #395a7f and #263d56 read as near black
+   there, so links written in them disappeared. */
+html.dark .text-primary-600 { color: #9db8d8; }
+html.dark .text-primary-700 { color: #a9bacd; }
+html.dark .text-primary-800 { color: #c8d7e6; }
 
 /* Standalone selects styled as pills (role picker on /users) */
 html.dark select.filter-select {

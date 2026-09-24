@@ -57,7 +57,7 @@
                 <tbody>
                     @forelse ($parkir as $p)
                         <tr>
-                            <td class="font-mono font-semibold text-ink">{{ $p->kendaraan->plat_nomor ?? '-' }}</td>
+                            <td class="text-ink"><x-plate :value="$p->kendaraan->plat_nomor ?? null" /></td>
                             <td>{{ ucfirst($p->kendaraan->jenis_kendaraan ?? '-') }}</td>
                             <td>{{ $p->kendaraan->pemilik ?? '-' }}</td>
                             <td class="num text-slate-600">{{ $p->waktu_masuk->format('d M · H:i') }}</td>

@@ -9,7 +9,7 @@
         <div>
             <a href="{{ route('ticket.kendaraan') }}"
                class="text-xs font-semibold text-primary-600 transition hover:text-primary-700">&larr; Data Kendaraan</a>
-            <h1 class="mt-1 font-mono text-2xl font-bold text-ink">{{ $vehicle->plat_nomor }}</h1>
+            <h1 class="mt-1 text-ink"><x-plate :value="$vehicle->plat_nomor" size="lg" /></h1>
             <p class="num mt-1 text-sm text-slate-600">
                 {{ ucfirst($vehicle->jenis_kendaraan) }} · {{ $vehicle->warna }} · {{ $vehicle->pemilik }}
                 — data oleh {{ $vehicle->user->nama_lengkap ?? '-' }}

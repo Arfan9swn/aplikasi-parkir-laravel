@@ -40,6 +40,7 @@
                     <input id="reservasi-plat" name="plat_nomor" required type="text" maxlength="20" placeholder="B 1234 ABC"
                            value="{{ old('plat_nomor') }}"
                            class="field mt-1 font-mono" />
+                    <p class="mt-1 text-xs text-slate-600">Tulis berurutan: kode area, nomor, lalu huruf belakang. Contoh: B 1234 ABC.</p>
                     @error('plat_nomor')
                         <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
                     @enderror

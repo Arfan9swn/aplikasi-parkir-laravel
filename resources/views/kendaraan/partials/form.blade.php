@@ -21,6 +21,7 @@
             <input id="kendaraan-plat" name="plat_nomor" type="text" required value="{{ old('plat_nomor', $item->plat_nomor ?? '') }}"
                    class="field mt-1 font-mono"
                    placeholder="cth: B 1234 ABC" />
+            <p class="mt-1 text-xs text-slate-600">Tulis berurutan: kode area, nomor, lalu huruf belakang. Contoh: B 1234 ABC.</p>
             @error('plat_nomor')
                 <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
             @enderror
