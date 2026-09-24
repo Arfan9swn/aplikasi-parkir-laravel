@@ -8,66 +8,70 @@
     <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
             <a href="{{ route('ticket.area') }}" class="text-xs font-semibold text-primary-600 transition hover:text-primary-700">← Semua area</a>
-            <h1 class="mt-1 text-2xl font-bold text-slate-800">Area {{ $area->nama_area }}</h1>
-            <p class="mt-1 text-sm text-slate-500">Kendaraan yang sedang berada di area ini saat ini.</p>
+            <h1 class="mt-1 font-display text-2xl font-bold text-ink">Area {{ $area->nama_area }}</h1>
+            <p class="mt-1 text-sm text-slate-600">Kendaraan yang sedang berada di area ini saat ini.</p>
         </div>
-        <a href="{{ route('reservasi.create', ['area' => $area->id_area]) }}"
-           class="inline-flex items-center gap-1.5 rounded-lg bg-primary-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-600">
+        <a href="{{ route('reservasi.create', ['area' => $area->id_area]) }}" class="btn btn-primary">
             Reservasi slot di area ini
         </a>
     </div>
 
-    <div class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Kapasitas</p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ $area->kapasitas }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">Slot tersedia</p>
-        </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Terisi</p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ $area->terisi }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">Sedang parkir</p>
-        </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Kosong</p>
-            <p class="mt-1.5 text-2xl font-extrabold text-emerald-600">{{ max(0, $area->kapasitas - $area->terisi) }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">Bisa dipakai</p>
-        </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Petugas</p>
-            <p class="mt-1.5 truncate text-lg font-bold text-slate-800">{{ $area->petugas->nama_lengkap ?? '—' }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">Penanggung jawab area</p>
+    <div class="sheet mb-6">
+        <div class="cols-ruled">
+            <div>
+                <p class="figure-label">Kapasitas</p>
+                <p class="figure mt-1">{{ $area->kapasitas }}</p>
+                <p class="figure-note mt-0.5">Slot tersedia</p>
+            </div>
+            <div>
+                <p class="figure-label">Terisi</p>
+                <p class="figure mt-1">{{ $area->terisi }}</p>
+                <p class="figure-note mt-0.5">Sedang parkir</p>
+            </div>
+            <div>
+                <p class="figure-label">Kosong</p>
+                <p class="figure mt-1">{{ max(0, $area->kapasitas - $area->terisi) }}</p>
+                <p class="figure-note mt-0.5">Bisa dipakai</p>
+            </div>
+            <div>
+                <p class="figure-label">Petugas</p>
+                <p class="mt-1 truncate text-lg font-semibold text-ink">{{ $area->petugas->nama_lengkap ?? '—' }}</p>
+                <p class="figure-note mt-0.5">Penanggung jawab area</p>
+            </div>
         </div>
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-sm">
+    <div class="sheet overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+            <table class="ledger">
                 <thead>
-                    <tr class="border-b border-primary-100 bg-primary-50 text-[11px] uppercase tracking-wider text-slate-400">
-                        <th class="px-4 py-3 font-semibold">Kendaraan</th>
-                        <th class="px-4 py-3 font-semibold">Jenis</th>
-                        <th class="px-4 py-3 font-semibold">Pemilik</th>
-                        <th class="px-4 py-3 font-semibold">Masuk</th>
-                        <th class="px-4 py-3 font-semibold">Lama Parkir</th>
-                        <th class="px-4 py-3 font-semibold">Perkiraan Biaya</th>
+                    <tr>
+                        <th>Kendaraan</th>
+                        <th>Jenis</th>
+                        <th>Pemilik</th>
+                        <th>Masuk</th>
+                        <th class="text-right">Lama Parkir</th>
+                        <th class="text-right">Perkiraan Biaya</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($parkir as $p)
-                        <tr class="border-b border-primary-100 last:border-0">
-                            <td class="px-4 py-3 font-mono font-semibold text-slate-800">{{ $p->kendaraan->plat_nomor ?? '-' }}</td>
-                            <td class="px-4 py-2">{{ ucfirst($p->kendaraan->jenis_kendaraan ?? '-') }}</td>
-                            <td class="px-4 py-2">{{ $p->kendaraan->pemilik ?? '-' }}</td>
-                            <td class="px-4 py-2 text-slate-600">{{ $p->waktu_masuk->format('d M · H:i') }}</td>
-                            <td class="px-4 py-2">
-                                <span class="rounded-full bg-primary-50 px-2.5 py-0.5 text-xs font-semibold text-primary-700">{{ $p->durasi_jam }} jam</span>
-                            </td>
-                            <td class="px-4 py-2 font-mono">Rp {{ number_format($p->estimasi, 0, ',', '.') }}</td>
+                        <tr>
+                            <td class="font-mono font-semibold text-ink">{{ $p->kendaraan->plat_nomor ?? '-' }}</td>
+                            <td>{{ ucfirst($p->kendaraan->jenis_kendaraan ?? '-') }}</td>
+                            <td>{{ $p->kendaraan->pemilik ?? '-' }}</td>
+                            <td class="num text-slate-600">{{ $p->waktu_masuk->format('d M · H:i') }}</td>
+                            <td class="num text-right">{{ $p->durasi_jam }} jam</td>
+                            <td class="num text-right font-semibold">Rp {{ number_format($p->estimasi, 0, ',', '.') }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-10 text-center text-sm text-slate-300">Belum ada kendaraan di area ini.</td>
+                            <td colspan="6" class="p-0">
+                                <p class="notice m-3">
+                                    Belum ada kendaraan di area ini, jadi tidak ada yang bisa diproses keluar.
+                                    Baris terisi saat petugas menerbitkan tiket untuk area ini di menu Masuk.
+                                </p>
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -76,18 +80,16 @@
     </div>
 
     @if ($canManage)
-        <div class="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
+        <div class="sheet mt-6 flex flex-wrap items-center justify-between gap-3 p-4">
             <div>
-                <p class="text-sm font-semibold text-slate-700">Panel petugas</p>
-                <p class="mt-0.5 text-xs text-slate-500">
+                <p class="font-display text-sm font-bold uppercase tracking-wide text-primary-700">Panel petugas</p>
+                <p class="num mt-0.5 text-xs text-slate-600">
                     {{ $reservasiMenunggu }} reservasi menunggu konfirmasi di area ini.
                 </p>
             </div>
             <div class="flex items-center gap-2">
-                <a href="{{ route('ticket.area.edit', $area->id_area) }}"
-                   class="rounded-lg border border-primary-200 bg-white px-3.5 py-2 text-xs font-semibold text-primary-700 transition hover:bg-primary-50">Edit Area</a>
-                <a href="{{ route('reservasi.index') }}"
-                   class="rounded-lg bg-primary-500 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-primary-600">Reservasi Masuk</a>
+                <a href="{{ route('ticket.area.edit', $area->id_area) }}" class="btn btn-quiet">Edit Area</a>
+                <a href="{{ route('reservasi.index') }}" class="btn btn-primary">Reservasi Masuk</a>
             </div>
         </div>
     @endif

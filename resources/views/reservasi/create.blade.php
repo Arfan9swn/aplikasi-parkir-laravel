@@ -5,19 +5,21 @@
 
 @section('content')
     <div class="mx-auto max-w-3xl">
-        <h1 class="text-2xl font-bold text-slate-800">Reservasi Slot Parkir</h1>
-        <p class="mt-1 text-sm text-slate-500">
+        <h1 class="font-display text-2xl font-bold text-ink">Reservasi Slot Parkir</h1>
+        <p class="mt-1 text-sm text-slate-600">
             Tidak perlu login — ajukan slot di area pilihan Anda, petugas akan mengonfirmasi ketersediaannya.
         </p>
 
-        <form method="POST" action="{{ route('reservasi.store') }}" autocomplete="off"
-              class="mt-6 rounded-2xl border border-primary-100 bg-white p-6 shadow-sm sm:p-8">
+        <div class="sheet mt-6">
+            <div class="sheet-head">
+                <h2>Isi Data Reservasi</h2>
+            </div>
+            <form method="POST" action="{{ route('reservasi.store') }}" autocomplete="off" class="p-4 sm:p-6">
             @csrf
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div class="sm:col-span-2">
-                    <label class="text-xs font-medium text-slate-500">Area Parkir <span class="text-red-500">*</span></label>
-                    <select name="id_area" required
-                            class="mt-1 block w-full rounded-xl border border-primary-200 px-4 py-2.5 text-base text-slate-800 focus:border-primary-500 focus:ring-2 focus:ring-primary-200">
+                    <label for="reservasi-area" class="text-xs font-semibold text-slate-600">Area Parkir <span class="text-red-600">*</span></label>
+                    <select id="reservasi-area" name="id_area" required class="field mt-1 text-base">
                         <option value="">— Pilih area —</option>
                         @foreach ($areas as $a)
                             @php $free = max(0, $a->kapasitas - $a->terisi); @endphp
@@ -34,49 +36,44 @@
                 </div>
 
                 <div>
-                    <label class="text-xs font-medium text-slate-500">Nomor Polisi <span class="text-red-500">*</span></label>
-                    <input name="plat_nomor" required type="text" maxlength="20" placeholder="B 1234 ABC"
+                    <label for="reservasi-plat" class="text-xs font-semibold text-slate-600">Nomor Polisi <span class="text-red-600">*</span></label>
+                    <input id="reservasi-plat" name="plat_nomor" required type="text" maxlength="20" placeholder="B 1234 ABC"
                            value="{{ old('plat_nomor') }}"
-                           class="mt-1 block w-full rounded-xl border border-primary-200 px-4 py-2.5 text-sm font-mono uppercase text-slate-800 placeholder-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200" />
+                           class="field mt-1 font-mono" />
                     @error('plat_nomor')
                         <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label class="text-xs font-medium text-slate-500">Perkiraan Waktu Datang <span class="text-red-500">*</span></label>
-                    <input name="waktu_datang" required type="datetime-local" value="{{ old('waktu_datang') }}"
-                           class="mt-1 block w-full rounded-xl border border-primary-200 px-4 py-2.5 text-sm text-slate-800 focus:border-primary-500 focus:ring-2 focus:ring-primary-200" />
+                    <label for="reservasi-waktu" class="text-xs font-semibold text-slate-600">Perkiraan Waktu Datang <span class="text-red-600">*</span></label>
+                    <input id="reservasi-waktu" name="waktu_datang" required type="datetime-local" value="{{ old('waktu_datang') }}"
+                           class="field num mt-1" />
                     @error('waktu_datang')
                         <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
-                    <label class="text-xs font-medium text-slate-500">Nama Pemilik</label>
-                    <input name="pemilik" type="text" maxlength="100" placeholder="Contoh: Budi"
+                    <label for="reservasi-pemilik" class="text-xs font-semibold text-slate-600">Nama Pemilik</label>
+                    <input id="reservasi-pemilik" name="pemilik" type="text" maxlength="100" placeholder="Contoh: Budi"
                            value="{{ old('pemilik') }}"
-                           class="mt-1 block w-full rounded-xl border border-primary-200 px-4 py-2.5 text-sm text-slate-800 placeholder-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200" />
+                           class="field mt-1" />
                 </div>
 
                 <div>
-                    <label class="text-xs font-medium text-slate-500">Kontak (WA / telp)</label>
-                    <input name="kontak" type="text" maxlength="100" placeholder="Contoh: 0812xxxx"
+                    <label for="reservasi-kontak" class="text-xs font-semibold text-slate-600">Kontak (WA / telp)</label>
+                    <input id="reservasi-kontak" name="kontak" type="text" maxlength="100" placeholder="Contoh: 0812xxxx"
                            value="{{ old('kontak') }}"
-                           class="mt-1 block w-full rounded-xl border border-primary-200 px-4 py-2.5 text-sm text-slate-800 placeholder-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200" />
+                           class="field mt-1" />
                 </div>
             </div>
 
-            <div class="mt-6 flex items-center justify-end gap-3 border-t border-primary-100 pt-4">
-                <a href="{{ url('/area') }}"
-                   class="rounded-xl border border-primary-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-primary-50">
-                    Lihat area dulu
-                </a>
-                <button type="submit"
-                        class="rounded-xl bg-primary-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-600">
-                    Kirim Reservasi
-                </button>
+            <div class="mt-6 flex items-center justify-end gap-2 border-t border-rule pt-4">
+                <a href="{{ url('/area') }}" class="btn btn-quiet">Lihat area dulu</a>
+                <button type="submit" class="btn btn-primary">Kirim Reservasi</button>
             </div>
         </form>
+        </div>
     </div>
 @endsection

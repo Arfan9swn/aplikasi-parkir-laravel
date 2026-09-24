@@ -4,111 +4,91 @@
 @section('page', 'beranda')
 
 @section('content')
-    <section class="rounded-2xl bg-primary-500 p-8 shadow-sm sm:p-10">  
+    <section class="sheet">
+        <div class="sheet-head">
+            <p>{{ now()->format('l, d F Y') }}</p>
+            <p class="num text-xs font-medium text-slate-600">{{ now()->format('H:i:s') }}</p>
+        </div>
 
-        <h1 class="mt-4 text-3xl font-extrabold text-white sm:text-4xl">
-            Masuk. Parkir. Bayar &amp; selesai.
-        </h1>
-        <p class="mt-3 max-w-xl text-base text-primary-100">
-            Aplikasi pencatatan parkir yang sederhana. Cetak tiket saat kendaraan masuk,
-            lalu cari lagi dengan nomor polisi saat kendaraan keluar.
-        </p>
+        <div class="p-5 sm:p-6">  
 
-        <div class="mt-6 flex flex-wrap gap-3">
+            <h1 class="font-display text-3xl font-bold leading-tight text-ink sm:text-4xl">
+                Masuk. Parkir. Bayar &amp; selesai.
+            </h1>
+            <p class="mt-3 max-w-xl text-sm leading-relaxed text-slate-600">
+                Aplikasi pencatatan parkir yang sederhana. Cetak tiket saat kendaraan masuk,
+                lalu cari lagi dengan nomor polisi saat kendaraan keluar.
+            </p>
+
+            <div class="mt-5 flex flex-wrap gap-2">
             @if (session('auth_user'))
-                <a href="/masuk"
-                   class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-primary-700 shadow-sm transition hover:bg-primary-50">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <a href="/masuk" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/>
                         <path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
                     </svg>
                     Masuk Terbitkan Tiket
                 </a>
-                <a href="/keluar"
-                   class="inline-flex items-center gap-2 rounded-xl border border-white/40 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <a href="/keluar" class="btn btn-quiet">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>
                     </svg>
                     Keluar Bayar &amp; Pulang
                 </a>
             @else
-                <a href="{{ route('reservasi.create') }}"
-                   class="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-primary-700 shadow-sm transition hover:bg-primary-50">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <a href="{{ route('reservasi.create') }}" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
                     </svg>
                     Reservasi Slot Parkir
                 </a>
-                <a href="/area"
-                   class="inline-flex items-center gap-2 rounded-xl border border-white/40 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <a href="/area" class="btn btn-quiet">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>
                     </svg>
                     Lihat Area &amp; Kendaraan
                 </a>
             @endif
-        </div>
-
-        <p class="mt-6 font-mono text-sm text-white/85">{{ now()->format('l, d F Y · H:i:s') }}</p>
-    </section>
-
-    <section class="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm hover:-translate-y-0.5 transition-all duration-400 ease-in-out">
-            <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary-50 text-primary-600">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/>
-                    </svg>
-                </span>
-                Total Slot
-            </p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ number_format($spots, 0, ',', '.') }}</p>
-            <p class="mt-1 text-[11px] text-slate-500">Kapasitas parkir</p>
-        </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm hover:-translate-y-0.5 transition-all duration-400 ease-in-out">
-            <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary-50 text-primary-600">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>
-                    </svg>
-                </span>
-                Terisi Saat Ini
-            </p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ number_format($occupied, 0, ',', '.') }}</p>
-            <p class="mt-1 text-[11px] text-slate-500">Slot terpakai</p>
-        </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm hover:-translate-y-0.5 transition-all duration-400 ease-in-out">
-            <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary-50 text-primary-600">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
-                    </svg>
-                </span>
-                Tiket Aktif
-            </p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ number_format($active, 0, ',', '.') }}</p>
-            <p class="mt-1 text-[11px] text-slate-500">Sedang parkir</p>
-        </div>
-        @if (session('auth_user'))
-            <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm hover:-translate-y-0.5 transition-all duration-400 ease-in-out">
-                <p class="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    <span class="grid h-7 w-7 place-items-center rounded-lg bg-primary-50 text-primary-600">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/>
-                        </svg>
-                    </span>
-                    Pendapatan Hari Ini
-                </p>
-                <p class="mt-1.5 text-2xl font-extrabold text-primary-700">Rp {{ number_format($revenue, 0, ',', '.') }}</p>
-                <p class="mt-1 text-[11px] text-slate-500">Total bayar</p>
             </div>
-        @endif
+        </div>
     </section>
 
-    <section class="mt-10">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-            <h2 class="text-xl font-bold text-slate-800">Performa Area</h2>
-            <span class="text-xs text-slate-400">14 hari terakhir · seluruh area</span>
+    {{-- The figures, ruled as columns. Each one used to sit in its own tinted
+         box; the label already names the figure, so the box only repeated the
+         label's job in decoration. --}}
+    <section class="sheet mt-6" aria-label="Ringkasan parkir">
+        <div class="cols-ruled" style="--cols: {{ session('auth_user') ? 4 : 3 }}">
+            <div>
+                <p class="figure-label">Total Slot</p>
+                <p class="figure mt-1">{{ number_format($spots, 0, ',', '.') }}</p>
+                <p class="figure-note mt-0.5">Kapasitas parkir</p>
+            </div>
+            <div>
+                <p class="figure-label">Terisi Saat Ini</p>
+                <p class="figure mt-1">{{ number_format($occupied, 0, ',', '.') }}</p>
+                <p class="figure-note mt-0.5">Slot terpakai</p>
+            </div>
+            <div>
+                <p class="figure-label">Tiket Aktif</p>
+                <p class="figure mt-1">{{ number_format($active, 0, ',', '.') }}</p>
+                <p class="figure-note mt-0.5">Sedang parkir</p>
+            </div>
+            @if (session('auth_user'))
+                <div>
+                    <p class="figure-label">Pendapatan Hari Ini</p>
+                    <p class="figure mt-1">Rp {{ number_format($revenue, 0, ',', '.') }}</p>
+                    <p class="figure-note mt-0.5">Total bayar</p>
+                </div>
+            @endif
+        </div>
+    </section>
+
+    {{-- Performance, as one wide chart and one narrow one. Both are sheets with a
+         ruled head, so the number in the head reads before the graphic does. --}}
+    <section class="mt-8">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 class="font-display text-lg font-bold text-ink">Performa Area</h2>
+            <p class="num text-xs text-slate-600">14 hari terakhir · seluruh area</p>
         </div>
 
         @php
@@ -130,11 +110,14 @@
                 . round($padX + (count($daily) - 1) * $step, 1) . ',' . ($h - $padBot);
         @endphp
 
-        <div class="mt-5 grid gap-5 lg:grid-cols-3">
-            <div class="card-hover rounded-2xl border border-primary-100 bg-white p-6 shadow-sm lg:col-span-2">
-                <p class="text-sm font-bold text-slate-700">Kendaraan Masuk per Hari</p>
-                <p class="mt-0.5 text-[11px] text-slate-400">Arahkan kursor ke titik untuk detail harian.</p>
-                <svg viewBox="0 0 600 190" class="mt-3 w-full" role="img" aria-label="Grafik kendaraan masuk per hari">
+        <div class="mt-4 grid gap-4 lg:grid-cols-3">
+            <div class="sheet lg:col-span-2">
+                <div class="sheet-head">
+                    <h3>Kendaraan Masuk per Hari</h3>
+                    <p class="text-[11px] text-slate-600">Arahkan kursor ke titik untuk detail harian.</p>
+                </div>
+                <div class="p-4">
+                <svg viewBox="0 0 600 190" class="w-full" role="img" aria-label="Grafik kendaraan masuk per hari">
                     @for ($i = 0; $i <= 2; $i++)
                         <line class="chart-grid" x1="{{ $padX }}" x2="{{ $w - $padX }}"
                               y1="{{ round($padTop + $i * (($h - $padTop - $padBot) / 2), 1) }}"
@@ -151,10 +134,11 @@
                     @endforeach
                     @foreach ($pts as $p)
                         @if ($loop->iteration % 4 === 1 || $loop->last)
-                            <text class="chart-label" x="{{ $p['x'] }}" y="{{ $h - 8 }}" text-anchor="middle" font-size="10" fill="#94a3b8">{{ $p['l'] }}</text>
+                            <text class="chart-label" x="{{ $p['x'] }}" y="{{ $h - 8 }}" text-anchor="middle" font-size="10" fill="#64748b">{{ $p['l'] }}</text>
                         @endif
                     @endforeach
                 </svg>
+                </div>
             </div>
             @php
                 $slices  = $areaPerf->filter(fn ($a) => $a['revenue'] > 0)->values();
@@ -165,12 +149,14 @@
                 $palette = ['#395a7f', '#5b84b1', '#7fa8cd', '#66a68a', '#d9a86a', '#b98ea6', '#8fb6c9'];
             @endphp
 
-            <div class="card-hover rounded-2xl border border-primary-100 bg-white p-6 shadow-sm">
-                <p class="text-sm font-bold text-slate-700">Pangsa Pendapatan Area</p>
-                <p class="mt-0.5 text-[11px] text-slate-400">Dari tiket yang sudah selesai.</p>
+            <div class="sheet">
+                <div class="sheet-head">
+                    <h3>Pangsa Pendapatan Area</h3>
+                    <p class="text-[11px] text-slate-600">Dari tiket yang sudah selesai.</p>
+                </div>
 
                 @if ($total > 0)
-                    <div class="mt-3 flex items-center gap-5">
+                    <div class="flex items-center gap-4 p-4">
                         <svg viewBox="0 0 120 120" class="-rotate-90 h-32 w-32 shrink-0" role="img" aria-label="Pangsa pendapatan per area">
                             <circle class="pie-track" cx="60" cy="60" r="{{ $r }}" fill="none" stroke="#eef3f8" stroke-width="16" />
                             @foreach ($slices as $slice)
@@ -186,67 +172,111 @@
                             @foreach ($slices as $slice)
                                 <li class="flex items-center gap-2 text-xs">
                                     <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background: {{ $palette[$loop->index % count($palette)] }}"></span>
-                                    <span class="min-w-0 flex-1 truncate font-medium text-slate-600">{{ $slice['name'] }}</span>
-                                    <span class="font-mono text-slate-400">{{ round($slice['revenue'] / $total * 100) }}%</span>
+                                    <span class="num min-w-0 flex-1 truncate font-medium text-slate-600">{{ $slice['name'] }}</span>
+                                    <span class="num text-slate-600">{{ round($slice['revenue'] / $total * 100) }}%</span>
                                 </li>
                             @endforeach
                         </ul>
                     </div>
-                    <p class="mt-3 text-[11px] text-slate-400">
-                        Total <span class="font-semibold text-slate-600">Rp {{ number_format($total, 0, ',', '.') }}</span>
+                    <p class="border-t border-rule px-4 py-3 text-[11px] text-slate-600">
+                        Total <span class="num font-semibold text-ink">Rp {{ number_format($total, 0, ',', '.') }}</span>
                         dari {{ $slices->sum('tickets') }} tiket selesai.
                     </p>
                 @else
-                    <p class="mt-6 rounded-xl border border-dashed border-primary-200 p-6 text-center text-xs text-slate-400">
-                        Belum ada tiket selesai — grafik akan terisi setelah ada pembayaran.
+                    <p class="notice m-4">
+                        Belum ada tiket selesai, jadi pangsa pendapatan belum bisa dihitung.
+                        Angka ini terisi setelah petugas memproses pembayaran pertama.
                     </p>
                 @endif
             </div>
         </div>
     </section>
 
-    <section class="mt-10">
-        <h2 class="text-xl font-bold text-slate-800">Cara Pakai</h2>
-        <div class="mt-5 grid gap-5 md:grid-cols-3">
-            <div class="rounded-2xl border border-primary-100 bg-white p-6 shadow-sm">
-                <p class="grid h-9 w-9 place-items-center rounded-full bg-primary-500 text-sm font-bold text-white">1</p>
-                <h3 class="mt-3 font-semibold text-slate-800">Kendaraan masuk</h3>
-                <p class="mt-1.5 text-sm text-slate-500">Tulis nomor polisi, pilih area dan jenis kendaraan — tiket masuk langsung jadi.</p>
-            </div>
-            <div class="rounded-2xl border border-primary-100 bg-white p-6 shadow-sm">
-                <p class="grid h-9 w-9 place-items-center rounded-full bg-primary-500 text-sm font-bold text-white">2</p>
-                <h3 class="mt-3 font-semibold text-slate-800">Pantau langsung</h3>
-                <p class="mt-1.5 text-sm text-slate-500">Setiap area menampilkan kepadatan parkir secara langsung, lengkap dengan lama parkir dan perkiraan biaya.</p>
-            </div>
-            <div class="rounded-2xl border border-primary-100 bg-white p-6 shadow-sm">
-                <p class="grid h-9 w-9 place-items-center rounded-full bg-primary-500 text-sm font-bold text-white">3</p>
-                <h3 class="mt-3 font-semibold text-slate-800">Keluar &amp; bayar</h3>
-                <p class="mt-1.5 text-sm text-slate-500">Cari kendaraan lewat nomor polisi, cek durasinya, bayar biayanya, lalu slot langsung kosong lagi.</p>
-            </div>
+    {{-- The three steps as numbered clauses: ordered, ruled, with the number in
+         its own narrow column. Three identical boxes said nothing about order. --}}
+    <section class="sheet mt-8">
+        <div class="sheet-head">
+            <h2>Cara Pakai</h2>
         </div>
+        <ol>
+            <li class="clause">
+                <span class="clause-number">1</span>
+                <div>
+                    <h3 class="font-semibold text-ink">Kendaraan masuk</h3>
+                    <p class="mt-1 text-sm leading-relaxed text-slate-600">Tulis nomor polisi, pilih area dan jenis kendaraan — tiket masuk langsung jadi.</p>
+                </div>
+            </li>
+            <li class="clause">
+                <span class="clause-number">2</span>
+                <div>
+                    <h3 class="font-semibold text-ink">Pantau langsung</h3>
+                    <p class="mt-1 text-sm leading-relaxed text-slate-600">Setiap area menampilkan kepadatan parkir secara langsung, lengkap dengan lama parkir dan perkiraan biaya.</p>
+                </div>
+            </li>
+            <li class="clause">
+                <span class="clause-number">3</span>
+                <div>
+                    <h3 class="font-semibold text-ink">Keluar &amp; bayar</h3>
+                    <p class="mt-1 text-sm leading-relaxed text-slate-600">Cari kendaraan lewat nomor polisi, cek durasinya, bayar biayanya, lalu slot langsung kosong lagi.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
-    <section class="mt-10">
-        <div class="flex items-center justify-between">
-            <h2 class="text-xl font-bold text-slate-800">Kondisi Parkir Saat Ini</h2>
-            <a href="/area" class="text-sm font-semibold text-primary-600 transition hover:text-primary-700">Lihat semua area →</a>
+    <section class="mt-8">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 class="font-display text-lg font-bold text-ink">Kondisi Parkir Saat Ini</h2>
+            <a href="/area" class="text-xs font-semibold text-primary-600 transition hover:text-primary-700">Lihat semua area →</a>
         </div>
-        <div class="mt-5 space-y-4">
-            @forelse ($areas as $a)
-                <div class="rise">
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="font-medium text-slate-700">{{ $a->nama_area }}</span>
-                        <span class="text-xs text-slate-500">{{ $a->terisi }} / {{ $a->kapasitas }}</span>
-                    </div>
-                    <div class="mt-1.5 h-2 rounded-full bg-primary-100 overflow-hidden">
-                        @php $pct = $a->kapasitas > 0 ? min(100, ($a->terisi / $a->kapasitas) * 100) : 0; @endphp
-                        <div class="h-full rounded-full {{ $a->terisi >= $a->kapasitas ? 'bg-red-400' : 'bg-primary-500' }}"
-                             style="width: {{ $pct }}%"></div>
-                    </div>
-                </div>
-            @empty
-                <p class="rounded-2xl border border-primary-100 bg-white p-8 text-center text-sm text-slate-400">Belum ada area parkir.</p>
-            @endforelse
+        <div class="sheet mt-4 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="ledger">
+                    <thead>
+                        <tr>
+                            <th>Area</th>
+                            <th class="text-right">Terisi</th>
+                            <th class="text-right">Kapasitas</th>
+                            <th>Kepadatan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($areas as $a)
+                            @php
+                                $pct  = $a->kapasitas > 0 ? min(100, ($a->terisi / $a->kapasitas) * 100) : 0;
+                                $full = $a->kapasitas > 0 && $a->terisi >= $a->kapasitas;
+                            @endphp
+                            <tr>
+                                <td class="font-medium text-ink">{{ $a->nama_area }}</td>
+                                <td class="num text-right">{{ $a->terisi }}</td>
+                                <td class="num text-right text-slate-600">{{ $a->kapasitas }}</td>
+                                <td>
+                                    <div class="flex items-center gap-2">
+                                        <div class="h-1.5 w-24 bg-primary-100">
+                                            <div class="h-full {{ $full ? 'bg-red-500' : 'bg-primary-500' }}" style="width: {{ $pct }}%"></div>
+                                        </div>
+                                        <span class="num text-xs font-semibold {{ $full ? 'text-red-600' : 'text-slate-600' }}">
+                                            {{ $full ? 'PENUH' : round($pct) . '%' }}
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="p-0">
+                                    <p class="notice m-3">
+                                        Belum ada area parkir yang terdaftar, jadi belum ada slot yang bisa diisi.
+                                        @if (session('auth_user'))
+                                            Tambahkan lewat menu Area.
+                                        @else
+                                            Daftar ini terisi setelah petugas mendaftarkan area.
+                                        @endif
+                                    </p>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </section>
 @endsection

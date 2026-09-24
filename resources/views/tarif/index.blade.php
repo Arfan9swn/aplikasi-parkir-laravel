@@ -7,23 +7,18 @@
 <div>
     <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-800">Jenis Kendaraan &amp; Tarif</h1>
-            <p class="mt-1 text-sm text-slate-500">
+            <h1 class="font-display text-2xl font-bold text-ink">Jenis Kendaraan &amp; Tarif</h1>
+            <p class="mt-1 text-sm text-slate-600">
                 Setiap jenis di sini menjadi pilihan jenis kendaraan di gerbang masuk.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
             <form method="GET" action="{{ url('/tarif') }}" class="flex items-center gap-2">
-                <input name="q" type="text" value="{{ $q }}" placeholder="Cari jenis kendaraan…"
-                       class="w-56 rounded-xl border border-primary-200 px-4 py-2 text-sm text-slate-800 placeholder-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200" />
-                <button type="submit"
-                        class="rounded-xl border border-primary-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-primary-50">
-                    Cari
-                </button>
+                <input name="q" type="text" value="{{ $q }}" placeholder="Cari jenis kendaraan…" class="field w-56" />
+                <button type="submit" class="btn btn-quiet">Cari</button>
             </form>
             @if ($canManage)
-                <a href="{{ route('ticket.tarif.create') }}"
-                   class="inline-flex items-center gap-1.5 rounded-lg bg-primary-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-600">
+                <a href="{{ route('ticket.tarif.create') }}" class="btn btn-primary">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                         <path d="M12 5v14M5 12h14"/>
                     </svg>
@@ -33,52 +28,46 @@
         </div>
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-sm">
+    <div class="sheet overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+            <table class="ledger">
                 <thead>
-                    <tr class="border-b border-primary-100 bg-primary-50 text-[11px] uppercase tracking-wider text-slate-400">
+                    <tr>
                         <x-table-sort column="jenis_kendaraan" label="Jenis" :allowed="$allowed" />
                         <x-table-sort column="tarif_per_jam" label="Tarif / Jam" :allowed="$allowed" />
                         <x-table-sort column="vehicles" label="Kendaraan" :allowed="$allowed" />
-                        <th class="px-4 py-3 font-semibold">Sedang Parkir</th>
+                        <th class="text-right">Sedang Parkir</th>
                         <x-table-sort column="tickets" label="Total Tiket" :allowed="$allowed" />
                         <x-table-sort column="revenue" label="Pendapatan" :allowed="$allowed" />
                         @if ($canManage)
-                            <th class="px-4 py-3 text-right font-semibold">Aksi</th>
+                            <th class="text-right">Aksi</th>
                         @endif
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($tarifs as $t)
                         @php $u = $usage[$t->id_tarif]; @endphp
-                        <tr class="border-b border-primary-100 last:border-0">
-                            <td class="px-4 py-3 font-semibold text-slate-800">{{ ucfirst($t->jenis_kendaraan) }}</td>
-                            <td class="px-4 py-3 font-mono">Rp {{ number_format((float) $t->tarif_per_jam, 0, ',', '.') }}</td>
-                            <td class="px-4 py-3">{{ $u['vehicles'] }}</td>
-                            <td class="px-4 py-3">
+                        <tr>
+                            <td class="font-semibold text-ink">{{ ucfirst($t->jenis_kendaraan) }}</td>
+                            <td class="num text-right">Rp {{ number_format((float) $t->tarif_per_jam, 0, ',', '.') }}</td>
+                            <td class="num text-right text-slate-600">{{ $u['vehicles'] }}</td>
+                            <td class="text-right">
                                 @if ($u['parked'] > 0)
-                                    <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">{{ $u['parked'] }}</span>
+                                    <span class="state bg-emerald-100 text-emerald-800">{{ $u['parked'] }} di tempat</span>
                                 @else
-                                    <span class="text-slate-300">—</span>
+                                    <span class="text-slate-500">—</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-3">{{ $u['tickets'] }}</td>
-                            <td class="px-4 py-3 font-mono">Rp {{ number_format($u['revenue'], 0, ',', '.') }}</td>
+                            <td class="num text-right text-slate-600">{{ $u['tickets'] }}</td>
+                            <td class="num text-right font-semibold">Rp {{ number_format($u['revenue'], 0, ',', '.') }}</td>
                             @if ($canManage)
-                                <td class="px-4 py-3">
+                                <td class="text-right">
                                     <div class="flex items-center justify-end gap-1">
-                                        <a href="{{ route('ticket.tarif.edit', $t->id_tarif) }}"
-                                           class="rounded-lg border border-primary-200 bg-white px-2.5 py-1 text-xs font-semibold text-primary-700 transition hover:bg-primary-50">
-                                            Edit
-                                        </a>
+                                        <a href="{{ route('ticket.tarif.edit', $t->id_tarif) }}" class="btn btn-quiet">Edit</a>
                                         <form method="POST" action="{{ url('/tarif/' . $t->id_tarif) }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
-                                                    class="rounded-lg border border-red-200 bg-white px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50">
-                                                Hapus
-                                            </button>
+                                            <button type="submit" class="btn btn-danger">Hapus</button>
                                         </form>
                                     </div>
                                 </td>
@@ -86,8 +75,16 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ $canManage ? 7 : 6 }}" class="px-4 py-10 text-center text-sm text-slate-300">
-                                {{ $q !== '' ? 'Tidak ada jenis kendaraan yang cocok.' : 'Belum ada jenis kendaraan.' }}
+                            <td colspan="{{ $canManage ? 7 : 6 }}" class="p-0">
+                                <p class="notice m-3">
+                                    @if ($q !== '')
+                                        Tidak ada jenis kendaraan yang cocok dengan kata kunci ini. Coba kata kunci lain, atau kosongkan pencarian.
+                                    @elseif ($canManage)
+                                        Belum ada jenis kendaraan, jadi gerbang Masuk belum punya pilihan jenis. Tambahkan satu lewat tombol Tambah Jenis.
+                                    @else
+                                        Belum ada jenis kendaraan yang terdaftar. Data muncul setelah petugas menambahkannya.
+                                    @endif
+                                </p>
                             </td>
                         </tr>
                     @endforelse
@@ -96,7 +93,7 @@
         </div>
     </div>
 
-    <p class="mt-4 text-xs text-slate-400">
+    <p class="mt-4 text-xs text-slate-600">
         Hapus hanya bisa dilakukan bila jenis tersebut belum dipakai kendaraan maupun tiket mana pun.
     </p>
 </div>

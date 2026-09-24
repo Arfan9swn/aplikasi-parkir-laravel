@@ -6,7 +6,7 @@
     <title>@yield('title', 'park.')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;500;600;700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <script>
         (function () {
             var stored = null;
@@ -17,7 +17,7 @@
     </script>
     @vite('resources/css/app.css')
 </head>
-<body class="min-h-screen bg-primary-50 font-sans text-slate-800 antialiased">
+<body class="min-h-screen bg-ground font-sans text-ink antialiased">
     @php $section = explode('/', trim(request()->path(), '/'))[0]; @endphp
 
     <a href="#main-content" class="sidebar-skip">Lewati navigasi</a>
@@ -26,8 +26,8 @@
             <a href="/" class="sidebar-brand" aria-label="park. — Beranda" data-tooltip="Beranda">
                 <span class="sidebar-logo" aria-hidden="true">P</span>
                 <span class="sidebar-label leading-tight">
-                    <span class="block font-bold text-primary-700 text-2xl">park.</span>
-                    <span class="block text-[11px] tracking-widest text-slate-400">aplikasi tiket parkir.</span>
+                    <span class="block font-display text-2xl font-bold tracking-wide text-primary-700">park.</span>
+                    <span class="block text-[11px] tracking-widest text-slate-500">aplikasi tiket parkir.</span>
                 </span>
             </a>
             <button type="button" id="sidebar-toggle" class="sidebar-action sidebar-toggle" aria-controls="sidebar-navigation" aria-expanded="true" aria-label="Ciutkan sidebar" data-tooltip="Ciutkan sidebar" hidden>
@@ -79,10 +79,11 @@
                 @endforeach
             </nav>
 
-            <button type="button" id="theme-toggle" class="flex justify-center text-slate-700 hover:-translate-y-[5px] hover:bg-slate-500 rounded w-fit p-[10px] transition-all 200ms ease-in-out"
-                    aria-pressed="false" aria-label="Ganti mode gelap / terang" data-tooltip="Mode Gelap">
+            <button type="button" id="theme-toggle" class="sidebar-action" aria-pressed="false"
+                    aria-label="Ganti mode gelap / terang" data-tooltip="Mode Gelap">
                 @include('layouts.sidebar-icon', ['icon' => 'moon', 'iconClass' => 'sidebar-icon theme-icon-moon'])
                 @include('layouts.sidebar-icon', ['icon' => 'sun', 'iconClass' => 'sidebar-icon theme-icon-sun'])
+                <span class="sidebar-label">Mode Gelap</span>
             </button>
 
             <div class="sidebar-account">
@@ -120,19 +121,15 @@
     <div class="sidebar-content">
     <main id="main-content" tabindex="-1" class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
         @if (session('success'))
-            <div class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
-                {{ session('success') }}
-            </div>
+            <div class="notice notice-ok mb-5 font-medium" role="status">{{ session('success') }}</div>
         @endif
 
         @if (session('error'))
-            <div class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-                {{ session('error') }}
-            </div>
+            <div class="notice notice-error mb-5 font-medium" role="alert">{{ session('error') }}</div>
         @endif
 
         @if ($errors->any())
-            <div class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div class="notice notice-error mb-5" role="alert">
                 <p class="font-semibold">Periksa kembali isian Anda:</p>
                 <ul class="mt-1 list-inside list-disc space-y-0.5">
                     @foreach ($errors->all() as $error)

@@ -7,12 +7,11 @@
 <div>
     <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-800">Area Parkir</h1>
-            <p class="mt-1 text-sm text-slate-500">Kepadatan parkir per area — setiap area memiliki petugas khusus.</p>
+            <h1 class="font-display text-2xl font-bold text-ink">Area Parkir</h1>
+            <p class="mt-1 text-sm text-slate-600">Kepadatan parkir per area — setiap area memiliki petugas khusus.</p>
         </div>
         @if ($canManage)
-            <a href="{{ route('ticket.area.create') }}"
-               class="inline-flex items-center gap-1.5 rounded-lg bg-primary-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-600">
+            <a href="{{ route('ticket.area.create') }}" class="btn btn-primary">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
                     <path d="M12 5v14M5 12h14"/>
                 </svg>
@@ -26,41 +25,43 @@
         $totalUsed  = $areas->sum('terisi');
         $totalFree  = max(0, $totalSpots - $totalUsed);
     @endphp
-    <div class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Slot</p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ number_format((int) $totalSpots, 0, ',', '.') }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">Kapasitas gabungan</p>
-        </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Terisi</p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ number_format((int) $totalUsed, 0, ',', '.') }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">{{ $totalSpots > 0 ? (int) min(100, ($totalUsed / $totalSpots) * 100) : 0 }}% padatnya</p>
-        </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Kosong</p>
-            <p class="mt-1.5 text-2xl font-extrabold text-emerald-600">{{ number_format((int) $totalFree, 0, ',', '.') }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">Slot tersedia</p>
-        </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Area Terdaftar</p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ $areas->count() }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">Area aktif</p>
+    <div class="sheet mb-6">
+        <div class="cols-ruled">
+            <div>
+                <p class="figure-label">Total Slot</p>
+                <p class="figure mt-1">{{ number_format((int) $totalSpots, 0, ',', '.') }}</p>
+                <p class="figure-note mt-0.5">Kapasitas gabungan</p>
+            </div>
+            <div>
+                <p class="figure-label">Terisi</p>
+                <p class="figure mt-1">{{ number_format((int) $totalUsed, 0, ',', '.') }}</p>
+                <p class="figure-note mt-0.5">{{ $totalSpots > 0 ? (int) min(100, ($totalUsed / $totalSpots) * 100) : 0 }}% padatnya</p>
+            </div>
+            <div>
+                <p class="figure-label">Kosong</p>
+                <p class="figure mt-1">{{ number_format((int) $totalFree, 0, ',', '.') }}</p>
+                <p class="figure-note mt-0.5">Slot tersedia</p>
+            </div>
+            <div>
+                <p class="figure-label">Area Terdaftar</p>
+                <p class="figure mt-1">{{ $areas->count() }}</p>
+                <p class="figure-note mt-0.5">Area aktif</p>
+            </div>
         </div>
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-sm">
+    <div class="sheet overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+            <table class="ledger">
                 <thead>
-                    <tr class="border-b border-primary-100 bg-primary-50 text-[11px] uppercase tracking-wider text-slate-400">
+                    <tr>
                         <x-table-sort column="nama_area" label="Area" :allowed="$allowed" />
                         <x-table-sort column="petugas" label="Petugas" :allowed="$allowed" />
                         <x-table-sort column="kapasitas" label="Kapasitas" :allowed="$allowed" />
                         <x-table-sort column="terisi" label="Terisi / Kosong" :allowed="$allowed" />
-                        <th class="px-4 py-3 font-semibold">Status</th>
+                        <th>Status</th>
                         @if ($canManage)
-                            <th class="px-4 py-3 font-semibold text-right">Aksi</th>
+                            <th class="text-right">Aksi</th>
                         @endif
                     </tr>
                 </thead>
@@ -71,44 +72,38 @@
                             $pct  = $a->kapasitas > 0 ? min(100, ($a->terisi / $a->kapasitas) * 100) : 0;
                             $full = $a->kapasitas > 0 && $a->terisi >= $a->kapasitas;
                         @endphp
-                        <tr class="border-b border-primary-100 last:border-0">
-                            <td class="px-4 py-3">
+                        <tr>
+                            <td>
                                 <a href="{{ route('ticket.area.show', $a->id_area) }}"
-                                   class="font-semibold text-slate-800 transition hover:text-primary-700">{{ $a->nama_area }}</a>
-                                <p class="mt-0.5 text-[11px] text-slate-400">Lihat kendaraan di area ini →</p>
+                                   class="font-semibold text-ink transition hover:text-primary-700">{{ $a->nama_area }}</a>
+                                <p class="mt-0.5 text-[11px] text-slate-600">Lihat kendaraan di area ini →</p>
                             </td>
-                            <td class="px-4 py-2 text-slate-600">{{ $a->petugas->nama_lengkap ?? '-' }}</td>
-                            <td class="px-4 py-2">{{ $a->kapasitas }}</td>
-                            <td class="px-4 py-2">
+                            <td class="text-slate-600">{{ $a->petugas->nama_lengkap ?? '-' }}</td>
+                            <td class="num">{{ $a->kapasitas }}</td>
+                            <td>
                                 <div class="flex items-center gap-2">
-                                    <div class="h-2 w-24 rounded-full bg-primary-100">
-                                        <div class="h-full rounded-full {{ $full ? 'bg-red-400' : 'bg-primary-500' }}"
+                                    <div class="h-1.5 w-20 bg-primary-100">
+                                        <div class="h-full {{ $full ? 'bg-red-500' : 'bg-primary-500' }}"
                                              style="width: {{ $pct }}%"></div>
                                     </div>
-                                    <span class="font-mono text-xs text-slate-600">{{ $a->terisi }}/{{ $a->kapasitas }}</span>
+                                    <span class="num text-xs text-slate-600">{{ $a->terisi }}/{{ $a->kapasitas }}</span>
                                 </div>
                             </td>
-                            <td class="px-4 py-2">
+                            <td>
                                 @if ($a->id_user)
-                                    <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">Teredaftar</span>
+                                    <span class="state bg-emerald-100 text-emerald-800">Teredaftar</span>
                                 @else
-                                    <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">Tanpa petugas</span>
+                                    <span class="state bg-amber-100 text-amber-800">Tanpa petugas</span>
                                 @endif
                             </td>
                             @if ($canManage)
-                                <td class="px-4 py-2 text-right">
+                                <td class="text-right">
                                     <div class="flex items-center justify-end gap-1">
-                                        <a href="{{ route('ticket.area.edit', $a->id_area) }}"
-                                           class="rounded-lg border border-primary-200 bg-white px-2.5 py-1 text-xs font-semibold text-primary-700 transition hover:bg-primary-50">
-                                            Edit
-                                        </a>
+                                        <a href="{{ route('ticket.area.edit', $a->id_area) }}" class="btn btn-quiet">Edit</a>
                                         <form method="POST" action="{{ url('/area/' . $a->id_area) }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit"
-                                                    class="rounded-lg border border-red-200 bg-white px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50">
-                                                Hapus
-                                            </button>
+                                            <button type="submit" class="btn btn-danger">Hapus</button>
                                         </form>
                                     </div>
                                 </td>
@@ -116,7 +111,16 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-10 text-center text-sm text-slate-300">Belum ada area parkir.</td>
+                            <td colspan="6" class="p-0">
+                                <p class="notice m-3">
+                                    Belum ada area parkir, jadi belum ada slot yang bisa diisi.
+                                    @if ($canManage)
+                                        Tambahkan area pertama lewat tombol Tambah Area di atas.
+                                    @else
+                                        Data muncul setelah petugas mendaftarkan area.
+                                    @endif
+                                </p>
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>

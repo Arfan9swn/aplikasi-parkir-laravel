@@ -6,55 +6,53 @@
 @section('content')
     <div class="mx-auto max-w-3xl">
         <div class="print-area">
-            <h1 class="text-2xl font-bold text-slate-800">Tiket Berhasil Terbit</h1>
-            <div class="mx-auto mt-6 max-w-md rounded-2xl border-2 border-dashed border-primary-200 bg-white p-6 shadow-sm">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold tracking-widest text-slate-400">TIKET PARKIR</span>
-                    <span class="grid h-8 w-8 place-items-center rounded-lg bg-primary-500 text-xs font-bold text-white">P</span>
+            <h1 class="font-display text-2xl font-bold text-ink">Tiket Berhasil Terbit</h1>
+            <div class="mx-auto mt-6 max-w-md sheet tear px-6 py-5">
+                <div class="flex items-baseline justify-between">
+                    <span class="font-display text-xs font-bold uppercase tracking-[0.2em] text-slate-600">Tiket Parkir</span>
+                    <span class="font-display text-lg font-bold text-primary-700">park.</span>
                 </div>
 
-                <div class="mt-2 text-center">
-                    <p class="text-xs font-semibold tracking-widest text-slate-400">NOMOR TIKET</p>
-                    <p class="font-mono text-3xl font-extrabold tracking-widest text-primary-700">P-{{ str_pad($ticket->id_parkir, 6, '0', STR_PAD_LEFT) }}</p>
+                <div class="mt-3 text-center">
+                    <p class="font-display text-[11px] font-bold uppercase tracking-[0.15em] text-slate-600">Nomor Tiket</p>
+                    <p class="num mt-1 font-mono text-3xl font-bold tracking-widest text-primary-700">P-{{ str_pad($ticket->id_parkir, 6, '0', STR_PAD_LEFT) }}</p>
                 </div>
 
-                <div class="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                <dl class="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
                     <div>
-                        <p class="text-xs text-slate-400">Plat</p>
-                        <p class="font-mono font-semibold text-slate-800">{{ $ticket->kendaraan->plat_nomor }}</p>
+                        <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Plat</dt>
+                        <dd class="font-mono font-semibold text-ink">{{ $ticket->kendaraan->plat_nomor }}</dd>
                     </div>
                     <div>
-                        <p class="text-xs text-slate-400">Jenis</p>
-                        <p class="font-semibold text-slate-800">{{ ucfirst($ticket->kendaraan->jenis_kendaraan) }}</p>
+                        <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Jenis</dt>
+                        <dd class="font-semibold text-ink">{{ ucfirst($ticket->kendaraan->jenis_kendaraan) }}</dd>
                     </div>
                     <div>
-                        <p class="text-xs text-slate-400">Warna</p>
-                        <p class="text-slate-800">{{ $ticket->kendaraan->warna }}</p>
+                        <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Warna</dt>
+                        <dd class="text-ink">{{ $ticket->kendaraan->warna }}</dd>
                     </div>
                     <div>
-                        <p class="text-xs text-slate-400">Pemilik</p>
-                        <p class="text-slate-800">{{ $ticket->kendaraan->pemilik }}</p>
+                        <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Pemilik</dt>
+                        <dd class="text-ink">{{ $ticket->kendaraan->pemilik }}</dd>
                     </div>
                     <div class="col-span-2">
-                        <p class="text-xs text-slate-400">Area</p>
-                        <p class="font-semibold text-slate-800">{{ $ticket->area->nama_area }}</p>
+                        <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Area</dt>
+                        <dd class="font-semibold text-ink">{{ $ticket->area->nama_area }}</dd>
                     </div>
                     <div class="col-span-2">
-                        <p class="text-xs text-slate-400">Waktu Masuk</p>
-                        <p class="font-mono font-semibold text-slate-800">{{ \Carbon\Carbon::parse($ticket->waktu_masuk)->format('d M Y · H:i') }}</p>
+                        <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Waktu Masuk</dt>
+                        <dd class="num font-mono font-semibold text-ink">{{ \Carbon\Carbon::parse($ticket->waktu_masuk)->format('d M Y · H:i') }}</dd>
                     </div>
-                </div>
+                </dl>
 
-                <div class="mt-4 flex items-center justify-end gap-3 border-t border-primary-100 pt-3">
-                    <button type="button" onclick="window.print()"
-                            class="inline-flex items-center gap-1.5 rounded-xl bg-primary-700 px-4 py-2 text-xs font-bold text-white transition hover:bg-primary-800">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="mt-4 flex items-center justify-end gap-2 border-t border-rule pt-3">
+                    <button type="button" onclick="window.print()" class="btn btn-primary">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/>
                         </svg>
                         Cetak Tiket
                     </button>
-                    <a href="{{ url('/masuk') }}"
-                       class="rounded-xl border border-primary-200 px-4 py-2 text-xs font-semibold text-primary-700 transition hover:bg-primary-50">
+                    <a href="{{ url('/masuk') }}" class="btn btn-quiet">
                         + Kendaraan Baru
                     </a>
                 </div>

@@ -7,6 +7,11 @@
     --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 
+    /* Titles only, never body copy. Poppins is a wide geometric sans, so the
+       authority in this build has to come from the condensed face.
+       See DESIGN.md, Typography. */
+    --font-display: 'Archivo Narrow', 'Barlow Condensed', ui-sans-serif, system-ui, sans-serif;
+
     --color-primary-50:  #eef3f8;
     --color-primary-100: #e0eaf4;
     --color-primary-200: #b8cdf9;
@@ -17,28 +22,36 @@
     --color-primary-700: #263d56;
     --color-primary-800: #1c2d41;
     --color-primary-900: #111e2d;
+
+    /* Ledger palette. Every value below already exists in this file or in the
+       views, so the redesign promotes existing colours to tokens instead of
+       introducing new ones. See DESIGN.md, Palette. */
+    --color-ground: #eef3f8;
+    --color-sheet:  #ffffff;
+    --color-rule:   #d8e2ee;
+    --color-ink:    #111e2d;
+
+    /* Sheets are cut square, so the app runs on a 2-3px radius scale instead of
+       one pill radius on every element. See DESIGN.md, Personality. */
+    --radius-panel:   2px;
+    --radius-control: 3px;
 }
 
 body {
-    background-color: rgb(228, 227, 255);
+    background-color: var(--color-ground);
+    color: var(--color-ink);
 }
 
 /* =====================================================================
-   Little animations
+   Motion: one entrance, and only where a thing arrives
+
+   MOTION 2 (DESIGN.md) means motion explains something. So there is a single
+   entrance animation instead of six staggered ones, no idle loops, and the
+   shimmer survives only because a loading skeleton is a real state.
    ===================================================================== */
 @keyframes rise-in {
-    from { opacity: 0; transform: translateY(13px); }
+    from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes pop-in {
-    from { opacity: 0; transform: scale(0.92) translateY(8px); }
-    to   { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-@keyframes live-pulse {
-    0%, 100% { opacity: 1; }
-    50%      { opacity: 0.35; }
 }
 
 @keyframes shimmer-move {
@@ -46,17 +59,7 @@ body {
     to   { background-position: 140% 50%; }
 }
 
-.rise   { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.rise-1 { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both; }
-.rise-2 { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both; }
-.rise-3 { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both; }
-.rise-4 { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both; }
-.rise-5 { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.30s both; }
-.rise-6 { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.36s both; }
-
-.pop { animation: pop-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) both; }
-
-.live-dot { animation: live-pulse 1.8s ease-in-out infinite; }
+.rise { animation: rise-in 0.32s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 /* Loading skeleton */
 .skeleton {
@@ -65,61 +68,237 @@ body {
     animation: shimmer-move 1.2s linear infinite;
 }
 
-/* Subtle parking-lot lane stripes for the hero */
-.hero-stripes {
-    background-image:
-        repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1.5px, transparent 1.5px 28px),
-        repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0 1.5px, transparent 1.5px 28px);
-}
-
-/* Ticket-style dashed edge */
-.ticket-edge {
-    border: 1.5px dashed #a9c1de;
+/* Perforation on printed tickets and receipts: two tear lines, top and bottom.
+   This is the one piece of decoration in the app, and it carries meaning: this
+   surface is the thing that comes out of the printer. */
+.sheet.tear {
+    border-top: 1.5px dashed #a9c1de;
+    border-bottom: 1.5px dashed #a9c1de;
 }
 
 /* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
-    .rise, .rise-1, .rise-2, .rise-3, .rise-4, .rise-5, .rise-6,
-    .pop, .live-dot, .skeleton {
+    .rise, .skeleton {
         animation: none !important;
     }
 }
 
-/* Filter pills (tickets page) */
-.filter-pill {
-    background: #ffffff;
-    border: 1px solid #d8e2ee;
-    color: #395a7f;
-    transition: background-color 160ms ease, color 160ms ease;
-}
-.filter-pill:hover { background: #e0eaf4; }
-.filter-pill.is-active {
-    background: #395a7f;
-    border-color: #395a7f;
-    color: #ffffff;
+/* =====================================================================
+   Ledger components
+
+   Everything in the app is built from these parts. RHYTHM 4 (DESIGN.md) lets
+   each screen differ in composition, but the parts agree on one language:
+   ruled lines, square sheets, tabular numbers.
+   ===================================================================== */
+
+/* A sheet is one page of the ledger: flat paper, hairline rule, no elevation.
+   Shadow is reserved for surfaces that genuinely float (tooltip, popover form),
+   so that elevation still means something. */
+.sheet {
+    background: var(--color-sheet);
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-panel);
 }
 
-/* Log page tabs */
-.tab-pill {
-    background: #ffffff;
-    border: 1px solid #d8e2ee;
-    color: #395a7f;
-    transition: background-color 160ms ease, color 160ms ease;
+/* The ruled line that separates a sheet's heading from its contents. */
+.sheet-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .5rem 1rem;
+    padding: .5rem .875rem;
+    border-bottom: 1px solid var(--color-rule);
+    background: var(--color-primary-50);
+    border-radius: var(--radius-panel) var(--radius-panel) 0 0;
 }
-.tab-pill:hover { background: #e0eaf4; }
-.tab-pill.is-active {
-    background: #395a7f;
-    border-color: #395a7f;
-    color: #ffffff;
+.sheet-head :is(h1, h2, h3, p:first-child) {
+    font-family: var(--font-display);
+    font-size: .8125rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--color-primary-700);
 }
 
-/* Primary navigation link */
-.nav-link {
-    color: #6f95c0;
-    transition: color 160ms ease, background-color 160ms ease;
+/* Ruled columns: figures sit in their own column, divided the way a ledger
+   divides them, with no box drawn around each one. This is what replaces the
+   row of four identical stat cards. */
+.cols-ruled { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cols-ruled > * { padding: .75rem .875rem; border-top: 1px solid var(--color-rule); }
+.cols-ruled > :nth-child(-n + 2) { border-top: 0; }
+.cols-ruled > :nth-child(even) { border-left: 1px solid var(--color-rule); }
+@media (min-width: 1024px) {
+    /* The column count follows how many figures the account actually has, so the
+       guest view (three) leaves no empty ruled column behind. */
+    .cols-ruled { grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); }
+    .cols-ruled > * { border-top: 0; }
+    .cols-ruled > * + * { border-left: 1px solid var(--color-rule); }
 }
-.nav-link:hover { color: #395a7f; background: #e0eaf4; }
-.nav-link.is-active { color: #ffffff; background: #395a7f; }
+.cols-ruled .figure {
+    font-family: var(--font-display);
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink);
+}
+.cols-ruled .figure-label {
+    font-family: var(--font-display);
+    font-size: .6875rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: #475569;
+}
+.cols-ruled .figure-note { font-size: .6875rem; color: #475569; }
+.sheet-foot {
+    padding: .5rem .875rem;
+    border-top: 1px solid var(--color-rule);
+    background: var(--color-primary-50);
+    border-radius: 0 0 var(--radius-panel) var(--radius-panel);
+}
+
+/* Ledger table: ruled rows and ruled columns, so a long list reads as a page. */
+.ledger { width: 100%; border-collapse: collapse; text-align: left; }
+.ledger thead th {
+    font-family: var(--font-display);
+    font-size: .6875rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #475569;
+    background: var(--color-primary-50);
+    border-bottom: 1px solid var(--color-rule);
+    padding: .5rem .875rem;
+    white-space: nowrap;
+}
+.ledger tbody td {
+    padding: .5rem .875rem;
+    border-bottom: 1px solid var(--color-rule);
+    vertical-align: middle;
+}
+.ledger tbody tr:last-child td { border-bottom: 0; }
+.ledger tbody tr:hover { background: var(--color-primary-50); }
+.ledger :is(td, th) + :is(td, th) { border-left: 1px solid var(--color-rule); }
+
+/* Numerals for anything a reader compares down a column: money, plates,
+   ticket numbers, times, counts. */
+.num { font-variant-numeric: tabular-nums; }
+
+/* A state is a marked word, not a floating capsule. Colour here always means a
+   real state and never decoration (DESIGN.md, Palette). */
+.state {
+    display: inline-flex;
+    align-items: center;
+    gap: .375rem;
+    border-radius: var(--radius-panel);
+    padding: .0625rem .4375rem;
+    font-size: .6875rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Numbered clauses: a procedure set as a ruled list, number in its own narrow
+   column. Used where steps need order but not three identical boxes. */
+.clause { display: flex; gap: 1rem; padding: .875rem 1rem; border-bottom: 1px solid var(--color-rule); }
+.clause:last-child { border-bottom: 0; }
+.clause-number {
+    flex: 0 0 2rem;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-primary-400);
+}
+
+/* Tabs are ruled, not pills: the active tab is where the rule turns to ink. */
+.tab {
+    display: inline-flex;
+    align-items: center;
+    padding: .375rem .125rem .5rem;
+    border-bottom: 2px solid transparent;
+    /* #475569 clears 4.5:1 on both the white sheets and the page ground;
+       #64748b managed only 4.25:1 on the ground. */
+    color: #475569;
+    font-size: .8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 140ms ease, border-color 140ms ease;
+}
+.tab:hover { color: var(--color-primary-700); border-bottom-color: var(--color-rule); }
+.tab.is-active { color: var(--color-ink); border-bottom-color: var(--color-primary-500); }
+
+/* Empty, loading and error text. Always names the cause and the next action;
+   never "No data" (antislop R-27). */
+.notice {
+    border: 1px solid var(--color-rule);
+    border-left: 3px solid var(--color-primary-400);
+    border-radius: var(--radius-panel);
+    background: var(--color-sheet);
+    padding: .625rem .875rem;
+    font-size: .8125rem;
+    color: #475569;
+}
+
+/* Fields and buttons: one control radius, one focus treatment for the whole app. */
+.field {
+    width: 100%;
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-control);
+    background: var(--color-sheet);
+    padding: .5rem .75rem;
+    font: inherit;
+    font-size: .875rem;
+    color: var(--color-ink);
+    transition: border-color 140ms ease, background-color 140ms ease;
+}
+.field::placeholder { color: #94a3b8; }
+.field:hover { border-color: var(--color-primary-300); }
+.field:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 0;
+    border-color: var(--color-primary-500);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .375rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-control);
+    padding: .5rem .875rem;
+    font-size: .8125rem;
+    font-weight: 700;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+.btn:focus-visible { outline: 2px solid var(--color-primary-500); outline-offset: 2px; }
+.btn-primary { background: var(--color-primary-500); color: #fff; }
+.btn-primary:hover { background: var(--color-primary-700); }
+.btn-quiet { border-color: var(--color-rule); color: var(--color-primary-700); }
+.btn-quiet:hover { background: var(--color-primary-50); border-color: var(--color-primary-300); }
+.btn-danger { border-color: #fecaca; color: #b91c1c; }
+.btn-danger:hover { background: #fee2e2; }
+
+/* Notices carry their state on the rule, not in a tinted capsule. The words
+   beside them still say what happened, so colour is never the only signal
+   (antislop R-25, colour-only feedback). */
+.notice-ok    { border-left-color: #059669; }
+.notice-error { border-left-color: #dc2626; }
+
+/* One focus treatment for the whole app. Nothing here removes an outline
+   without putting a visible one back (antislop R-32). */
+:is(a, button, summary, select, textarea, input, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+}
 
 /* Collapsible navigation: the tooltip lives outside the scrolling sidebar. */
 body { --sidebar-width: 15rem; }
@@ -139,8 +318,8 @@ body[data-sidebar-collapsed="true"] { --sidebar-width: 4.5rem; }
 }
 .sidebar-inner { display: flex; flex-direction: column; min-height: 100%; padding: 1rem .75rem; gap: 1rem; }
 .sidebar-brand, .sidebar-profile { display: flex; align-items: center; gap: .75rem; min-height: 3rem; }
-.sidebar-logo, .sidebar-avatar { display: grid; place-items: center; flex: 0 0 3rem; height: 3rem; border-radius: .875rem; background: var(--color-primary-500); color: white; font-weight: 700; }
-.sidebar-logo { font-size: 1.75rem; }
+.sidebar-logo, .sidebar-avatar { display: grid; place-items: center; flex: 0 0 3rem; height: 3rem; border-radius: var(--radius-panel); background: var(--color-primary-500); color: white; font-weight: 700; }
+.sidebar-logo { font-family: var(--font-display); font-size: 1.75rem; }
 .sidebar-avatar { font-size: 1rem; }
 .sidebar-navigation { display: flex; flex-direction: column; gap: .375rem; flex: 1; }
 .sidebar-action {
@@ -149,21 +328,30 @@ body[data-sidebar-collapsed="true"] { --sidebar-width: 4.5rem; }
     gap: .75rem;
     width: 100%;
     min-height: 2.75rem;
-    padding: .75rem .875rem;
-    border-radius: .75rem;
+    padding: .75rem .875rem .75rem .625rem;
+    /* The rule that marks the current page sits here permanently, transparent
+       while idle, because the old 2px border that appeared on hover nudged the
+       label on every row it touched. */
+    border-left: 3px solid transparent;
+    border-radius: var(--radius-panel);
     color: var(--color-primary-600);
     font-size: .875rem;
     font-weight: 500;
     white-space: nowrap;
     cursor: pointer;
-    transition: background-color 160ms ease, color 160ms ease;
+    transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
 }
 .sidebar-action[hidden] { display: none; }
-.sidebar-action:hover { border: solid 2px #395a7f; box-shadow: 2px 3px 8px #395a7f10; }
-.sidebar-action.is-active, .sidebar-login { background: var(--color-primary-500); color: white; box-shadow: 0 3px 8px #395a7f20; }
-.sidebar-action.is-active:hover, .sidebar-login:hover { background: var(--color-primary-600); color: white; }
-.sidebar-logout { color: #dc2626; }
-.sidebar-logout:hover { color: #b91c1c; background: #e1c1c1; }
+.sidebar-action:hover { background: var(--color-primary-50); border-left-color: var(--color-primary-300); }
+.sidebar-action.is-active, .sidebar-login {
+    background: var(--color-primary-50);
+    border-left-color: var(--color-primary-500);
+    color: var(--color-primary-700);
+    font-weight: 700;
+}
+.sidebar-action.is-active:hover, .sidebar-login:hover { background: var(--color-primary-100); color: var(--color-primary-800); }
+.sidebar-logout { color: #b91c1c; }
+.sidebar-logout:hover { color: #991b1b; background: #fee2e2; border-left-color: #dc2626; }
 .sidebar-toggle { background: var(--color-primary-50); }
 .sidebar-icon { flex-shrink: 0; }
 .sidebar-account { display: flex; flex-direction: column; gap: .5rem; margin-top: auto; border-top: 1px solid var(--color-primary-100); padding-top: 1rem; }
@@ -194,22 +382,7 @@ body[data-sidebar-collapsed="true"] .sidebar-toggle svg { transform: rotate(180d
     .app-sidebar, .sidebar-content, .sidebar-action { transition: none; }
 }
 
-/* Filter pills (sort tabs / status chips) */
-.filter-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    background-color: var(--color-slate-100, #f1f5f9);
-    color: var(--color-slate-600, #475569);
-    cursor: pointer;
-}
-.filter-pill:hover { background-color: var(--color-primary-50, #eff6ff); color: var(--color-primary-700); }
-.filter-pill.is-active {
-    background-color: var(--color-primary-500);
-    color: #fff;
-    box-shadow: 0 4px 12px #395a7f33;
-}
-.filter-pill.is-active:hover { background-color: var(--color-primary-600); }
+/* The sidebar shell keeps its own rule colours: it is the frame, not a sheet. */
 
 /* Filter dropdown (area selectors that would overflow as pills) */
 :is(.filter-select select, select.filter-select) {
@@ -218,21 +391,20 @@ body[data-sidebar-collapsed="true"] .sidebar-toggle svg { transform: rotate(180d
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
-    border: 1px solid #d8e2ee;
-    border-radius: 9999px;
+    border: 1px solid var(--color-rule);
+    border-radius: var(--radius-control);
     color: #475569;
     cursor: pointer;
     font: inherit;
     font-size: 0.75rem;
     font-weight: 600;
     padding: 0.4rem 2rem 0.4rem 0.9rem;
-    transition: background-color 160ms ease, border-color 160ms ease, box-shadow 150ms ease, color 160ms ease;
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
 }
 :is(.filter-select select, select.filter-select):hover,
 :is(.filter-select select, select.filter-select):focus {
-    background-color: #eff6ff;
+    background-color: var(--color-primary-50);
     border-color: var(--color-primary-300, #93b4d8);
-    box-shadow: 0 4px 10px #395a7f12;
     color: var(--color-primary-700);
 }
 :is(.filter-select select, select.filter-select):focus-visible {
@@ -274,19 +446,9 @@ body[data-sidebar-collapsed="true"] .sidebar-toggle svg { transform: rotate(180d
 .sort-arrow.is-active { opacity: 1; }
 .sort-arrow.is-asc { transform: rotate(180deg); }
 
-/* Micro-actions: hover lift / glow */
-.micro-hover {
-    transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
-}
-.micro-hover:hover { transform: translateY(-1px); box-shadow: 0 6px 16px #395a7f1a; }
-.filter-pill, .tab-pill {
-    transition: background-color 160ms ease, color 160ms ease, transform 150ms ease, box-shadow 150ms ease;
-}
-.filter-pill:hover, .tab-pill:hover { transform: translateY(-1px); box-shadow: 0 4px 10px #395a7f12; }
-.card-hover {
-    transition: box-shadow 150ms ease, transform 150ms ease;
-}
-.card-hover:hover { box-shadow: 0 10px 24px #395a7f18; transform: translateY(-2px); }
+/* Hover feedback without the lift. MOTION 2 (DESIGN.md) means motion explains
+   something; a card drifting upward on hover explains nothing, and stacked
+   lifts on every row and pill read as one texture. Surfaces change instead. */
 .icon-btn:hover { color: var(--color-primary-700); }
 
 /* Dark theme (class on <html>, toggled by the sidebar button)
@@ -316,6 +478,36 @@ html.dark .text-primary-700 { color: #9db8d8; }
 html.dark .border-primary-100 { border-color: #1d2f45; }
 html.dark .border-primary-200 { border-color: #27405c; }
 html.dark .placeholder-slate-300::placeholder { color: #4a5f76; }
+html.dark .text-ink { color: #e6edf5; }
+
+/* Ledger components in dark: same hierarchy, ink on a dark ground. */
+html.dark .sheet { background-color: #101b2b; border-color: #1d2f45; }
+/* Tailwind writes the light rule colour into border-rule; on a dark ground it
+   has to be told again, or the ledgers glow. */
+html.dark .border-rule { border-color: #1d2f45; }
+html.dark .bg-primary-100 { background-color: #1a2a3f; }
+html.dark .sheet-head, html.dark .sheet-foot { background-color: #0f1a29; border-color: #1d2f45; }
+html.dark .sheet-head :is(h1, h2, h3, p:first-child) { color: #9db8d8; }
+html.dark .clause { border-bottom-color: #1d2f45; }
+html.dark .clause-number { color: #7fa8cd; }
+html.dark .cols-ruled > * { border-color: #1d2f45; }
+html.dark .cols-ruled .figure { color: #e6edf5; }
+html.dark .cols-ruled .figure-label,
+html.dark .cols-ruled .figure-note { color: #8298ae; }
+html.dark .ledger thead th { background-color: #0f1a29; color: #8298ae; border-bottom-color: #1d2f45; }
+html.dark .ledger tbody td { border-bottom-color: #1d2f45; }
+html.dark .ledger :is(td, th) + :is(td, th) { border-left-color: #1d2f45; }
+html.dark .ledger tbody tr:hover { background-color: #142338; }
+html.dark .notice { background-color: #101b2b; border-color: #1d2f45; color: #a9bacd; }
+html.dark .notice-ok { border-left-color: #10b981; }
+html.dark .notice-error { border-left-color: #ef4444; }
+html.dark .field { background-color: #142338; border-color: #27405c; color: #e6edf5; }
+html.dark .field:hover { border-color: #3a5a80; }
+html.dark .btn-quiet { border-color: #27405c; color: #9db8d8; }
+html.dark .btn-quiet:hover { background-color: #142338; border-color: #3a5a80; }
+html.dark .btn-primary:hover { background-color: #2f4c6b; }
+html.dark .btn-danger { border-color: #6b2737; color: #f0a5b0; }
+html.dark .btn-danger:hover { background-color: #3a1d1d; }
 
 /* Session alerts */
 html.dark .bg-emerald-50 { background-color: #0c2a22; }
@@ -336,11 +528,19 @@ html.dark textarea {
     color: #e6edf5;
 }
 html.dark input::placeholder { color: #4a5f76; }
+/* No outline removal here. Dark mode needs the focus ring more than light does,
+   and dropping it silently is the classic keyboard trap (antislop R-32). */
 html.dark input:focus,
 html.dark select:focus {
-    outline: none;
     border-color: #7fa8cd;
     box-shadow: 0 0 0 3px #7fa8cd1f;
+}
+html.dark :is(a, button, summary, select, textarea, input, [tabindex]):focus-visible,
+html.dark .field:focus-visible,
+html.dark .btn:focus-visible {
+    /* #395a7f is only 2.2:1 against the dark ground, so dark gets its own ring:
+       #7fa8cd reaches 6.3:1 there. */
+    outline-color: #7fa8cd;
 }
 html.dark .focus\:ring-primary-100:focus { --tw-ring-color: #1a2a3f; }
 html.dark .bg-primary-500.text-white:hover { background-color: #2f4c6b; }
@@ -374,10 +574,9 @@ html.dark .sidebar-toggle { background: #142338; }
 html.dark .sidebar-action:hover { border-color: #7fa8cd; box-shadow: 2px 3px 8px #00000040; }
 html.dark .sidebar-logout:hover { background: #3a1d1d; }
 html.dark .sidebar-skip { background: #101b2b; color: #9db8d8; }
-html.dark .filter-pill { background-color: #182738; color: #a9bacd; }
-html.dark .filter-pill:hover { background-color: #1c3050; color: #9db8d8; }
-html.dark .tab-pill { background: #182738; color: #a9bacd; }
-html.dark .tab-pill:hover { background: #1c3050; }
+html.dark .tab { color: #8298ae; }
+html.dark .tab:hover { color: #9db8d8; }
+html.dark .tab.is-active { color: #e6edf5; }
 html.dark .filter-select select {
     background-color: #182738;
     border-color: #27405c;
@@ -389,7 +588,7 @@ html.dark .filter-select select:focus { background-color: #1c3050; color: #9db8d
 html.dark .sort-header a:hover { background-color: #142338; }
 html.dark .sort-header.is-active a { color: #9db8d8; }
 html.dark .skeleton { background: linear-gradient(100deg, #142338 30%, #1c3050 50%, #142338 70%); background-size: 200% 100%; }
-html.dark .ticket-edge { border-color: #2c425c; }
+html.dark .tear { border-top-color: #2c425c; border-bottom-color: #2c425c; }
 
 /* Charts */
 html.dark .chart-grid { stroke: #22344b; }

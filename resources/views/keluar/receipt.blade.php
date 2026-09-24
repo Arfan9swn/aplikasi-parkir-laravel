@@ -7,55 +7,52 @@
 
 @section('content')
 <div class="mx-auto max-w-3xl">
-    <div class="rounded-2xl border border-primary-100 bg-white p-8 shadow-sm">
-        <div class="mb-6 flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-slate-800">Tiket Selesai</h1>
-            <button type="button" onclick="window.print()"
-                class="inline-flex items-center gap-1.5 rounded-xl bg-primary-700 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-primary-800">
-                Cetak
-            </button>
+    <div class="sheet tear p-6 sm:p-8">
+        <div class="mb-6 flex items-center justify-between gap-3 border-b border-rule pb-4">
+            <div>
+                <p class="font-display text-xs font-bold uppercase tracking-[0.2em] text-slate-600">park.</p>
+                <h1 class="font-display text-2xl font-bold text-ink">Tiket Selesai</h1>
+            </div>
+            <button type="button" onclick="window.print()" class="btn btn-primary">Cetak</button>
         </div>
 
-        <div class="grid grid-cols-2 gap-x-6 gap-y-5 text-sm">
+        <dl class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
             <div>
-                <p class="text-xs text-slate-400">Nomor Tiket</p>
-                <p class="font-mono text-lg font-bold text-primary-700">P-{{ str_pad($receipt->id_parkir, 6, '0', STR_PAD_LEFT) }}</p>
-            </div>
-            <div>
-                <p class="text-xs text-slate-400">Plat</p>
-                <p class="font-mono font-semibold text-slate-800">{{ $receipt->kendaraan->plat_nomor ?? '-' }}</p>
+                <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Nomor Tiket</dt>
+                <dd class="num font-mono text-lg font-bold text-primary-700">P-{{ str_pad($receipt->id_parkir, 6, '0', STR_PAD_LEFT) }}</dd>
             </div>
             <div>
-                <p class="text-xs text-slate-400">Area</p>
-                <p class="font-semibold text-slate-800">{{ $receipt->area->nama_area ?? '-' }}</p>
+                <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Plat</dt>
+                <dd class="font-mono font-semibold text-ink">{{ $receipt->kendaraan->plat_nomor ?? '-' }}</dd>
             </div>
             <div>
-                <p class="text-xs text-slate-400">Petugas</p>
-                <p class="font-semibold text-slate-800">{{ $receipt->user->nama_lengkap ?? '-' }}</p>
+                <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Area</dt>
+                <dd class="font-semibold text-ink">{{ $receipt->area->nama_area ?? '-' }}</dd>
             </div>
             <div>
-                <p class="text-xs text-slate-400">Jam Masuk</p>
-                <p class="font-mono text-slate-800">{{ \Carbon\Carbon::parse($receipt->waktu_masuk)->format($fmt) }}</p>
+                <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Petugas</dt>
+                <dd class="font-semibold text-ink">{{ $receipt->user->nama_lengkap ?? '-' }}</dd>
             </div>
             <div>
-                <p class="text-xs text-slate-400">Jam Keluar</p>
-                <p class="font-mono text-slate-800">{{ \Carbon\Carbon::parse($receipt->waktu_keluar)->format($fmt) }}</p>
+                <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Jam Masuk</dt>
+                <dd class="num font-mono text-ink">{{ \Carbon\Carbon::parse($receipt->waktu_masuk)->format($fmt) }}</dd>
             </div>
-            <div class="col-span-2 border-t border-primary-100 pt-4">
-                <p class="text-xs text-slate-400">Durasi Parkir</p>
-                <p class="font-mono text-2xl font-extrabold text-slate-800">{{ $receipt->durasi_jam }} jam</p>
+            <div>
+                <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Jam Keluar</dt>
+                <dd class="num font-mono text-ink">{{ \Carbon\Carbon::parse($receipt->waktu_keluar)->format($fmt) }}</dd>
             </div>
-            <div class="col-span-2">
-                <p class="text-xs text-slate-400">Total Bayar</p>
-                <p class="font-mono text-2xl font-extrabold text-emerald-600">Rp {{ number_format((float) ($receipt->biaya_total ?? 0), 0, ',', '.') }}</p>
+            <div class="col-span-2 border-t border-rule pt-4">
+                <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Durasi Parkir</dt>
+                <dd class="num font-display text-2xl font-bold text-ink">{{ $receipt->durasi_jam }} jam</dd>
             </div>
-        </div>
+            <div class="col-span-2 border-t border-rule pt-4">
+                <dt class="font-display text-[11px] font-bold uppercase tracking-wide text-slate-600">Total Bayar</dt>
+                <dd class="num font-display text-3xl font-bold text-ink">Rp {{ number_format((float) ($receipt->biaya_total ?? 0), 0, ',', '.') }}</dd>
+            </div>
+        </dl>
 
-        <div class="mt-6 flex justify-end">
-            <a href="{{ url('/keluar') }}"
-               class="rounded-xl border border-primary-200 px-4 py-2 text-xs font-semibold text-slate-600 transition hover:bg-primary-50">
-                Transaksi baru
-            </a>
+        <div class="mt-6 flex justify-end border-t border-rule pt-4">
+            <a href="{{ url('/keluar') }}" class="btn btn-quiet">Transaksi baru</a>
         </div>
     </div>
 </div>

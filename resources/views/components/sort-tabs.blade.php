@@ -1,5 +1,5 @@
 @php
-    $base = 'filter-pill rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap';
+    $base = 'tab';
 @endphp
 @foreach ($tabs as $tab)
     <a href="{{ $urlFor($tab['value']) }}"

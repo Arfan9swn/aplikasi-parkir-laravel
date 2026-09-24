@@ -9,21 +9,20 @@
         <div>
             <a href="{{ route('ticket.kendaraan') }}"
                class="text-xs font-semibold text-primary-600 transition hover:text-primary-700">&larr; Data Kendaraan</a>
-            <h1 class="mt-1 font-mono text-2xl font-bold text-slate-800">{{ $vehicle->plat_nomor }}</h1>
-            <p class="mt-1 text-sm text-slate-500">
+            <h1 class="mt-1 font-mono text-2xl font-bold text-ink">{{ $vehicle->plat_nomor }}</h1>
+            <p class="num mt-1 text-sm text-slate-600">
                 {{ ucfirst($vehicle->jenis_kendaraan) }} · {{ $vehicle->warna }} · {{ $vehicle->pemilik }}
                 — data oleh {{ $vehicle->user->nama_lengkap ?? '-' }}
             </p>
         </div>
         <div class="flex items-center gap-2">
             @if ($sedangParkir)
-                <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Sedang parkir</span>
+                <span class="state bg-emerald-100 text-emerald-800">Sedang parkir</span>
             @else
-                <span class="rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600">Tidak di tempat</span>
+                <span class="state bg-slate-200 text-slate-700">Tidak di tempat</span>
             @endif
             @if ($canManage)
-                <a href="{{ route('ticket.kendaraan.edit', $vehicle->id_kendaraan) }}"
-                   class="rounded-xl border border-primary-200 bg-white px-4 py-2 text-xs font-semibold text-primary-700 transition hover:bg-primary-50">
+                <a href="{{ route('ticket.kendaraan.edit', $vehicle->id_kendaraan) }}" class="btn btn-quiet">
                     Edit
                 </a>
             @endif
@@ -31,33 +30,35 @@
     </div>
 
     {{-- Ringkasan semua kunjungan --}}
-    <div class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Kunjungan</p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ $kunjungan }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">Sejak pertama terdaftar</p>
-        </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Durasi</p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ $totalJam }} <span class="text-sm font-bold">jam</span></p>
-            <p class="mt-1 text-[11px] text-slate-300">Akumulasi seluruh kunjungan</p>
-        </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Rata-rata</p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">{{ $rataRata }} <span class="text-sm font-bold">jam</span></p>
-            <p class="mt-1 text-[11px] text-slate-300">Per kunjungan</p>
-        </div>
-        <div class="rounded-2xl border border-primary-100 bg-white p-5 shadow-sm">
-            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Biaya</p>
-            <p class="mt-1.5 text-2xl font-extrabold text-primary-700">Rp {{ number_format($totalBiaya, 0, ',', '.') }}</p>
-            <p class="mt-1 text-[11px] text-slate-300">Dari tiket yang sudah selesai</p>
+    <div class="sheet mb-6">
+        <div class="cols-ruled">
+            <div>
+                <p class="figure-label">Total Kunjungan</p>
+                <p class="figure mt-1">{{ $kunjungan }}</p>
+                <p class="figure-note mt-0.5">Sejak pertama terdaftar</p>
+            </div>
+            <div>
+                <p class="figure-label">Total Durasi</p>
+                <p class="figure mt-1">{{ $totalJam }} <span class="text-sm font-bold">jam</span></p>
+                <p class="figure-note mt-0.5">Akumulasi seluruh kunjungan</p>
+            </div>
+            <div>
+                <p class="figure-label">Rata-rata</p>
+                <p class="figure mt-1">{{ $rataRata }} <span class="text-sm font-bold">jam</span></p>
+                <p class="figure-note mt-0.5">Per kunjungan</p>
+            </div>
+            <div>
+                <p class="figure-label">Total Biaya</p>
+                <p class="figure mt-1">Rp {{ number_format($totalBiaya, 0, ',', '.') }}</p>
+                <p class="figure-note mt-0.5">Dari tiket yang sudah selesai</p>
+            </div>
         </div>
     </div>
 
     @forelse ($perArea as $area)
         @php $avgArea = $area['kunjungan'] > 0 ? round($area['total_jam'] / $area['kunjungan'], 1) : 0; @endphp
-        <div class="mb-5 overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-sm">
-            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-primary-100 bg-primary-50 px-4 py-3">
+        <div class="sheet mb-5 overflow-hidden">
+            <div class="sheet-head">
                 <div class="flex items-center gap-2">
                     <span class="grid h-8 w-8 place-items-center rounded-lg bg-primary-500 text-white">
                         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -65,49 +66,49 @@
                         </svg>
                     </span>
                     <div>
-                        <p class="font-semibold text-slate-800">{{ $area['nama_area'] }}</p>
-                        <p class="text-[11px] text-slate-500">
+                        <p class="font-semibold text-ink">{{ $area['nama_area'] }}</p>
+                        <p class="num text-[11px] text-slate-600">
                             {{ $area['kunjungan'] }} kunjungan · {{ $area['total_jam'] }} jam total · rata-rata {{ $avgArea }} jam
                             · Rp {{ number_format($area['total_biaya'], 0, ',', '.') }}
                         </p>
                     </div>
                 </div>
                 @if ($area['sedang_parkir'])
-                    <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">Ada di area ini</span>
+                    <span class="state bg-emerald-100 text-emerald-800">Ada di area ini</span>
                 @endif
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
+                <table class="ledger">
                     <thead>
-                        <tr class="border-b border-primary-100 text-[11px] uppercase tracking-wider text-slate-400">
-                            <th class="px-4 py-2.5 font-semibold">Tiket</th>
-                            <th class="px-4 py-2.5 font-semibold">Masuk</th>
-                            <th class="px-4 py-2.5 font-semibold">Keluar</th>
-                            <th class="px-4 py-2.5 font-semibold">Lama Parkir</th>
-                            <th class="px-4 py-2.5 font-semibold">Biaya</th>
-                            <th class="px-4 py-2.5 font-semibold">Status</th>
+                        <tr>
+                            <th>Tiket</th>
+                            <th>Masuk</th>
+                            <th>Keluar</th>
+                            <th class="text-right">Lama Parkir</th>
+                            <th class="text-right">Biaya</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($area['visits'] as $v)
-                            <tr class="border-b border-primary-100 last:border-0">
-                                <td class="px-4 py-2 font-mono">P-{{ str_pad($v['ticket']->id_parkir, 6, '0', STR_PAD_LEFT) }}</td>
-                                <td class="px-4 py-2 font-mono text-slate-600">
+                            <tr>
+                                <td class="font-mono font-semibold text-primary-700">P-{{ str_pad($v['ticket']->id_parkir, 6, '0', STR_PAD_LEFT) }}</td>
+                                <td class="num text-slate-600">
                                     {{ $v['ticket']->waktu_masuk ? \Carbon\Carbon::parse($v['ticket']->waktu_masuk)->format('d M Y · H:i') : '-' }}
                                 </td>
-                                <td class="px-4 py-2 font-mono text-slate-600">
+                                <td class="num text-slate-600">
                                     {{ $v['ticket']->waktu_keluar ? \Carbon\Carbon::parse($v['ticket']->waktu_keluar)->format('d M Y · H:i') : '—' }}
                                 </td>
-                                <td class="px-4 py-2 font-semibold text-slate-800">{{ $v['durasi'] }} jam</td>
-                                <td class="px-4 py-2 font-mono">
+                                <td class="num text-right font-semibold">{{ $v['durasi'] }} jam</td>
+                                <td class="num text-right">
                                     {{ $v['biaya'] > 0 ? 'Rp ' . number_format($v['biaya'], 0, ',', '.') : '—' }}
                                 </td>
-                                <td class="px-4 py-2">
+                                <td>
                                     @if ($v['ongoing'])
-                                        <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-800">Masih parkir</span>
+                                        <span class="state bg-emerald-100 text-emerald-800">Masih parkir</span>
                                     @else
-                                        <span class="rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-semibold text-slate-700">Selesai</span>
+                                        <span class="state bg-slate-200 text-slate-700">Selesai</span>
                                     @endif
                                 </td>
                             </tr>
@@ -117,8 +118,10 @@
             </div>
         </div>
     @empty
-        <div class="rounded-2xl border border-primary-100 bg-white px-4 py-12 text-center shadow-sm">
-            <p class="text-sm text-slate-400">Kendaraan ini belum pernah tercatat parkir.</p>
+        <div class="sheet p-3">
+            <p class="notice">
+                Kendaraan ini belum pernah tercatat parkir, jadi belum ada riwayat yang bisa dibuka. Riwayat terisi setelah ada tiket atas nomor polisi ini.
+            </p>
         </div>
     @endforelse
 </div>

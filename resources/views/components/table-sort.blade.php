@@ -1,7 +1,7 @@
 @php
     $classes = $active
-        ? 'px-3 py-2 font-semibold text-primary-700 cursor-default'
-        : 'px-3 py-2 font-semibold text-slate-500 hover:text-primary-700 hover:bg-primary-50 cursor-pointer select-none';
+        ? 'text-primary-700 cursor-default'
+        : 'text-slate-500 hover:text-primary-700 cursor-pointer select-none';
 @endphp
 <th class="sort-header" @if ($active) aria-sort="{{ $asc ? 'ascending' : 'descending' }}" @endif>
     <a href="{{ $sortUrl() }}"

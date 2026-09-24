@@ -6,59 +6,58 @@
 @section('content')
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-slate-800">Manajemen Akun</h1>
-            <p class="mt-1 text-sm text-slate-500">Kelola role, username, dan password seluruh pengguna aplikasi.</p>
+            <h1 class="font-display text-2xl font-bold text-ink">Manajemen Akun</h1>
+            <p class="mt-1 text-sm text-slate-600">Kelola role, username, dan password seluruh pengguna aplikasi.</p>
         </div>
         <form method="GET" action="{{ url('/users') }}" class="flex items-center gap-3">
-            <input name="q" type="text" value="{{ $q }}" placeholder="Cari username, nama, atau role…"
-                   class="w-64 rounded-xl border border-primary-200 px-4 py-2 text-sm text-slate-800 placeholder-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200" />
-            <button type="submit" class="micro-hover rounded-xl bg-primary-500 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-600">Cari</button>
+            <input name="q" type="text" value="{{ $q }}" placeholder="Cari username, nama, atau role…" class="field w-64" />
+            <button type="submit" class="btn btn-primary">Cari</button>
         </form>
     </div>
 
-    <p class="mt-4 text-xs text-slate-400">{{ $users->count() }} akun</p>
+    <p class="num mt-4 text-xs text-slate-600">{{ $users->count() }} akun</p>
 
-    <div class="mt-3 overflow-hidden rounded-2xl border border-primary-100 bg-white shadow-sm">
+    <div class="sheet mt-3 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
+            <table class="ledger">
                 <thead>
-                    <tr class="border-b border-primary-100 bg-primary-50 text-[11px] uppercase tracking-wider text-slate-400">
+                    <tr>
                         <x-table-sort column="username" label="Username" :allowed="['username', 'nama_lengkap', 'role']" />
                         <x-table-sort column="nama_lengkap" label="Nama Lengkap" :allowed="['username', 'nama_lengkap', 'role']" />
                         <x-table-sort column="role" label="Role" :allowed="['username', 'nama_lengkap', 'role']" />
-                        <th class="px-4 py-3 font-semibold">Aksi</th>
+                        <th class="text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($users as $u)
-                        <tr class="border-b border-primary-100 last:border-0">
-                            <td class="px-4 py-2 font-mono">{{ $u->username }}@if ((int) $u->id_user === $me)<span class="ml-1.5 rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-semibold text-primary-700">Anda</span>@endif</td>
-                            <td class="px-4 py-2">{{ $u->nama_lengkap }}</td>
-                            <td class="px-4 py-2">
+                        <tr>
+                            <td class="font-mono text-ink">{{ $u->username }}@if ((int) $u->id_user === $me)<span class="state ml-1.5 bg-primary-100 text-primary-700">Anda</span>@endif</td>
+                            <td>{{ $u->nama_lengkap }}</td>
+                            <td>
                                 @php
                                     $isOwner  = $u->role === 'owner';
                                     $isAdmin  = $u->role === 'admin';
                                     $canTouch = $actorRole === 'owner' || $u->role === 'petugas';
                                 @endphp
-                                <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold {{ $isOwner ? 'bg-purple-100 text-purple-800' : ($isAdmin ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') }}">{{ $u->role }}</span>
+                                <span class="state {{ $isOwner ? 'bg-purple-100 text-purple-800' : ($isAdmin ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') }}">{{ $u->role }}</span>
                                 @if ((int) $u->status_aktif !== 1)
-                                    <span class="ml-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700">nonaktif</span>
+                                    <span class="state ml-1 bg-red-100 text-red-700">nonaktif</span>
                                 @endif
                             </td>
-                            <td class="px-4 py-2">
+                            <td class="text-right">
                                 @if ((int) $u->id_user === $me)
-                                    <span class="text-xs text-slate-300">— akun Anda —</span>
+                                    <span class="text-xs text-slate-600">— akun Anda —</span>
                                 @elseif ($isOwner)
                                     <div class="flex flex-wrap items-center gap-2">
                                         <details class="relative">
-                                            <summary class="micro-hover cursor-pointer list-none rounded-lg bg-primary-500 px-2.5 py-1 text-xs font-semibold text-white transition hover:bg-primary-600"
+                                            <summary class="btn btn-primary cursor-pointer list-none"
                                                      data-tooltip="Pindahkan status owner ke akun lain — hanya boleh ada satu owner">Transfer Owner</summary>
                                             <form method="POST" action="{{ route('pengguna.ownership') }}"
-                                                  class="absolute right-0 z-20 mt-1 w-60 space-y-2 rounded-xl border border-primary-100 bg-white p-3 shadow-lg"
+                                                  class="absolute right-0 z-20 mt-1 w-64 space-y-2 sheet p-3 shadow-lg"
                                                   onsubmit="return confirm('Pindahkan kepemilikan? Owner saat ini akan menjadi admin.')">
                                                 @csrf
                                                 @method('PUT')
-                                                <label class="block text-[10px] font-semibold uppercase tracking-wide text-slate-400">Owner baru
+                                                <label class="block text-[10px] font-semibold uppercase tracking-wide text-slate-600">Owner baru
                                                     <select name="target_id" required
                                                             class="filter-select mt-1 w-full px-2 py-1.5 text-xs">
                                                         @foreach ($users->where('role', '!==', 'owner') as $candidate)
@@ -66,7 +65,7 @@
                                                         @endforeach
                                                     </select>
                                                 </label>
-                                                <button type="submit" class="w-full rounded-lg bg-primary-500 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-primary-600">Pindahkan</button>
+                                                <button type="submit" class="btn btn-primary w-full">Pindahkan</button>
                                             </form>
                                         </details>
                                     </div>
@@ -77,44 +76,44 @@
                                             @method('PUT')
                                             <select name="role" aria-label="Role untuk {{ $u->username }}"
                                                     data-tooltip="Ubah role {{ $u->username }}"
-                                                    class="filter-select rounded-lg border border-primary-200 px-2 py-1 text-xs">
+                                                    class="filter-select px-2 py-1 text-xs">
                                                 @foreach (['petugas', 'admin'] as $r)
                                                     <option value="{{ $r }}" @selected($u->role === $r)>{{ $r }}</option>
                                                 @endforeach
                                             </select>
-                                            <button type="submit" class="micro-hover rounded-lg bg-primary-500 px-2.5 py-1 text-xs font-semibold text-white transition hover:bg-primary-600"
+                                            <button type="submit" class="btn btn-primary"
                                                     data-tooltip="Terapkan role yang dipilih">Set</button>
                                         </form>
                                         <details class="relative">
-                                            <summary class="micro-hover cursor-pointer list-none rounded-lg border border-primary-200 px-2.5 py-1 text-xs font-semibold text-primary-700 transition hover:bg-primary-50"
+                                            <summary class="btn btn-quiet cursor-pointer list-none"
                                                      data-tooltip="Ganti password {{ $u->username }}">Reset Password</summary>
                                             <form method="POST" action="{{ route('pengguna.password', $u->id_user) }}"
-                                                  class="absolute right-0 z-20 mt-1 w-60 space-y-2 rounded-xl border border-primary-100 bg-white p-3 shadow-lg">
+                                                  class="absolute right-0 z-20 mt-1 w-64 space-y-2 sheet p-3 shadow-lg">
                                                 @csrf
                                                 @method('PUT')
                                                 <input type="password" name="password" placeholder="Password baru" required minlength="8"
-                                                       class="w-full rounded-lg border border-primary-200 px-2 py-1.5 text-xs" />
+                                                       class="field text-xs" />
                                                 <input type="password" name="password_confirmation" placeholder="Ulangi password" required minlength="8"
-                                                       class="w-full rounded-lg border border-primary-200 px-2 py-1.5 text-xs" />
-                                                <button type="submit" class="w-full rounded-lg bg-primary-500 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-primary-600">Simpan Password</button>
+                                                       class="field text-xs" />
+                                                <button type="submit" class="btn btn-primary w-full">Simpan Password</button>
                                             </form>
                                         </details>
                                         <details class="relative">
-                                            <summary class="micro-hover cursor-pointer list-none rounded-lg border border-primary-200 px-2.5 py-1 text-xs font-semibold text-primary-700 transition hover:bg-primary-50"
+                                            <summary class="btn btn-quiet cursor-pointer list-none"
                                                      data-tooltip="Edit username dan nama {{ $u->username }}">Edit</summary>
                                             <form method="POST" action="{{ route('pengguna.profile', $u->id_user) }}"
-                                                  class="absolute right-0 z-20 mt-1 w-60 space-y-2 rounded-xl border border-primary-100 bg-white p-3 shadow-lg">
+                                                  class="absolute right-0 z-20 mt-1 w-64 space-y-2 sheet p-3 shadow-lg">
                                                 @csrf
                                                 @method('PUT')
-                                                <label class="block text-[10px] font-semibold uppercase tracking-wide text-slate-400">Username
+                                                <label class="block text-[10px] font-semibold uppercase tracking-wide text-slate-600">Username
                                                     <input type="text" name="username" value="{{ $u->username }}" required minlength="3"
-                                                           class="mt-1 w-full rounded-lg border border-primary-200 px-2 py-1.5 text-xs" />
+                                                           class="field mt-1 text-xs" />
                                                 </label>
-                                                <label class="block text-[10px] font-semibold uppercase tracking-wide text-slate-400">Nama lengkap
+                                                <label class="block text-[10px] font-semibold uppercase tracking-wide text-slate-600">Nama lengkap
                                                     <input type="text" name="nama_lengkap" value="{{ $u->nama_lengkap }}" required
-                                                           class="mt-1 w-full rounded-lg border border-primary-200 px-2 py-1.5 text-xs" />
+                                                           class="field mt-1 text-xs" />
                                                 </label>
-                                                <button type="submit" class="w-full rounded-lg bg-primary-500 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-primary-600">Simpan Profil</button>
+                                                <button type="submit" class="btn btn-primary w-full">Simpan Profil</button>
                                             </form>
                                         </details>
                                         @if ($u->role === 'petugas')
@@ -122,18 +121,27 @@
                                                   onsubmit="return confirm('Hapus akun {{ $u->username }}? Akun dengan riwayat data akan dinonaktifkan saja.')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="micro-hover rounded-lg border border-red-200 bg-white px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50"
-                                                        data-tooltip="Hapus akun worker ini">Hapus</button>
+                                                <button type="submit" class="btn btn-danger" data-tooltip="Hapus akun worker ini">Hapus</button>
                                             </form>
                                         @endif
                                     </div>
                                 @else
-                                    <span class="text-xs text-slate-300" data-tooltip="Akun admin lain tidak dapat diubah — hanya worker (petugas)">Terkunci</span>
+                                    <span class="text-xs text-slate-600" data-tooltip="Akun admin lain tidak dapat diubah — hanya worker (petugas)">Terkunci</span>
                                 @endif
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="4" class="px-4 py-10 text-center text-sm text-slate-300">Tidak ada akun ditemukan.</td></tr>
+                        <tr>
+                            <td colspan="4" class="p-0">
+                                <p class="notice m-3">
+                                    @if ($q !== '')
+                                        Tidak ada akun yang cocok dengan kata kunci ini. Coba username, nama, atau role lain.
+                                    @else
+                                        Tidak ada akun ditemukan. Akun daftar sendiri lewat halaman Daftar, dan role diatur dari tabel ini.
+                                    @endif
+                                </p>
+                            </td>
+                        </tr>
                     @endforelse
 
                 </tbody>
