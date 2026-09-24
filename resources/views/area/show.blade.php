@@ -7,7 +7,7 @@
 <div>
     <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-            <a href="{{ route('ticket.area') }}" class="text-xs font-semibold text-primary-600 transition hover:text-primary-700">← Semua area</a>
+            <a href="{{ route('ticket.area') }}" class="text-xs font-semibold text-primary-600 transition hover:text-primary-700">Semua area</a>
             <h1 class="mt-1 font-display text-2xl font-bold text-ink">Area {{ $area->nama_area }}</h1>
             <p class="mt-1 text-sm text-slate-600">Kendaraan yang sedang berada di area ini saat ini.</p>
         </div>

@@ -46,27 +46,14 @@ body {
    Motion: one entrance, and only where a thing arrives
 
    MOTION 2 (DESIGN.md) means motion explains something. So there is a single
-   entrance animation instead of six staggered ones, no idle loops, and the
-   shimmer survives only because a loading skeleton is a real state.
+   entrance animation instead of six staggered ones, and no idle loops.
    ===================================================================== */
 @keyframes rise-in {
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes shimmer-move {
-    from { background-position: 0% 50%; }
-    to   { background-position: 140% 50%; }
-}
-
 .rise { animation: rise-in 0.32s cubic-bezier(0.16, 1, 0.3, 1) both; }
-
-/* Loading skeleton */
-.skeleton {
-    background: linear-gradient(100deg, #e6edf6 30%, #d5e0ec 50%, #e6edf6 70%);
-    background-size: 200% 100%;
-    animation: shimmer-move 1.2s linear infinite;
-}
 
 /* Perforation on printed tickets and receipts: two tear lines, top and bottom.
    This is the one piece of decoration in the app, and it carries meaning: this
@@ -78,7 +65,7 @@ body {
 
 /* Respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
-    .rise, .skeleton {
+    .rise {
         animation: none !important;
     }
 }
@@ -567,8 +554,6 @@ html.dark .bg-amber-100 { background-color: #3a2c12; }
 html.dark .text-amber-800 { color: #e8c37e; }
 html.dark .bg-emerald-100 { background-color: #12362a; }
 html.dark .text-emerald-800:not(a) { color: #8fe0c0; }
-html.dark .bg-purple-100 { background-color: #2d2145; }
-html.dark .text-purple-800 { color: #c3a8f0; }
 
 /* Register info card (bg-primary-50/60) */
 html.dark .bg-primary-50\/60 { background-color: #0f1a29; }
@@ -610,7 +595,6 @@ html.dark .filter-select select:hover,
 html.dark .filter-select select:focus { background-color: #1c3050; color: #9db8d8; }
 html.dark .sort-header a:hover { background-color: #142338; }
 html.dark .sort-header.is-active a { color: #9db8d8; }
-html.dark .skeleton { background: linear-gradient(100deg, #142338 30%, #1c3050 50%, #142338 70%); background-size: 200% 100%; }
 html.dark .tear { border-top-color: #2c425c; border-bottom-color: #2c425c; }
 
 /* Charts */

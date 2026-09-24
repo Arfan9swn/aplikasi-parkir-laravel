@@ -76,7 +76,7 @@
                             <td>
                                 <a href="{{ route('ticket.area.show', $a->id_area) }}"
                                    class="font-semibold text-ink transition hover:text-primary-700">{{ $a->nama_area }}</a>
-                                <p class="mt-0.5 text-[11px] text-slate-600">Lihat kendaraan di area ini →</p>
+                                <p class="mt-0.5 text-[11px] text-slate-600">Lihat kendaraan di area ini</p>
                             </td>
                             <td class="text-slate-600">{{ $a->petugas->nama_lengkap ?? '-' }}</td>
                             <td class="num">{{ $a->kapasitas }}</td>

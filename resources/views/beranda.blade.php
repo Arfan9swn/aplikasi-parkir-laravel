@@ -226,7 +226,7 @@
     <section class="mt-8">
         <div class="flex flex-wrap items-baseline justify-between gap-2">
             <h2 class="font-display text-lg font-bold text-ink">Kondisi Parkir Saat Ini</h2>
-            <a href="/area" class="text-xs font-semibold text-primary-600 transition hover:text-primary-700">Lihat semua area →</a>
+            <a href="/area" class="text-xs font-semibold text-primary-600 transition hover:text-primary-700">Lihat semua area</a>
         </div>
         <div class="sheet mt-4 overflow-hidden">
             <div class="overflow-x-auto">

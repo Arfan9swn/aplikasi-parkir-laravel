@@ -36,10 +36,9 @@
                             <td>
                                 @php
                                     $isOwner  = $u->role === 'owner';
-                                    $isAdmin  = $u->role === 'admin';
                                     $canTouch = $actorRole === 'owner' || $u->role === 'petugas';
                                 @endphp
-                                <span class="state {{ $isOwner ? 'bg-purple-100 text-purple-800' : ($isAdmin ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800') }}">{{ $u->role }}</span>
+                                <span class="state">{{ $u->role }}</span>
                                 @if ((int) $u->status_aktif !== 1)
                                     <span class="state ml-1 bg-red-100 text-red-700">nonaktif</span>
                                 @endif
