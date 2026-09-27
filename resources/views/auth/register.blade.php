@@ -31,6 +31,14 @@
                     @enderror
                 </div>
                 <div>
+                    <label for="register-email" class="text-xs font-semibold uppercase tracking-wide text-slate-600">Email</label>
+                    <input id="register-email" name="email" type="email" autocomplete="email" required value="{{ old('email') }}"
+                        class="field mt-1.5" placeholder="cth: budi@contoh.com" />
+                    @error('email')
+                        <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
                     <label for="register-username" class="text-xs font-semibold uppercase tracking-wide text-slate-600">Username</label>
                     <input id="register-username" name="username" type="text" autocomplete="username" required value="{{ old('username') }}"
                         class="field mt-1.5" placeholder="cth: budi" />

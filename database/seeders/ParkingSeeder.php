@@ -62,6 +62,7 @@ class ParkingSeeder extends Seeder
                 $user = parkir_users::create([
                     'nama_lengkap' => 'Petugas ' . $areaName,
                     'username'     => $username,
+                    'email'        => $username . '@parkir.test',
                     'password'     => Hash::make('password'),
                     'role'         => 'petugas',
                     'status_aktif' => 1,

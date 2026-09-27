@@ -13,6 +13,7 @@ class parkir_users extends Model
 
     protected $fillable = [
         'nama_lengkap',
+        'email',
         'username',
         'password',
         'role',

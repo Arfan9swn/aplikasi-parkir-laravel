@@ -7,10 +7,10 @@
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
             <h1 class="font-display text-2xl font-bold text-ink">Manajemen Akun</h1>
-            <p class="mt-1 text-sm text-slate-600">Setujui pendaftaran baru, lalu kelola role, username, dan password seluruh pengguna aplikasi.</p>
+            <p class="mt-1 text-sm text-slate-600">Setujui pendaftaran baru, lalu kelola role, username, email, dan password seluruh pengguna aplikasi.</p>
         </div>
         <form method="GET" action="{{ url('/users') }}" class="flex items-center gap-3">
-            <input name="q" type="text" value="{{ $q }}" placeholder="Cari username, nama, atau role…" class="field w-64" />
+            <input name="q" type="text" value="{{ $q }}" placeholder="Cari username, nama, email, atau role…" class="field w-64" />
             <button type="submit" class="btn btn-primary">Cari</button>
         </form>
     </div>
@@ -38,7 +38,10 @@
                     @forelse ($users as $u)
                         <tr>
                             <td class="font-mono text-ink">{{ $u->username }}@if ((int) $u->id_user === $me)<span class="state ml-1.5 bg-primary-100 text-primary-700">Anda</span>@endif</td>
-                            <td>{{ $u->nama_lengkap }}</td>
+                            <td>
+                                {{ $u->nama_lengkap }}
+                                <span class="block text-xs text-slate-600">{{ $u->email }}</span>
+                            </td>
                             <td>
                                 @php
                                     $isOwner  = $u->role === 'owner';
@@ -137,7 +140,7 @@
                                         </details>
                                         <details class="relative">
                                             <summary class="btn btn-quiet cursor-pointer list-none"
-                                                     data-tooltip="Edit username dan nama {{ $u->username }}">Edit</summary>
+                                                     data-tooltip="Edit username, nama, dan email {{ $u->username }}">Edit</summary>
                                             <form method="POST" action="{{ route('pengguna.profile', $u->id_user) }}"
                                                   class="absolute right-0 z-20 mt-1 w-64 space-y-2 sheet p-3 shadow-lg">
                                                 @csrf
@@ -148,6 +151,10 @@
                                                 </label>
                                                 <label class="block text-[10px] font-semibold uppercase tracking-wide text-slate-600">Nama lengkap
                                                     <input type="text" name="nama_lengkap" value="{{ $u->nama_lengkap }}" required
+                                                           class="field mt-1 text-xs" />
+                                                </label>
+                                                <label class="block text-[10px] font-semibold uppercase tracking-wide text-slate-600">Email
+                                                    <input type="email" name="email" value="{{ $u->email }}" required
                                                            class="field mt-1 text-xs" />
                                                 </label>
                                                 <button type="submit" class="btn btn-primary w-full">Simpan Profil</button>

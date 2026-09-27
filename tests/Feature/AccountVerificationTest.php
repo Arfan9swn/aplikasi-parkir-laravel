@@ -9,14 +9,18 @@ beforeEach(function () {
 
 function createVerificationAccount(array $overrides = []): parkir_users
 {
-    return parkir_users::create(array_merge([
+    $data = array_merge([
         'nama_lengkap'     => 'Petugas Uji',
         'username'         => 'petugasuji',
         'password'         => Hash::make('password123'),
         'role'             => 'petugas',
         'status_aktif'     => 1,
         'status_verifikasi' => 'menunggu',
-    ], $overrides));
+    ], $overrides);
+
+    $data['email'] ??= $data['username'] . '@uji.test';
+
+    return parkir_users::create($data);
 }
 
 function createVerificationAdmin(): parkir_users
@@ -42,12 +46,14 @@ function verificationSession(parkir_users $user): array
 test('the registration page tells visitors an admin must approve the account', function () {
     $this->get('/registrasi')
         ->assertOk()
-        ->assertSee('menunggu');
+        ->assertSee('menunggu')
+        ->assertSee('name="email"', false);
 });
 
 test('web registration creates a waiting account instead of an active worker', function () {
     $response = $this->post('/registrasi', [
         'nama_lengkap'          => 'Budi Santoso',
+        'email'                 => 'budi@contoh.test',
         'username'              => 'budiuji',
         'password'              => 'password123',
         'password_confirmation' => 'password123',
@@ -56,6 +62,7 @@ test('web registration creates a waiting account instead of an active worker', f
     $user = parkir_users::where('username', 'budiuji')->firstOrFail();
 
     expect($user->role)->toBe('petugas')
+        ->and($user->email)->toBe('budi@contoh.test')
         ->and((int) $user->status_aktif)->toBe(1)
         ->and($user->status_verifikasi)->toBe('menunggu');
 
@@ -66,6 +73,7 @@ test('web registration creates a waiting account instead of an active worker', f
 test('api registration also creates a waiting account', function () {
     $response = $this->postJson('/api/register', [
         'nama_lengkap'          => 'Akun Api',
+        'email'                 => 'api@contoh.test',
         'username'              => 'akunapi',
         'password'              => 'password123',
         'password_confirmation' => 'password123',
@@ -74,7 +82,8 @@ test('api registration also creates a waiting account', function () {
     $response->assertStatus(201);
 
     $user = parkir_users::where('username', 'akunapi')->firstOrFail();
-    expect($user->status_verifikasi)->toBe('menunggu');
+    expect($user->email)->toBe('api@contoh.test')
+        ->and($user->status_verifikasi)->toBe('menunggu');
 });
 
 test('a waiting account can log in but only reaches the waiting page', function () {
@@ -187,4 +196,35 @@ test('only admins can verify registrations', function () {
         ->assertRedirect(route('beranda'));
 
     expect($worker->fresh()->status_verifikasi)->toBe('menunggu');
+});
+
+test('registration rejects a missing or malformed email', function () {
+    $base = [
+        'nama_lengkap'          => 'Uji Email',
+        'password'              => 'password123',
+        'password_confirmation' => 'password123',
+    ];
+
+    $this->post('/registrasi', array_merge($base, ['username' => 'tanpaemail']))
+        ->assertSessionHasErrors('email');
+
+    $this->post('/registrasi', array_merge($base, ['username' => 'emailrusak', 'email' => 'bukan-email']))
+        ->assertSessionHasErrors('email');
+
+    expect(parkir_users::count())->toBe(0);
+});
+
+test('the admin profile editor saves a new email', function () {
+    $admin  = createVerificationAdmin();
+    $worker = createVerificationAccount();
+
+    $this->withSession(['auth_user' => verificationSession($admin)])
+        ->put(route('pengguna.profile', $worker->id_user), [
+            'username'     => 'petugasuji',
+            'nama_lengkap' => 'Petugas Uji',
+            'email'        => 'baru@contoh.test',
+        ])
+        ->assertRedirect(route('pengguna.index'));
+
+    expect($worker->fresh()->email)->toBe('baru@contoh.test');
 });

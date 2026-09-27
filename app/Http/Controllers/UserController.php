@@ -35,6 +35,7 @@ class UserController extends Controller
                 $query->where(fn ($w) => $w
                     ->where('username', 'like', "%{$q}%")
                     ->orWhere('nama_lengkap', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%")
                     ->orWhere('role', 'like', "%{$q}%"));
             })
             ->orderBy($sort, $dir)
@@ -197,10 +198,14 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'username'     => 'required|string|min:3|max:255|unique:tb_user,username,' . $target->id_user . ',id_user',
             'nama_lengkap' => 'required|string|max:255',
+            'email'        => 'required|email|max:255|unique:tb_user,email,' . $target->id_user . ',id_user',
         ], [
             'username.required' => 'Username wajib diisi.',
             'username.min'      => 'Username minimal 3 karakter.',
             'username.unique'   => 'Username sudah digunakan.',
+            'email.required'    => 'Email wajib diisi.',
+            'email.email'       => 'Format email tidak valid.',
+            'email.unique'      => 'Email sudah digunakan.',
             'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
         ]);
 
@@ -212,6 +217,7 @@ class UserController extends Controller
         $target->update([
             'username'     => $request->username,
             'nama_lengkap' => $request->nama_lengkap,
+            'email'        => $request->email,
         ]);
 
         $this->log($request, 'Mengubah profil akun ' . $old . ' menjadi ' . $request->username);

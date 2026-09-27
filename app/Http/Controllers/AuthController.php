@@ -84,6 +84,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'nama_lengkap' => 'required|string|max:255',
+            'email'        => 'required|email|max:255|unique:tb_user,email',
             'username'     => 'required|string|min:3|max:255|unique:tb_user,username',
             'password'     => 'required|string|min:8|confirmed',
         ]);
@@ -98,11 +99,12 @@ class AuthController extends Controller
         // Self-registration always creates a petugas account that stays 'menunggu'
         // until an admin approves it; admin/owner roles are granted via /api/users.
         $user = parkir_users::create([
-            'nama_lengkap'     => $request->nama_lengkap,
-            'username'         => $request->username,
-            'password'         => Hash::make($request->password),
-            'role'             => 'petugas',
-            'status_aktif'     => 1,
+            'nama_lengkap'       => $request->nama_lengkap,
+            'email'              => $request->email,
+            'username'           => $request->username,
+            'password'           => Hash::make($request->password),
+            'role'               => 'petugas',
+            'status_aktif'       => 1,
             'status_verifikasi' => 'menunggu',
         ]);
 
@@ -204,10 +206,14 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'nama_lengkap' => 'required|string|max:255',
+            'email'        => 'required|email|max:255|unique:tb_user,email',
             'username'     => 'required|string|min:3|max:255|unique:tb_user,username',
             'password'     => 'required|string|min:8|confirmed',
         ], [
             'nama_lengkap.required' => 'Nama lengkap wajib diisi.',
+            'email.required'        => 'Email wajib diisi.',
+            'email.email'           => 'Format email tidak valid.',
+            'email.unique'          => 'Email sudah digunakan.',
             'username.required'     => 'Username wajib diisi.',
             'username.min'          => 'Username minimal 3 karakter.',
             'username.unique'       => 'Username sudah digunakan.',
@@ -221,11 +227,12 @@ class AuthController extends Controller
         }
 
         $user = parkir_users::create([
-            'nama_lengkap'     => $request->nama_lengkap,
-            'username'         => $request->username,
-            'password'         => Hash::make($request->password),
-            'role'             => 'petugas',
-            'status_aktif'     => 1,
+            'nama_lengkap'       => $request->nama_lengkap,
+            'email'              => $request->email,
+            'username'           => $request->username,
+            'password'           => Hash::make($request->password),
+            'role'               => 'petugas',
+            'status_aktif'       => 1,
             'status_verifikasi' => 'menunggu',
         ]);
 

@@ -29,6 +29,7 @@ class UsersController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'nama_lengkap' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:tb_user,email',
             'username' => 'required|string|min:3|max:255|unique:tb_user,username',
             'password' => 'required|string|min:8',
             'role' => 'required|in:admin,user',
@@ -90,6 +91,7 @@ class UsersController extends Controller
 
         $validator = Validator::make($request->all(), [
             'nama_lengkap' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|max:255|unique:tb_user,email,' . $id . ',id_user',
             'username' => 'sometimes|string|min:3|max:255|unique:tb_user,username,' . $id . ',id_user',
             'password' => 'sometimes|string|min:8',
             'role' => 'sometimes|in:admin,user',
