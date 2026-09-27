@@ -41,11 +41,16 @@
                     ['/area',      'Area',      'area'],
                     ['/reservasi', 'Reservasi', 'reservasi'],
                 ];
+                $publicNav = $nav;
 
                 if (session('auth_user')) {
                     $role = session('auth_user.role');
+                    $verifikasi = session('auth_user.status_verifikasi');
 
-                    if ($role === 'admin') {
+                    if ($verifikasi !== null && $verifikasi !== 'diterima') {
+                        // Unverified accounts keep the public links until an admin approves them.
+                        $nav = $publicNav;
+                    } elseif ($role === 'admin') {
                         // Admin panel: accounts + logs only — no parking data.
                         $nav = [
                             ['/',      'Beranda', ''],

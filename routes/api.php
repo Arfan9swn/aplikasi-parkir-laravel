@@ -14,7 +14,7 @@ Route::post('/logout', [AuthController::class, 'logout']);
 
 Route::apiResource('areas', AreasController::class)->only(['index', 'show']);
 
-Route::middleware('role:admin,petugas')->group(function () {
+Route::middleware(['verified.web', 'role:admin,petugas'])->group(function () {
     Route::apiResource('areas', AreasController::class)->only(['store', 'update', 'destroy']);
 });
 
@@ -27,5 +27,5 @@ Route::apiResources([
 ]);
 
 Route::get('/system-logs', [LogsController::class, 'systemLog'])
-    ->middleware('role:admin,owner');
+    ->middleware(['verified.web', 'role:admin,owner']);
 ?>

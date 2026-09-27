@@ -40,12 +40,15 @@ class UserController extends Controller
             ->orderBy($sort, $dir)
             ->get();
 
+        $pendingCount = parkir_users::where('status_verifikasi', 'menunggu')->count();
+
         return view('users.index', [
-            'users'     => $users,
-            'q'         => $q,
-            'sortKey'   => $sort . ' ' . $dir,
-            'me'        => $me,
-            'actorRole' => session('auth_user.role'),
+            'users'        => $users,
+            'q'            => $q,
+            'sortKey'      => $sort . ' ' . $dir,
+            'me'           => $me,
+            'actorRole'    => session('auth_user.role'),
+            'pendingCount' => $pendingCount,
         ]);
     }
 
@@ -253,6 +256,61 @@ class UserController extends Controller
         $this->log($request, 'Mengatur ulang password akun ' . $target->username);
 
         return redirect()->route('pengguna.index')->with('success', 'Password ' . $target->username . ' diperbarui.');
+    }
+
+    /**
+     * Approve or reject a self-registered petugas account. Approval moves
+     * status_verifikasi to diterima, which is what opens the worker panel.
+     */
+    public function verifikasi(Request $request, string $id)
+    {
+        $actor  = $this->authorizeAdmin();
+        $target = parkir_users::find($id);
+
+        if (! $target) {
+            return redirect()->route('pengguna.index')->with('error', 'Pengguna tidak ditemukan.');
+        }
+
+        if ((int) $target->id_user === (int) $actor['id_user']) {
+            return redirect()->route('pengguna.index')->with('error', 'Anda tidak dapat memverifikasi akun sendiri.');
+        }
+
+        if ($target->role !== 'petugas') {
+            return redirect()->route('pengguna.index')->with('error', 'Hanya akun petugas hasil pendaftaran sendiri yang bisa diverifikasi.');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'aksi' => 'required|in:terima,tolak',
+        ], [
+            'aksi.required' => 'Aksi verifikasi wajib dipilih.',
+            'aksi.in'       => 'Aksi verifikasi hanya boleh terima atau tolak.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('pengguna.index')->withErrors($validator);
+        }
+
+        if ($request->aksi === 'terima') {
+            if ($target->status_verifikasi === 'diterima') {
+                return redirect()->route('pengguna.index')->with('error', 'Akun ' . $target->username . ' sudah disetujui sebelumnya.');
+            }
+
+            $target->update(['status_verifikasi' => 'diterima']);
+
+            $this->log($request, 'Menyetujui pendaftaran akun ' . $target->username);
+
+            return redirect()->route('pengguna.index')->with('success', 'Pendaftaran ' . $target->username . ' disetujui. Akun ini sekarang bisa dipakai masuk panel.');
+        }
+
+        if ($target->status_verifikasi !== 'menunggu') {
+            return redirect()->route('pengguna.index')->with('error', 'Hanya akun berstatus menunggu yang bisa ditolak.');
+        }
+
+        $target->update(['status_verifikasi' => 'ditolak']);
+
+        $this->log($request, 'Menolak pendaftaran akun ' . $target->username);
+
+        return redirect()->route('pengguna.index')->with('success', 'Pendaftaran ' . $target->username . ' ditolak. Akun ini tidak bisa dipakai masuk panel.');
     }
 
     private function authorizeAdmin(): array

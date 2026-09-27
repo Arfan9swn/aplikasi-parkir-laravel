@@ -7,7 +7,7 @@
     <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
             <h1 class="font-display text-2xl font-bold text-ink">Manajemen Akun</h1>
-            <p class="mt-1 text-sm text-slate-600">Kelola role, username, dan password seluruh pengguna aplikasi.</p>
+            <p class="mt-1 text-sm text-slate-600">Setujui pendaftaran baru, lalu kelola role, username, dan password seluruh pengguna aplikasi.</p>
         </div>
         <form method="GET" action="{{ url('/users') }}" class="flex items-center gap-3">
             <input name="q" type="text" value="{{ $q }}" placeholder="Cari username, nama, atau role…" class="field w-64" />
@@ -16,6 +16,12 @@
     </div>
 
     <p class="num mt-4 text-xs text-slate-600">{{ $users->count() }} akun</p>
+
+    @if ($pendingCount > 0)
+        <p class="notice mt-3">
+            {{ $pendingCount }} akun menunggu persetujuan dari halaman Daftar. Setujui atau tolak lewat kolom Aksi.
+        </p>
+    @endif
 
     <div class="sheet mt-3 overflow-hidden">
         <div class="overflow-x-auto">
@@ -39,6 +45,11 @@
                                     $canTouch = $actorRole === 'owner' || $u->role === 'petugas';
                                 @endphp
                                 <span class="state">{{ $u->role }}</span>
+                                @if ($u->status_verifikasi === 'menunggu')
+                                    <span class="state ml-1 bg-amber-100 text-amber-800">menunggu verifikasi</span>
+                                @elseif ($u->status_verifikasi === 'ditolak')
+                                    <span class="state ml-1 bg-red-100 text-red-700">ditolak</span>
+                                @endif
                                 @if ((int) $u->status_aktif !== 1)
                                     <span class="state ml-1 bg-red-100 text-red-700">nonaktif</span>
                                 @endif
@@ -70,6 +81,33 @@
                                     </div>
                                 @elseif ($canTouch)
                                     <div class="flex flex-wrap items-center gap-2">
+                                        @if ($u->status_verifikasi === 'menunggu')
+                                            <form method="POST" action="{{ route('pengguna.verifikasi', $u->id_user) }}" class="m-0"
+                                                  onsubmit="return confirm('Setujui pendaftaran {{ $u->username }} sebagai petugas?')">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="aksi" value="terima" />
+                                                <button type="submit" class="btn btn-primary"
+                                                        data-tooltip="Setujui akun {{ $u->username }} sebagai petugas">Terima</button>
+                                            </form>
+                                            <form method="POST" action="{{ route('pengguna.verifikasi', $u->id_user) }}" class="m-0"
+                                                  onsubmit="return confirm('Tolak pendaftaran {{ $u->username }}? Akun ini tidak akan bisa dipakai sebagai petugas.')">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="aksi" value="tolak" />
+                                                <button type="submit" class="btn btn-danger"
+                                                        data-tooltip="Tolak pendaftaran {{ $u->username }}">Tolak</button>
+                                            </form>
+                                        @elseif ($u->status_verifikasi === 'ditolak')
+                                            <form method="POST" action="{{ route('pengguna.verifikasi', $u->id_user) }}" class="m-0"
+                                                  onsubmit="return confirm('Setujui ulang pendaftaran {{ $u->username }}?')">
+                                                @csrf
+                                                @method('PUT')
+                                                <input type="hidden" name="aksi" value="terima" />
+                                                <button type="submit" class="btn btn-quiet"
+                                                        data-tooltip="Setujui pendaftaran {{ $u->username }} yang sebelumnya ditolak">Setujui</button>
+                                            </form>
+                                        @endif
                                         <form method="POST" action="{{ route('pengguna.role', $u->id_user) }}" class="m-0 flex items-center gap-1.5">
                                             @csrf
                                             @method('PUT')
@@ -136,7 +174,7 @@
                                     @if ($q !== '')
                                         Tidak ada akun yang cocok dengan kata kunci ini. Coba username, nama, atau role lain.
                                     @else
-                                        Tidak ada akun ditemukan. Akun daftar sendiri lewat halaman Daftar, dan role diatur dari tabel ini.
+                                        Tidak ada akun ditemukan. Akun daftar sendiri lewat halaman Daftar, lalu disetujui dan dikelola dari tabel ini.
                                     @endif
                                 </p>
                             </td>

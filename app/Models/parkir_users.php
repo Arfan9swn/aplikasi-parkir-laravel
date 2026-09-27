@@ -16,12 +16,18 @@ class parkir_users extends Model
         'username',
         'password',
         'role',
-        'status_aktif'
+        'status_aktif',
+        'status_verifikasi'
     ];
 
     protected $hidden = [
         'password'
     ];
+
+    public function isVerified(): bool
+    {
+        return $this->status_verifikasi === 'diterima';
+    }
 
     public function kendaraan(): HasMany
     {
