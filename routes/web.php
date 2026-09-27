@@ -59,7 +59,15 @@ Route::post('/logout', [AuthController::class, 'logoutWeb'])->name('logout');
 | Staff — requires a logged-in session
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth.web')->group(function () {
+/*
+| Waiting room for accounts an admin has not approved yet. It only needs the
+| login gate; the controller forwards approved users straight to beranda.
+*/
+Route::get('/verifikasi', [AuthController::class, 'verifikasiMenunggu'])
+    ->middleware('auth.web')
+    ->name('verifikasi.menunggu');
+
+Route::middleware(['auth.web', 'verified.web'])->group(function () {
     Route::middleware('role:petugas,owner')->group(function () {
         Route::get('/masuk', [MasukController::class, 'create'])->name('ticket.masuk');
         Route::post('/masuk', [MasukController::class, 'store']);
@@ -105,7 +113,8 @@ Route::middleware('auth.web')->group(function () {
     });
 
     /*
-    | Admin panel — role admin manages accounts only (plus the system logs).
+    | Admin panel — role admin manages accounts only (plus the system logs),
+    | including approving or rejecting new self-registered accounts.
     */
     Route::middleware('role:admin')->group(function () {
         // Named pengguna.* to avoid clashing with the api/users resource names.
@@ -113,6 +122,7 @@ Route::middleware('auth.web')->group(function () {
         Route::put('/users/{user}/role', [UserController::class, 'updateRole'])->whereNumber('user')->name('pengguna.role');
         Route::put('/users/{user}/password', [UserController::class, 'updatePassword'])->whereNumber('user')->name('pengguna.password');
         Route::put('/users/{user}/profile', [UserController::class, 'updateProfile'])->whereNumber('user')->name('pengguna.profile');
+        Route::put('/users/{user}/verifikasi', [UserController::class, 'verifikasi'])->whereNumber('user')->name('pengguna.verifikasi');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->whereNumber('user')->name('pengguna.destroy');
         Route::put('/users/ownership', [UserController::class, 'transferOwnership'])->name('pengguna.ownership');
     });

@@ -47,10 +47,11 @@ class AuthController extends Controller
         }
 
         $request->session()->put(self::SESSION_KEY, [
-            'id_user'  => $user->id_user,
-            'nama'     => $user->nama_lengkap,
-            'username' => $user->username,
-            'role'     => $user->role,
+            'id_user'           => $user->id_user,
+            'nama'              => $user->nama_lengkap,
+            'username'          => $user->username,
+            'role'              => $user->role,
+            'status_verifikasi' => $user->status_verifikasi,
         ]);
 
         $this->logActivity($user, 'Login ke sistem.');
@@ -75,7 +76,8 @@ class AuthController extends Controller
     }
 
     /**
-     * Register a new staff (petugas) account and sign them in.
+     * Register a new staff (petugas) account and sign them in. The account
+     * stays 'menunggu' until an admin approves it.
      * POST /api/register
      */
     public function register(Request $request)
@@ -93,31 +95,33 @@ class AuthController extends Controller
             ], 422);
         }
 
-        // Self-registration always creates an active staff account —
-        // admin/owner roles can only be granted by an admin via /api/users.
+        // Self-registration always creates a petugas account that stays 'menunggu'
+        // until an admin approves it; admin/owner roles are granted via /api/users.
         $user = parkir_users::create([
-            'nama_lengkap' => $request->nama_lengkap,
-            'username'     => $request->username,
-            'password'     => Hash::make($request->password),
-            'role'         => 'petugas',
-            'status_aktif' => 1,
+            'nama_lengkap'     => $request->nama_lengkap,
+            'username'         => $request->username,
+            'password'         => Hash::make($request->password),
+            'role'             => 'petugas',
+            'status_aktif'     => 1,
+            'status_verifikasi' => 'menunggu',
         ]);
 
         $this->logActivity($user, 'Registrasi akun baru');
 
         // auto-login right after registering
         $request->session()->put(self::SESSION_KEY, [
-            'id_user'  => $user->id_user,
-            'nama'     => $user->nama_lengkap,
-            'username' => $user->username,
-            'role'     => $user->role,
+            'id_user'           => $user->id_user,
+            'nama'              => $user->nama_lengkap,
+            'username'          => $user->username,
+            'role'              => $user->role,
+            'status_verifikasi' => $user->status_verifikasi,
         ]);
 
         $this->logActivity($user, 'Login ke sistem.');
 
         return response()->json([
             'success' => true,
-            'message' => 'Registrasi berhasil. Selamat datang, ' . $user->nama_lengkap . '!',
+            'message' => 'Registrasi berhasil. Akun Anda menunggu persetujuan admin sebelum panel petugas bisa dibuka.',
             'data'    => $request->session()->get(self::SESSION_KEY)
         ], 201);
     }
@@ -176,13 +180,18 @@ class AuthController extends Controller
         }
 
         $request->session()->put(self::SESSION_KEY, [
-            'id_user'  => $user->id_user,
-            'nama'     => $user->nama_lengkap,
-            'username' => $user->username,
-            'role'     => $user->role,
+            'id_user'           => $user->id_user,
+            'nama'              => $user->nama_lengkap,
+            'username'          => $user->username,
+            'role'              => $user->role,
+            'status_verifikasi' => $user->status_verifikasi,
         ]);
 
         $this->logActivity($user, 'Login ke sistem.');
+
+        if (! $user->isVerified()) {
+            return redirect()->route('verifikasi.menunggu');
+        }
 
         return redirect()->route('beranda');
     }
@@ -212,25 +221,55 @@ class AuthController extends Controller
         }
 
         $user = parkir_users::create([
-            'nama_lengkap' => $request->nama_lengkap,
-            'username'     => $request->username,
-            'password'     => Hash::make($request->password),
-            'role'         => 'petugas',
-            'status_aktif' => 1,
+            'nama_lengkap'     => $request->nama_lengkap,
+            'username'         => $request->username,
+            'password'         => Hash::make($request->password),
+            'role'             => 'petugas',
+            'status_aktif'     => 1,
+            'status_verifikasi' => 'menunggu',
         ]);
 
         $this->logActivity($user, 'Registrasi akun baru');
 
         $request->session()->put(self::SESSION_KEY, [
-            'id_user'  => $user->id_user,
-            'nama'     => $user->nama_lengkap,
-            'username' => $user->username,
-            'role'     => $user->role,
+            'id_user'           => $user->id_user,
+            'nama'              => $user->nama_lengkap,
+            'username'          => $user->username,
+            'role'              => $user->role,
+            'status_verifikasi' => $user->status_verifikasi,
         ]);
 
         $this->logActivity($user, 'Login ke sistem.');
 
-        return redirect()->route('beranda');
+        return redirect()->route('verifikasi.menunggu')
+            ->with('success', 'Pendaftaran berhasil. Akun Anda menunggu persetujuan admin.');
+    }
+
+    /**
+     * Waiting room for accounts an admin has not approved yet. Approved accounts
+     * are forwarded to beranda, so reloading doubles as a status check.
+     * GET /verifikasi
+     */
+    public function verifikasiMenunggu(Request $request)
+    {
+        $sessionUser = $request->session()->get(self::SESSION_KEY);
+
+        $user = parkir_users::find($sessionUser['id_user'] ?? null);
+
+        if (! $user) {
+            $request->session()->forget(self::SESSION_KEY);
+
+            return redirect()->route('login');
+        }
+
+        $request->session()->put(self::SESSION_KEY . '.status_verifikasi', $user->status_verifikasi);
+
+        if ($user->isVerified()) {
+            return redirect()->route('beranda')
+                ->with('success', 'Akun Anda sudah disetujui admin dan siap digunakan.');
+        }
+
+        return view('auth.verifikasi', ['user' => $user]);
     }
 
     private function flushSession(Request $request): void
