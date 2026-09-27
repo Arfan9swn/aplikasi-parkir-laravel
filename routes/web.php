@@ -50,7 +50,7 @@ Route::get('/registrasi', function () {
     return view('auth.register');
 })->name('register');
 
-Route::post('/registrasi', [AuthController::class, 'registerWeb']);
+Route::post('/registrasi', [AuthController::class, 'registerWeb'])->middleware('throttle:5,1');
 
 Route::post('/logout', [AuthController::class, 'logoutWeb'])->name('logout');
 
@@ -66,6 +66,12 @@ Route::post('/logout', [AuthController::class, 'logoutWeb'])->name('logout');
 Route::get('/verifikasi', [AuthController::class, 'verifikasiMenunggu'])
     ->middleware('auth.web')
     ->name('verifikasi.menunggu');
+Route::post('/verifikasi/otp', [AuthController::class, 'verifyEmailOtp'])
+    ->middleware(['auth.web', 'throttle:6,1'])
+    ->name('verifikasi.otp');
+Route::post('/verifikasi/otp/kirim-ulang', [AuthController::class, 'resendEmailOtp'])
+    ->middleware(['auth.web', 'throttle:3,1'])
+    ->name('verifikasi.otp.resend');
 
 Route::middleware(['auth.web', 'verified.web'])->group(function () {
     Route::middleware('role:petugas,owner')->group(function () {

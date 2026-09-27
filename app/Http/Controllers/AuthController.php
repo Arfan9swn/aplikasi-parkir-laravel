@@ -109,6 +109,7 @@ class AuthController extends Controller
         ]);
 
         $this->logActivity($user, 'Registrasi akun baru');
+        $user->issueEmailOtp();
 
         // auto-login right after registering
         $request->session()->put(self::SESSION_KEY, [
@@ -123,7 +124,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Registrasi berhasil. Akun Anda menunggu persetujuan admin sebelum panel petugas bisa dibuka.',
+            'message' => 'Registrasi berhasil. Kode verifikasi dikirim ke email Anda dan akun menunggu persetujuan admin.',
             'data'    => $request->session()->get(self::SESSION_KEY)
         ], 201);
     }
@@ -237,6 +238,7 @@ class AuthController extends Controller
         ]);
 
         $this->logActivity($user, 'Registrasi akun baru');
+        $user->issueEmailOtp();
 
         $request->session()->put(self::SESSION_KEY, [
             'id_user'           => $user->id_user,
@@ -249,7 +251,7 @@ class AuthController extends Controller
         $this->logActivity($user, 'Login ke sistem.');
 
         return redirect()->route('verifikasi.menunggu')
-            ->with('success', 'Pendaftaran berhasil. Akun Anda menunggu persetujuan admin.');
+            ->with('success', 'Pendaftaran berhasil. Kode verifikasi 6 digit sudah dikirim ke email Anda.');
     }
 
     /**
@@ -277,6 +279,92 @@ class AuthController extends Controller
         }
 
         return view('auth.verifikasi', ['user' => $user]);
+    }
+
+    /**
+     * Check the 6-digit OTP against the stored hash. Success marks the email
+     * verified; the admin gate is still required afterwards.
+     * POST /verifikasi/otp
+     */
+    public function verifyEmailOtp(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'otp' => ['required', 'string', 'regex:/^[0-9]{6}$/'],
+        ], [
+            'otp.required' => 'Kode verifikasi wajib diisi.',
+            'otp.regex'    => 'Kode verifikasi harus 6 angka.',
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator);
+        }
+
+        $user = $this->currentUser($request);
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        if ($user->status_verifikasi === 'ditolak') {
+            return redirect()->route('verifikasi.menunggu')
+                ->with('error', 'Pendaftaran akun ini ditolak, kode verifikasi tidak berlaku lagi.');
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return redirect()->route('verifikasi.menunggu')
+                ->with('success', 'Email sudah terverifikasi. Tinggal menunggu persetujuan admin.');
+        }
+
+        if (! $user->otp_code || ! $user->otp_expires_at || $user->otp_expires_at->isPast()) {
+            return back()->withErrors(['otp' => 'Kode sudah kedaluwarsa. Minta kode baru lewat tombol Kirim Ulang.']);
+        }
+
+        if (! Hash::check($request->otp, $user->otp_code)) {
+            return back()->withErrors(['otp' => 'Kode tidak valid. Periksa lagi email Anda.']);
+        }
+
+        $user->forceFill([
+            'email_verified_at' => now(),
+            'otp_code'          => null,
+            'otp_expires_at'    => null,
+        ])->save();
+
+        $this->logActivity($user, 'Memverifikasi email ' . $user->email);
+
+        return redirect()->route('verifikasi.menunggu')
+            ->with('success', 'Email terverifikasi. Tinggal menunggu persetujuan admin.');
+    }
+
+    /**
+     * Rotate and resend the OTP; the previous code stops working.
+     * POST /verifikasi/otp/kirim-ulang
+     */
+    public function resendEmailOtp(Request $request)
+    {
+        $user = $this->currentUser($request);
+
+        if (! $user) {
+            return redirect()->route('login');
+        }
+
+        if ($user->status_verifikasi === 'ditolak') {
+            return back()->with('error', 'Pendaftaran akun ini sudah ditolak admin.');
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return back()->with('success', 'Email sudah terverifikasi, kode baru tidak diperlukan.');
+        }
+
+        $user->issueEmailOtp();
+
+        return back()->with('success', 'Kode baru dikirim ke ' . $user->email . '. Kode sebelumnya tidak berlaku lagi.');
+    }
+
+    private function currentUser(Request $request): ?parkir_users
+    {
+        $sessionUser = $request->session()->get(self::SESSION_KEY);
+
+        return parkir_users::find($sessionUser['id_user'] ?? null);
     }
 
     private function flushSession(Request $request): void

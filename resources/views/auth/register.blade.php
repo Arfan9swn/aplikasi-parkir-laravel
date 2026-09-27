@@ -69,10 +69,9 @@
                 <a href="{{ route('login') }}" class="font-semibold text-primary-600 hover:underline">Masuk</a>
             </p>
 
-            {{-- A note with a rule, not a card: it explains one thing about this form. --}}
             <div class="mt-4 border-t border-rule pt-3 text-xs text-slate-600">
                 <p class="font-display font-bold uppercase tracking-wide">Info</p>
-                <p class="mt-1">Akun yang didaftarkan di halaman ini otomatis berperan sebagai <span class="font-semibold text-primary-700">petugas</span> dengan status <span class="state bg-amber-100 text-amber-800">menunggu</span>. Admin menyetujui atau menolak pendaftaran lewat menu Akun. Role admin hanya bisa diberikan oleh admin.</p>
+                <p class="mt-1">Akun yang didaftarkan di halaman ini otomatis berperan sebagai <span class="font-semibold text-primary-700">petugas</span> dengan status <span class="state bg-amber-100 text-amber-800">menunggu</span>. Anda menerima kode verifikasi lewat email, lalu admin menyetujui atau menolak pendaftaran lewat menu Akun. Role admin hanya bisa diberikan oleh admin.</p>
             </div>
         </div>
     </div>

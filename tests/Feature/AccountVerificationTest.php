@@ -19,8 +19,17 @@ function createVerificationAccount(array $overrides = []): parkir_users
     ], $overrides);
 
     $data['email'] ??= $data['username'] . '@uji.test';
+    $verified = $data['email_verified'] ?? true;
+    unset($data['email_verified']);
 
-    return parkir_users::create($data);
+    $user = parkir_users::create($data);
+
+    // Verified by default so non-OTP tests isolate the admin gate; OTP tests override.
+    if ($verified) {
+        $user->forceFill(['email_verified_at' => now()])->save();
+    }
+
+    return $user;
 }
 
 function createVerificationAdmin(): parkir_users

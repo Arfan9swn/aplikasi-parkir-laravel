@@ -213,16 +213,29 @@ class UserController extends Controller
             return redirect()->route('pengguna.index')->withErrors($validator);
         }
 
-        $old = $target->username;
+        $old          = $target->username;
+        $emailChanged = $target->email !== $request->email;
         $target->update([
             'username'     => $request->username,
             'nama_lengkap' => $request->nama_lengkap,
             'email'        => $request->email,
         ]);
 
+        if ($emailChanged) {
+            $target->forceFill(['email_verified_at' => null])->save();
+
+            if ($target->status_verifikasi !== 'diterima') {
+                $target->issueEmailOtp();
+            }
+        }
+
         $this->log($request, 'Mengubah profil akun ' . $old . ' menjadi ' . $request->username);
 
-        return redirect()->route('pengguna.index')->with('success', 'Profil akun diperbarui.');
+        $message = $emailChanged && $target->status_verifikasi !== 'diterima'
+            ? 'Profil akun diperbarui. Kode verifikasi baru dikirim ke email tersebut.'
+            : 'Profil akun diperbarui.';
+
+        return redirect()->route('pengguna.index')->with('success', $message);
     }
 
     /**
@@ -297,6 +310,10 @@ class UserController extends Controller
         }
 
         if ($request->aksi === 'terima') {
+            if (! $target->hasVerifiedEmail()) {
+                return redirect()->route('pengguna.index')->with('error', 'Email ' . $target->username . ' belum diverifikasi. Minta pengguna memasukkan kode OTP dulu sebelum disetujui.');
+            }
+
             if ($target->status_verifikasi === 'diterima') {
                 return redirect()->route('pengguna.index')->with('error', 'Akun ' . $target->username . ' sudah disetujui sebelumnya.');
             }

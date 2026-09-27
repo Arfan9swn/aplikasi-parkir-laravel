@@ -107,11 +107,17 @@ class UsersController extends Controller
 
         $data = $request->all();
 
+        $emailChanged = $request->has('email') && $user->email !== $request->email;
+
         if ($request->has('password')) {
             $data['password'] = Hash::make($request->password);
         }
 
         $user->update($data);
+
+        if ($emailChanged) {
+            $user->forceFill(['email_verified_at' => null])->save();
+        }
 
         return response()->json([
             'success' => true,

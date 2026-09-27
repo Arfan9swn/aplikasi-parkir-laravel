@@ -53,6 +53,9 @@
                                 @elseif ($u->status_verifikasi === 'ditolak')
                                     <span class="state ml-1 bg-red-100 text-red-700">ditolak</span>
                                 @endif
+                                @if ($u->status_verifikasi !== 'diterima' && ! $u->email_verified_at)
+                                    <span class="state ml-1 bg-amber-100 text-amber-800">email belum terverifikasi</span>
+                                @endif
                                 @if ((int) $u->status_aktif !== 1)
                                     <span class="state ml-1 bg-red-100 text-red-700">nonaktif</span>
                                 @endif
@@ -85,14 +88,16 @@
                                 @elseif ($canTouch)
                                     <div class="flex flex-wrap items-center gap-2">
                                         @if ($u->status_verifikasi === 'menunggu')
-                                            <form method="POST" action="{{ route('pengguna.verifikasi', $u->id_user) }}" class="m-0"
-                                                  onsubmit="return confirm('Setujui pendaftaran {{ $u->username }} sebagai petugas?')">
-                                                @csrf
-                                                @method('PUT')
-                                                <input type="hidden" name="aksi" value="terima" />
-                                                <button type="submit" class="btn btn-primary"
-                                                        data-tooltip="Setujui akun {{ $u->username }} sebagai petugas">Terima</button>
-                                            </form>
+                                            @if ($u->email_verified_at)
+                                                <form method="POST" action="{{ route('pengguna.verifikasi', $u->id_user) }}" class="m-0"
+                                                      onsubmit="return confirm('Setujui pendaftaran {{ $u->username }} sebagai petugas?')">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <input type="hidden" name="aksi" value="terima" />
+                                                    <button type="submit" class="btn btn-primary"
+                                                            data-tooltip="Setujui akun {{ $u->username }} sebagai petugas">Terima</button>
+                                                </form>
+                                            @endif
                                             <form method="POST" action="{{ route('pengguna.verifikasi', $u->id_user) }}" class="m-0"
                                                   onsubmit="return confirm('Tolak pendaftaran {{ $u->username }}? Akun ini tidak akan bisa dipakai sebagai petugas.')">
                                                 @csrf
@@ -102,14 +107,16 @@
                                                         data-tooltip="Tolak pendaftaran {{ $u->username }}">Tolak</button>
                                             </form>
                                         @elseif ($u->status_verifikasi === 'ditolak')
-                                            <form method="POST" action="{{ route('pengguna.verifikasi', $u->id_user) }}" class="m-0"
-                                                  onsubmit="return confirm('Setujui ulang pendaftaran {{ $u->username }}?')">
-                                                @csrf
-                                                @method('PUT')
-                                                <input type="hidden" name="aksi" value="terima" />
-                                                <button type="submit" class="btn btn-quiet"
-                                                        data-tooltip="Setujui pendaftaran {{ $u->username }} yang sebelumnya ditolak">Setujui</button>
-                                            </form>
+                                            @if ($u->email_verified_at)
+                                                <form method="POST" action="{{ route('pengguna.verifikasi', $u->id_user) }}" class="m-0"
+                                                      onsubmit="return confirm('Setujui ulang pendaftaran {{ $u->username }}?')">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <input type="hidden" name="aksi" value="terima" />
+                                                    <button type="submit" class="btn btn-quiet"
+                                                            data-tooltip="Setujui pendaftaran {{ $u->username }} yang sebelumnya ditolak">Setujui</button>
+                                                </form>
+                                            @endif
                                         @endif
                                         <form method="POST" action="{{ route('pengguna.role', $u->id_user) }}" class="m-0 flex items-center gap-1.5">
                                             @csrf
